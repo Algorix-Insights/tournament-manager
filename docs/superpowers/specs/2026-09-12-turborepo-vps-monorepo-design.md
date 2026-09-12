@@ -33,8 +33,8 @@ The root becomes a private npm workspace using `apps/*`. It owns the single lock
 ├── docs/
 │   └── deployment.md
 ├── .github/workflows/
-│   ├── ci.yml
-│   └── deploy.yml
+│   ├── validate-monorepo.yml
+│   └── deploy-production-vps.yml
 ├── package.json
 ├── package-lock.json
 └── turbo.json
@@ -81,7 +81,7 @@ MySQL stores data in a named Docker volume. Before applying a deployment migrati
 
 ## Continuous integration
 
-`.github/workflows/ci.yml` runs for pull requests and pushes to `develop` and `main`:
+`.github/workflows/validate-monorepo.yml`, displayed in GitHub as **Validate affected API and web workspaces**, runs for pull requests and pushes to `develop` and `main`. Its verification job is displayed as **Lint, test, and build affected workspaces**:
 
 1. Check out full Git history so `--affected` can compare the correct base.
 2. Install Node.js 24 and restore npm's download cache using the root lockfile.
@@ -103,7 +103,7 @@ TLS termination is owned by the VPS edge proxy or host-level certificate setup a
 
 ## Continuous deployment
 
-`.github/workflows/deploy.yml` runs only after CI succeeds for `main`:
+`.github/workflows/deploy-production-vps.yml`, displayed in GitHub as **Deploy Tournament Manager to production VPS**, runs only after the validation workflow succeeds for `main`. Its jobs and steps use outcome-oriented names such as **Build and publish application images**, **Back up production MySQL**, **Apply Prisma migrations**, **Start production services**, and **Verify production health**:
 
 1. Build immutable API and web images from the approved commit.
 2. Tag both images with the commit SHA and publish them to GitHub Container Registry using `GITHUB_TOKEN` with package-write permission.
