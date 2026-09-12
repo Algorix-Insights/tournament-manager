@@ -1,13 +1,13 @@
 export function parseOrderBy(
-  ordenParam?: string,
+  orderParam?: string,
   fieldMapping?: Record<string, string | Record<string, string>>,
   defaultOrderBy?: any
 ): any {
-  if (!ordenParam || typeof ordenParam !== 'string' || !ordenParam.trim()) {
+  if (!orderParam || typeof orderParam !== 'string' || !orderParam.trim()) {
     return defaultOrderBy;
   }
 
-  const trimmed = ordenParam.trim();
+  const trimmed = orderParam.trim();
   const isDesc = trimmed.startsWith('-');
   const fieldName = isDesc ? trimmed.substring(1) : trimmed;
 
