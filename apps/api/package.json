@@ -5,8 +5,11 @@
   "main": "dist/server.js",
   "scripts": {
     "build": "tsc",
+    "dev": "tsx src/server.ts",
     "start": "npm run build && node dist/server.js",
     "seed": "npx tsx prisma/seed.ts",
+    "prisma:generate": "prisma generate",
+    "prisma:deploy": "prisma migrate deploy",
     "test": "jest"
   },
   "prisma": {
