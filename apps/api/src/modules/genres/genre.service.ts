@@ -1,5 +1,6 @@
 import { prisma } from '../../core/prisma';
 import { CreateGenreDTO, GenreFilterDTO, UpdateGenreDTO } from './genre.types';
+import { parseOrderBy } from '../../core/utils/order-by.util';
 
 export class GenreService {
   static async getAll(filters?: GenreFilterDTO) {
@@ -9,11 +10,18 @@ export class GenreService {
       where.nombre = { contains: filters.nombre.trim() };
     }
 
+    const orderBy = parseOrderBy(
+      filters?.orden,
+      {
+        id: 'id',
+        nombre: 'nombre',
+      },
+      { nombre: 'asc' }
+    );
+
     return prisma.genero.findMany({
       where,
-      orderBy: {
-        nombre: 'asc',
-      },
+      orderBy,
       include: {
         _count: {
           select: { videojuegos: true },

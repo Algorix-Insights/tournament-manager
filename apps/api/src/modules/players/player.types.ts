@@ -17,4 +17,5 @@ export interface PlayerFilterDTO {
   periodo?: number;
   fechaInicio?: string;
   fechaFin?: string;
+  orden?: string;
 }

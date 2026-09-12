@@ -1,5 +1,6 @@
 import { prisma } from '../../core/prisma';
 import { CreateGameDTO, GameFilterDTO, UpdateGameDTO } from './game.types';
+import { parseOrderBy } from '../../core/utils/order-by.util';
 
 export class GameService {
   static async getAll(filters?: GameFilterDTO) {
@@ -19,14 +20,23 @@ export class GameService {
       };
     }
 
+    const orderBy = parseOrderBy(
+      filters?.orden,
+      {
+        id: 'id',
+        nombre: 'nombre',
+        generoId: 'generoId',
+        genero: { genero: 'nombre' },
+      },
+      { nombre: 'asc' }
+    );
+
     return prisma.videojuego.findMany({
       where,
       include: {
         genero: true,
       },
-      orderBy: {
-        nombre: 'asc',
-      },
+      orderBy,
     });
   }
 

@@ -4,11 +4,15 @@ import { GenreService } from './genre.service';
 export class GenreController {
   static async getAll(req: Request, res: Response): Promise<void> {
     try {
-      const { nombre } = req.query;
+      const { nombre, orden } = req.query;
       const filters: any = {};
 
       if (typeof nombre === 'string' && nombre.trim()) {
         filters.nombre = nombre.trim();
+      }
+
+      if (typeof orden === 'string' && orden.trim()) {
+        filters.orden = orden.trim();
       }
 
       const genres = await GenreService.getAll(filters);

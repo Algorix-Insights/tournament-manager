@@ -13,6 +13,7 @@ export interface RankingFilterDTO {
   periodo?: number;
   fechaInicio?: string;
   fechaFin?: string;
+  orden?: string;
 }
 
 export type ScoreFilterDTO = RankingFilterDTO;

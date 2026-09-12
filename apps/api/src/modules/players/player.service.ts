@@ -1,6 +1,7 @@
 import { prisma } from '../../core/prisma';
 import { CreatePlayerDTO, PlayerFilterDTO, UpdatePlayerDTO } from './player.types';
 import { buildDateFilter } from '../../core/utils/date-filter.util';
+import { parseOrderBy } from '../../core/utils/order-by.util';
 
 export class PlayerService {
   static async getAll(filters?: PlayerFilterDTO) {
@@ -23,6 +24,19 @@ export class PlayerService {
       where.fechaRegistro = dateRange;
     }
 
+    const orderBy = parseOrderBy(
+      filters?.orden,
+      {
+        id: 'id',
+        nombre: 'nombre',
+        gamertag: 'gamertag',
+        correo: 'correo',
+        fechaRegistro: 'fechaRegistro',
+        fecha: 'fechaRegistro',
+      },
+      { fechaRegistro: 'desc' }
+    );
+
     return prisma.jugador.findMany({
       where,
       select: {
@@ -32,9 +46,7 @@ export class PlayerService {
         correo: true,
         fechaRegistro: true,
       },
-      orderBy: {
-        fechaRegistro: 'desc',
-      },
+      orderBy,
     });
   }
 

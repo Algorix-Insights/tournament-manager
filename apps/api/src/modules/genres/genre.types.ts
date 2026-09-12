@@ -8,4 +8,5 @@ export interface UpdateGenreDTO {
 
 export interface GenreFilterDTO {
   nombre?: string;
+  orden?: string;
 }

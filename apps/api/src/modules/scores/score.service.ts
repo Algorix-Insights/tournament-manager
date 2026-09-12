@@ -1,6 +1,7 @@
 import { prisma } from '../../core/prisma';
 import { CreateScoreDTO, RankingFilterDTO, ScoreFilterDTO } from './score.types';
 import { buildDateFilter } from '../../core/utils/date-filter.util';
+import { parseOrderBy } from '../../core/utils/order-by.util';
 
 function buildScoreWhere(filters?: ScoreFilterDTO) {
   const where: any = {};
@@ -37,9 +38,19 @@ function buildScoreWhere(filters?: ScoreFilterDTO) {
   return where;
 }
 
+const scoreFieldMapping = {
+  id: 'id',
+  puntuacion: 'puntuacion',
+  fecha: 'fecha',
+  jugador: { jugador: 'gamertag' },
+  jugadorNombre: { jugador: 'nombre' },
+  videojuego: { videojuego: 'nombre' },
+};
+
 export class ScoreService {
   static async getAll(filters?: ScoreFilterDTO) {
     const where = buildScoreWhere(filters);
+    const orderBy = parseOrderBy(filters?.orden, scoreFieldMapping, { fecha: 'desc' });
 
     return prisma.puntuacion.findMany({
       where,
@@ -59,9 +70,7 @@ export class ScoreService {
           },
         },
       },
-      orderBy: {
-        fecha: 'desc',
-      },
+      orderBy,
     });
   }
 
@@ -89,6 +98,7 @@ export class ScoreService {
 
   static async getRanking(filters?: RankingFilterDTO) {
     const where = buildScoreWhere(filters);
+    const orderBy = parseOrderBy(filters?.orden, scoreFieldMapping, { puntuacion: 'desc' });
 
     const scores = await prisma.puntuacion.findMany({
       where,
@@ -108,9 +118,7 @@ export class ScoreService {
           },
         },
       },
-      orderBy: {
-        puntuacion: 'desc',
-      },
+      orderBy,
     });
 
     return scores.map((item, index) => ({

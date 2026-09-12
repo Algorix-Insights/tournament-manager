@@ -4,7 +4,7 @@ import { PlayerService } from './player.service';
 export class PlayerController {
   static async getAll(req: Request, res: Response): Promise<void> {
     try {
-      const { nombre, gamertag, correo, periodo, fechaInicio, fechaFin, search } = req.query;
+      const { nombre, gamertag, correo, periodo, fechaInicio, fechaFin, orden, search } = req.query;
 
       const filters: any = {};
 
@@ -35,6 +35,10 @@ export class PlayerController {
       }
       if (typeof fechaFin === 'string') {
         filters.fechaFin = fechaFin;
+      }
+
+      if (typeof orden === 'string' && orden.trim()) {
+        filters.orden = orden.trim();
       }
 
       const players = await PlayerService.getAll(filters);
