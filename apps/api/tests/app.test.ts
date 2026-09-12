@@ -19,6 +19,7 @@ test('GET / returns Hello World!', async () => {
     const response = await fetch(`http://127.0.0.1:${address.port}/`);
 
     expect(response.status).toBe(200);
+    expect(response.headers.get('x-powered-by')).toBeNull();
     await expect(response.text()).resolves.toBe('Hello World!');
   } finally {
     await new Promise<void>((resolve, reject) => {

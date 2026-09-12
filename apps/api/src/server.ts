@@ -1,7 +1,13 @@
-import app from './app';
+import express from 'express';
 
-const port = 3000;
+const app = express();
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+app.disable('x-powered-by');
+
+app.get('/', (_req, res) => {
+  res.send('Hello World!');
+});
+
+app.listen(3000, () => {
+  console.log('Listening on port 3000');
 });
