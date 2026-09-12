@@ -1,7 +1,7 @@
 import app from '../src/app';
 import { expect, test } from '@jest/globals';
 
-test('GET / returns Hello World!', async () => {
+test('GET / returns API welcome info', async () => {
   const server = app.listen(0, '127.0.0.1');
 
   await new Promise<void>((resolve, reject) => {
@@ -19,7 +19,8 @@ test('GET / returns Hello World!', async () => {
     const response = await fetch(`http://127.0.0.1:${address.port}/`);
 
     expect(response.status).toBe(200);
-    await expect(response.text()).resolves.toBe('Hello World!');
+    const data = await response.json();
+    expect(data.message).toBe('API del Sistema de Torneo de Videojuegos lista');
   } finally {
     await new Promise<void>((resolve, reject) => {
       server.close((error) => (error ? reject(error) : resolve()));
