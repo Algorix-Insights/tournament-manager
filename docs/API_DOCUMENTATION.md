@@ -1,192 +1,248 @@
-# Documentación Técnica de la API - Tournament Manager
+# Tournament Manager - Technical API Documentation
 
-Esta documentación detalla los endpoints de la API REST del Sistema de Gestión de Torneos de Videojuegos, sus parámetros, validaciones, límites, opciones de ordenamiento y sistema de paginación.
+This documentation details the REST API endpoints for the Video Game Tournament Management System, including parameters, validation rules, ordering options, pagination structure, and responses.
 
 ---
 
-## 1. Sistema de Paginación y Formato de Respuestas
+## 1. Pagination System & Response Format
 
-Todos los endpoints que devuelven listados de registros en peticiones `GET` utilizan la siguiente estructura estandarizada:
+All endpoints returning paginated lists on `GET` requests adhere to the standardized response format:
 
 ```json
 {
   "data": [
-    /* ... arreglo de elementos paginados ... */
+    /* ... array of paginated records ... */
   ],
   "ROW_COUNT": 45
 }
 ```
 
-### Parámetros Globales de Paginación (Query Params)
+### Global Pagination Parameters (Query Params)
 
-| Parámetro | Tipo | Obligatorio | Valor por Defecto | Descripción |
+| Parameter | Type | Required | Default | Description |
 | :--- | :--- | :--- | :--- | :--- |
-| `pagina` | Entero | No | `1` | Número de página a consultar (min: 1). |
-| `cantidadRegistros` | Entero | No | `20` | Cantidad de elementos por página (min: 1). |
+| `page` | Integer | No | `1` | Page number to retrieve (min: 1). |
+| `limit` | Integer | No | `20` | Number of items per page (min: 1). |
+
+*(Note: Legacy Spanish query parameters `pagina` and `cantidadRegistros` are also supported for backward compatibility).*
 
 ---
 
-## 2. Endpoints por Entidad
+## 2. Endpoints by Entity
 
-### 👤 Jugadores (`/api/players`)
+### 👤 Players (`/api/players`)
 
 #### `GET /api/players`
-Obtiene un listado paginado de jugadores con filtros y ordenamiento.
+Retrieves a paginated list of players with filtering and ordering.
 
-- **Parámetros de Filtro (Query Params):**
-  - `nombre` *(String, opcional, max 100 chars)*: Búsqueda parcial case-insensitive por nombre.
-  - `gamertag` *(String, opcional, max 50 chars)*: Búsqueda parcial case-insensitive por gamertag.
-  - `correo` *(String, opcional, max 100 chars)*: Búsqueda parcial por correo electrónico.
-  - `search` *(String, opcional)*: Búsqueda alternativa general por nombre o gamertag.
-  - `periodo` *(Entero, opcional)*: Días transcurridos desde el registro (ej. `7`, `30`, `90`).
-  - `fechaInicio` *(String ISO YYYY-MM-DD, opcional)*: Fecha inicial de registro.
-  - `fechaFin` *(String ISO YYYY-MM-DD, opcional)*: Fecha final de registro.
-  - `pagina` *(Entero, opcional, def: 1)*.
-  - `cantidadRegistros` *(Entero, opcional, def: 20)*.
+- **Filter Parameters (Query Params):**
+  - `name` *(String, optional, max 100 chars)*: Partial case-insensitive search by name.
+  - `gamertag` *(String, optional, max 50 chars)*: Partial case-insensitive search by gamertag.
+  - `email` *(String, optional, max 100 chars)*: Partial search by email address.
+  - `search` *(String, optional)*: General search matching name.
+  - `period` *(Integer, optional)*: Days elapsed or period enum (e.g., `1` for current week, `3` for current month).
+  - `startDate` *(String ISO YYYY-MM-DD, optional)*: Registration start date filter.
+  - `endDate` *(String ISO YYYY-MM-DD, optional)*: Registration end date filter.
+  - `page` *(Integer, optional, def: 1)*.
+  - `limit` *(Integer, optional, def: 20)*.
 
-- **Opciones de Ordenamiento (`orden`):**
-  - `nombre_asc` / `nombre_desc`
-  - `gamertag_asc` / `gamertag_desc`
-  - `correo_asc` / `correo_desc`
-  - `fecha_asc` / `fecha_desc` *(por defecto: `fecha_desc`)*
+- **Sorting Options (`order`):**
+  - Prefix with `-` for descending, or omit for ascending (e.g., `name`, `-name`, `gamertag`, `-gamertag`, `email`, `-email`, `createdAt`, `-createdAt`).
+  - Default: `-createdAt` (newest first).
 
 #### `GET /api/players/:id`
-Obtiene el detalle completo de un jugador, incluyendo su historial de puntuaciones y videojuegos jugados.
-- **Parámetros de Ruta:** `id` *(Entero, obligatorio, min: 1)*.
+Retrieves full details for a player, including their score history and played games.
+- **Route Parameters:** `id` *(Integer, required, min: 1)*.
 
 #### `POST /api/players`
-Registra un nuevo jugador en el sistema.
-- **Cuerpo de la Petición (JSON Body):**
-  - `nombre` *(String, obligatorio, min 1, max 100 chars)*: Nombre completo.
-  - `gamertag` *(String, obligatorio, único, min 1, max 50 chars)*: Apodo de jugador.
-  - `correo` *(String, obligatorio, min 5, max 100 chars)*: Correo electrónico válido.
+Registers a new player in the system.
+- **Request Body (JSON):**
+  ```json
+  {
+    "name": "Carlos Mendoza",
+    "gamertag": "Shadow",
+    "email": "shadow@example.com"
+  }
+  ```
+  - `name` *(String, required, min 1, max 100 chars)*.
+  - `gamertag` *(String, required, unique, min 1, max 50 chars)*.
+  - `email` *(String, required, min 5, max 100 chars)*.
 
 #### `PUT /api/players/:id`
-Actualiza la información de un jugador existente.
-- **Parámetros de Ruta:** `id` *(Entero, obligatorio)*.
-- **Cuerpo de la Petición (JSON Body, campos opcionales):**
-  - `nombre` *(String, max 100 chars)*.
-  - `gamertag` *(String, único, max 50 chars)*.
-  - `correo` *(String, max 100 chars)*.
+Updates an existing player's details.
+- **Route Parameters:** `id` *(Integer, required)*.
+- **Request Body (JSON, optional fields):**
+  ```json
+  {
+    "name": "Carlos Mendoza Jr.",
+    "gamertag": "ShadowMaster",
+    "email": "shadow_new@example.com"
+  }
+  ```
 
 #### `DELETE /api/players/:id`
-Elimina un jugador por su ID (eliminación en cascada de sus puntuaciones).
-- **Parámetros de Ruta:** `id` *(Entero, obligatorio)*.
+Deletes a player by ID (cascades to their registered scores).
+- **Route Parameters:** `id` *(Integer, required)*.
 
 ---
 
-### 🎮 Videojuegos (`/api/games`)
+### 🎮 Games (`/api/games`)
 
 #### `GET /api/games`
-Obtiene un listado paginado de videojuegos registrados.
+Retrieves a paginated list of registered games.
 
-- **Parámetros de Filtro (Query Params):**
-  - `nombre` *(String, opcional, max 100 chars)*: Búsqueda parcial por nombre del videojuego.
-  - `generoId` *(Entero, opcional)*: Filtro exacto por ID del género.
-  - `generoNombre` *(String, opcional, max 50 chars)*: Búsqueda parcial por nombre del género.
-  - `pagina` *(Entero, opcional, def: 1)*.
-  - `cantidadRegistros` *(Entero, opcional, def: 20)*.
+- **Filter Parameters (Query Params):**
+  - `name` *(String, optional, max 100 chars)*: Partial search by game name.
+  - `genreId` *(Integer, optional)*: Exact filter by genre ID.
+  - `genreName` *(String, optional, max 50 chars)*: Partial search by genre name.
+  - `page` *(Integer, optional, def: 1)*.
+  - `limit` *(Integer, optional, def: 20)*.
 
-- **Opciones de Ordenamiento (`orden`):**
-  - `nombre_asc` / `nombre_desc` *(por defecto: `nombre_asc`)*
-  - `id_asc` / `id_desc`
-  - `genero_asc` / `genero_desc`
+- **Sorting Options (`order`):**
+  - `name`, `-name` *(default: `name` ascending)*
+  - `id`, `-id`
+  - `genre`, `-genre`
 
 #### `GET /api/games/:id`
-Obtiene los detalles de un videojuego por ID, incluyendo género y puntuaciones asociadas.
-- **Parámetros de Ruta:** `id` *(Entero, obligatorio)*.
+Retrieves details for a game by ID, including genre and associated scores.
+- **Route Parameters:** `id` *(Integer, required)*.
 
 #### `POST /api/games`
-Registra un nuevo videojuego en el catálogo.
-- **Cuerpo de la Petición (JSON Body):**
-  - `nombre` *(String, obligatorio, único, min 1, max 100 chars)*.
-  - `generoId` *(Entero, obligatorio, id de género existente)*.
+Registers a new game in the catalog.
+- **Request Body (JSON):**
+  ```json
+  {
+    "name": "Tekken 8",
+    "genreId": 1
+  }
+  ```
+  - `name` *(String, required, unique, min 1, max 100 chars)*.
+  - `genreId` *(Integer, required, existing genre ID)*.
 
 #### `PUT /api/games/:id`
-Actualiza un videojuego existente.
-- **Parámetros de Ruta:** `id` *(Entero, obligatorio)*.
-- **Cuerpo de la Petición (JSON Body, opcionales):** `nombre` *(String)*, `generoId` *(Entero)*.
+Updates an existing game.
+- **Route Parameters:** `id` *(Integer, required)*.
+- **Request Body (JSON, optional fields):**
+  ```json
+  {
+    "name": "Tekken 8 Ultimate",
+    "genreId": 1
+  }
+  ```
 
 #### `DELETE /api/games/:id`
-Elimina un videojuego del catálogo.
-- **Parámetros de Ruta:** `id` *(Entero, obligatorio)*.
+Deletes a game from the catalog.
+- **Route Parameters:** `id` *(Integer, required)*.
 
 ---
 
-### 🏷️ Géneros (`/api/genres` o `/api/generos`)
+### 🏷️ Genres (`/api/genres`)
 
 #### `GET /api/genres`
-Obtiene la lista paginada de géneros del catálogo con el conteo de videojuegos asociados (`_count.videojuegos`).
+Retrieves a paginated list of genres with their associated game count (`_count.games`).
 
-- **Parámetros de Filtro (Query Params):**
-  - `nombre` *(String, opcional, max 50 chars)*: Búsqueda parcial por nombre.
-  - `pagina` *(Entero, opcional, def: 1)*.
-  - `cantidadRegistros` *(Entero, opcional, def: 20)*.
+- **Filter Parameters (Query Params):**
+  - `name` *(String, optional, max 50 chars)*: Partial search by genre name.
+  - `page` *(Integer, optional, def: 1)*.
+  - `limit` *(Integer, optional, def: 20)*.
 
-- **Opciones de Ordenamiento (`orden`):**
-  - `nombre_asc` / `nombre_desc` *(por defecto: `nombre_asc`)*
-  - `id_asc` / `id_desc`
+- **Sorting Options (`order`):**
+  - `name`, `-name` *(default: `name` ascending)*
+  - `id`, `-id`
 
 #### `GET /api/genres/:id`
-Obtiene un género por su ID con sus videojuegos vinculados.
+Retrieves a genre by ID including its associated games list.
 
 #### `POST /api/genres`
-Crea un nuevo género.
-- **Cuerpo de la Petición (JSON Body):**
-  - `nombre` *(String, obligatorio, único, min 1, max 50 chars)*.
+Creates a new genre.
+- **Request Body (JSON):**
+  ```json
+  {
+    "name": "Fighting"
+  }
+  ```
+  - `name` *(String, required, unique, min 1, max 50 chars)*.
 
 #### `PUT /api/genres/:id`
-Actualiza un género existente.
+Updates an existing genre.
+- **Route Parameters:** `id` *(Integer, required)*.
+- **Request Body (JSON):**
+  ```json
+  {
+    "name": "Action / Fighting"
+  }
+  ```
 
 #### `DELETE /api/genres/:id`
-Elimina un género (Restringido si tiene videojuegos asociados).
+Deletes a genre (restricted if it has associated games).
 
 ---
 
-### 🏆 Puntuaciones y Ranking (`/api/scores`)
+### 🏆 Scores and Rankings (`/api/scores`)
 
 #### `GET /api/scores`
-Obtiene el historial paginado de partidas/puntuaciones registradas.
+Retrieves the paginated list of recorded match scores.
 
-- **Parámetros de Filtro (Query Params):**
-  - `jugadorId` *(Entero, opcional)*: Filtro por ID del jugador.
-  - `videojuegoId` / `gameId` *(Entero, opcional)*: Filtro por ID del videojuego.
-  - `generoId` *(Entero, opcional)*: Filtro por ID de género.
-  - `minScore` *(Entero, opcional, min: 0)*: Puntuación mínima.
-  - `maxScore` *(Entero, opcional, min: 0)*: Puntuación máxima.
-  - `periodo` *(Entero, opcional)*: Días de antigüedad (`7`, `30`, `90`).
-  - `fechaInicio` / `fechaFin` *(String ISO YYYY-MM-DD)*.
-  - `pagina` *(Entero, opcional, def: 1)*.
-  - `cantidadRegistros` *(Entero, opcional, def: 20)*.
+- **Filter Parameters (Query Params):**
+  - `playerId` *(Integer, optional)*: Filter by player ID.
+  - `gameId` *(Integer, optional)*: Filter by game ID.
+  - `genreId` *(Integer, optional)*: Filter by genre ID.
+  - `minScore` *(Integer, optional, min: 0)*: Minimum score.
+  - `maxScore` *(Integer, optional, min: 0)*: Maximum score.
+  - `period` *(Integer, optional)*: Period filter.
+  - `startDate` / `endDate` *(String ISO YYYY-MM-DD)*.
+  - `page` *(Integer, optional, def: 1)*.
+  - `limit` *(Integer, optional, def: 20)*.
 
-- **Opciones de Ordenamiento (`orden`):**
-  - `puntuacion_asc` / `puntuacion_desc`
-  - `fecha_asc` / `fecha_desc` *(por defecto: `fecha_desc`)*
-  - `jugador_asc` / `jugador_desc`
-  - `videojuego_asc` / `videojuego_desc`
+- **Sorting Options (`order`):**
+  - `score`, `-score`
+  - `createdAt`, `-createdAt` *(default: `-createdAt`)*
+  - `player`, `-player`
+  - `game`, `-game`
 
 #### `POST /api/scores`
-Registra un nuevo puntaje en el sistema.
-- **Cuerpo de la Petición (JSON Body):**
-  - `jugadorId` *(Entero, obligatorio, ID existente)*.
-  - `videojuegoId` *(Entero, obligatorio, ID existente)*.
-  - `puntuacion` *(Entero, obligatorio, min: 0)*.
+Registers a new game score.
+- **Request Body (JSON):**
+  ```json
+  {
+    "playerId": 1,
+    "gameId": 2,
+    "score": 950
+  }
+  ```
+  - `playerId` *(Integer, required, existing player ID)*.
+  - `gameId` *(Integer, required, existing game ID)*.
+  - `score` *(Integer, required, min: 0)*.
 
 #### `DELETE /api/scores/:id`
-Elimina una puntuación por su ID.
+Deletes a score record by its ID.
 
 #### `GET /api/scores/ranking`
-Obtiene la tabla de clasificación/ranking paginada.
-- Ordenamiento predeterminado: Mayor a menor puntaje (`puntuacion_desc`).
-- La propiedad `posicion` de cada elemento refleja el rango global real según la página consultada (ej. página 2 con 20 elementos iniciará en posición 21).
+Retrieves the paginated leaderboard ranking.
+- Default ordering: Highest score to lowest (`-score`).
+- Each item in `data` includes:
+  ```json
+  {
+    "position": 1,
+    "playerId": 1,
+    "player": "Shadow",
+    "playerName": "Carlos Mendoza",
+    "gameId": 2,
+    "game": "Tekken 8",
+    "genre": "Fighting",
+    "score": 950,
+    "createdAt": "2026-09-12T16:00:00.000Z"
+  }
+  ```
 
 #### `GET /api/scores/stats`
-Retorna un resumen de métricas del torneo:
+Returns global tournament metrics:
 ```json
 {
-  "totalJugadores": 15,
-  "totalVideojuegos": 5,
-  "totalPuntuaciones": 45,
-  "puntuacionPromedio": 867.14
+  "totalPlayers": 15,
+  "totalGames": 5,
+  "totalScores": 45,
+  "averageScore": 867.14
 }
 ```
+*(Note: Legacy properties `totalJugadores`, `totalVideojuegos`, `totalPuntuaciones`, and `puntuacionPromedio` are also returned for backwards compatibility).*
