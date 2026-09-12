@@ -2,7 +2,6 @@ import { prisma } from '../../core/prisma';
 import { CreateGameDTO, UpdateGameDTO } from './game.types';
 
 export class GameService {
-  // RF02: Listar videojuegos
   static async getAll() {
     return prisma.videojuego.findMany({
       orderBy: {
@@ -24,7 +23,6 @@ export class GameService {
     });
   }
 
-  // RF02: Registrar videojuego
   static async create(data: CreateGameDTO) {
     return prisma.videojuego.create({
       data: {

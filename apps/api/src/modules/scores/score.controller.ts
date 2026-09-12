@@ -11,7 +11,6 @@ export class ScoreController {
     }
   }
 
-  // RF03 / RF05: Registrar puntuación desde interfaz
   static async create(req: Request, res: Response): Promise<void> {
     try {
       const { jugadorId, videojuegoId, puntuacion } = req.body;
@@ -43,7 +42,6 @@ export class ScoreController {
     }
   }
 
-  // RF06: Scoreboard / Clasificación con filtros opcionales
   static async getRanking(req: Request, res: Response): Promise<void> {
     try {
       const { videojuegoId, gameId, minScore, maxScore } = req.query;
@@ -70,7 +68,6 @@ export class ScoreController {
     }
   }
 
-  // RF08: Mostrar estadísticas
   static async getStats(_req: Request, res: Response): Promise<void> {
     try {
       const stats = await ScoreService.getStats();

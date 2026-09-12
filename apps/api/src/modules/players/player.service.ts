@@ -2,7 +2,6 @@ import { prisma } from '../../core/prisma';
 import { CreatePlayerDTO, UpdatePlayerDTO } from './player.types';
 
 export class PlayerService {
-  // RF04: Consultar jugadores
   static async getAll() {
     return prisma.jugador.findMany({
       select: {
@@ -18,7 +17,6 @@ export class PlayerService {
     });
   }
 
-  // RF07: Buscar por nombre o gamertag
   static async search(query: string) {
     return prisma.jugador.findMany({
       where: {
@@ -46,7 +44,6 @@ export class PlayerService {
     });
   }
 
-  // RF01: Registrar jugador
   static async create(data: CreatePlayerDTO) {
     return prisma.jugador.create({
       data: {

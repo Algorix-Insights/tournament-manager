@@ -26,7 +26,6 @@ export class ScoreService {
     });
   }
 
-  // RF03 / RF05: Registrar puntuación
   static async create(data: CreateScoreDTO) {
     if (data.puntuacion < 0) {
       throw new Error('La puntuación no puede ser negativa');
@@ -45,7 +44,6 @@ export class ScoreService {
     });
   }
 
-  // RF06: Scoreboard / Ranking con soporte de filtros opcionales (videojuego, rango de puntaje)
   static async getRanking(filters?: RankingFilterDTO) {
     const where: any = {};
 
@@ -99,7 +97,6 @@ export class ScoreService {
     }));
   }
 
-  // RF08: Estadísticas globales
   static async getStats() {
     const totalJugadores = await prisma.jugador.count();
     const totalVideojuegos = await prisma.videojuego.count();
