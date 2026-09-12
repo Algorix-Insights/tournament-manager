@@ -52,14 +52,24 @@ No `packages/` directory will be created until actual shared code or configurati
 
 ## Root commands and task graph
 
-The root exposes `dev`, `build`, `test`, `lint`, and `check` scripts through `turbo run`. The API gains `dev` using its existing `tsx` dependency and named Prisma generation and deployment commands. The root `postinstall` invokes the API's generation command so a clean workspace install always creates Prisma Client.
+The root `package.json` is the team's only command entrypoint. It exposes these scripts so contributors never need to invoke the Turborepo CLI directly:
+
+- `npm run dev`: run `turbo watch dev` for both applications.
+- `npm run dev:api`: run `turbo watch dev --filter=api`.
+- `npm run dev:web`: run `turbo run dev --filter=web`.
+- `npm run build`: run `turbo run build`.
+- `npm test`: run `turbo run test`.
+- `npm run lint`: run `turbo run lint`.
+- `npm run check`: run `turbo run lint test build`.
+
+The API gains `dev` as `tsx src/server.ts`, using its existing `tsx` dependency without adding a second watcher. Turborepo owns change detection and process restarts. The API also gains named Prisma generation and deployment commands. The root `postinstall` invokes the API's generation command so a clean workspace install always creates Prisma Client.
 
 `turbo.json` defines:
 
 - `build`: depends on dependency builds through `^build` and caches `dist/**`.
 - `test`: cacheable, with no declared file output because Jest does not currently emit coverage.
 - `lint`: cacheable and runs only in packages that define the script. Initially this is the web application; no API lint dependency is introduced.
-- `dev`: persistent and uncached.
+- `dev`: persistent and uncached. The package-specific `api#dev` task is also `interruptible: true`, allowing `turbo watch` to restart the API process when files in the API workspace change. The web task remains non-interruptible because Vite already watches and reloads its own files.
 
 The task graph remains intentionally small. There are no internal package dependencies to model yet.
 
@@ -119,6 +129,8 @@ Completion requires:
 
 - `npm ci` succeeds from a clean checkout with no nested lockfiles.
 - `npx turbo ls` discovers `api` and `web`.
+- Root `npm run dev` starts both applications; editing an API source file causes Turborepo to restart only the API process, while Vite continues handling web changes.
+- Root `npm run dev:api` and `npm run dev:web` start either application without requiring contributors to know Turborepo flags.
 - Root `npm run build`, `npm test`, and `npm run lint` succeed.
 - A second local build reports Turborepo cache hits.
 - `npm run check -- --affected` selects only changed packages where applicable.
