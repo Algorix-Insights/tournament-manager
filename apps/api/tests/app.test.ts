@@ -1,4 +1,4 @@
-import app from '../src/app';
+import app from '../src/server';
 import { expect, test } from '@jest/globals';
 
 test('GET / returns API welcome info', async () => {
@@ -19,6 +19,8 @@ test('GET / returns API welcome info', async () => {
     const response = await fetch(`http://127.0.0.1:${address.port}/`);
 
     expect(response.status).toBe(200);
+    expect(response.headers.get('x-powered-by')).toBeNull();
+
     const data = await response.json();
     expect(data.message).toBe('API del Sistema de Torneo de Videojuegos lista');
   } finally {

@@ -1,8 +1,43 @@
-import 'dotenv/config';
-import app from './app';
+import express from 'express';
+import cors from 'cors';
+import playerRouter from './modules/players/player.router';
+import gameRouter from './modules/games/game.router';
+import scoreRouter from './modules/scores/score.router';
+import genreRouter from './modules/genres/genre.router';
 
-const port = process.env.PORT || 3000;
+const app = express();
 
-app.listen(port, () => {
-  console.log(`🎮 Server corriendo exitosamente en el puerto ${port}`);
+app.use(cors());
+app.use(express.json());
+app.disable('x-powered-by');
+
+// Endpoints base de la API
+app.use('/api/players', playerRouter);
+app.use('/api/games', gameRouter);
+app.use('/api/scores', scoreRouter);
+app.use('/api/genres', genreRouter);
+app.use('/api/generos', genreRouter);
+
+app.get('/', (_req, res) => {
+  res.json({
+    message: 'API del Sistema de Torneo de Videojuegos lista',
+    endpoints: {
+      players: '/api/players',
+      games: '/api/games',
+      scores: '/api/scores',
+      genres: '/api/genres',
+      ranking: '/api/scores/ranking',
+      stats: '/api/scores/stats',
+    },
+  });
 });
+
+const PORT = process.env.PORT || 3000;
+
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`🎮 Server corriendo exitosamente en el puerto ${PORT}`);
+  });
+}
+
+export default app;
