@@ -1,6 +1,7 @@
 import { prisma } from '../../core/prisma';
 import { CreateGenreDTO, GenreFilterDTO, UpdateGenreDTO } from './genre.types';
 import { parseOrderBy } from '../../core/utils/order-by.util';
+import { parsePaginationParams, formatPaginatedResponse } from '../../core/utils/pagination.util';
 
 export class GenreService {
   static async getAll(filters?: GenreFilterDTO) {
@@ -19,15 +20,24 @@ export class GenreService {
       { nombre: 'asc' }
     );
 
-    return prisma.genero.findMany({
-      where,
-      orderBy,
-      include: {
-        _count: {
-          select: { videojuegos: true },
+    const { skip, take } = parsePaginationParams(filters);
+
+    const [data, totalRecords] = await Promise.all([
+      prisma.genero.findMany({
+        where,
+        orderBy,
+        skip,
+        take,
+        include: {
+          _count: {
+            select: { videojuegos: true },
+          },
         },
-      },
-    });
+      }),
+      prisma.genero.count({ where }),
+    ]);
+
+    return formatPaginatedResponse(data, totalRecords);
   }
 
   static async getById(id: number) {

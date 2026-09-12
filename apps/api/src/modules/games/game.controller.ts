@@ -4,7 +4,7 @@ import { GameService } from './game.service';
 export class GameController {
   static async getAll(req: Request, res: Response): Promise<void> {
     try {
-      const { nombre, generoId, generoNombre, orden } = req.query;
+      const { nombre, generoId, generoNombre, orden, pagina, cantidadRegistros } = req.query;
       const filters: any = {};
 
       if (typeof nombre === 'string' && nombre.trim()) {
@@ -24,6 +24,20 @@ export class GameController {
 
       if (typeof orden === 'string' && orden.trim()) {
         filters.orden = orden.trim();
+      }
+
+      if (pagina !== undefined) {
+        const parsedPagina = parseInt(pagina as string, 10);
+        if (!isNaN(parsedPagina)) {
+          filters.pagina = parsedPagina;
+        }
+      }
+
+      if (cantidadRegistros !== undefined) {
+        const parsedLimit = parseInt(cantidadRegistros as string, 10);
+        if (!isNaN(parsedLimit)) {
+          filters.cantidadRegistros = parsedLimit;
+        }
       }
 
       const games = await GameService.getAll(filters);

@@ -4,7 +4,7 @@ import { PlayerService } from './player.service';
 export class PlayerController {
   static async getAll(req: Request, res: Response): Promise<void> {
     try {
-      const { nombre, gamertag, correo, periodo, fechaInicio, fechaFin, orden, search } = req.query;
+      const { nombre, gamertag, correo, periodo, fechaInicio, fechaFin, orden, search, pagina, cantidadRegistros } = req.query;
 
       const filters: any = {};
 
@@ -39,6 +39,20 @@ export class PlayerController {
 
       if (typeof orden === 'string' && orden.trim()) {
         filters.orden = orden.trim();
+      }
+
+      if (pagina !== undefined) {
+        const parsedPagina = parseInt(pagina as string, 10);
+        if (!isNaN(parsedPagina)) {
+          filters.pagina = parsedPagina;
+        }
+      }
+
+      if (cantidadRegistros !== undefined) {
+        const parsedLimit = parseInt(cantidadRegistros as string, 10);
+        if (!isNaN(parsedLimit)) {
+          filters.cantidadRegistros = parsedLimit;
+        }
       }
 
       const players = await PlayerService.getAll(filters);

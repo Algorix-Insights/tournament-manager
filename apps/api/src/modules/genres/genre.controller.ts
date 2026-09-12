@@ -4,7 +4,7 @@ import { GenreService } from './genre.service';
 export class GenreController {
   static async getAll(req: Request, res: Response): Promise<void> {
     try {
-      const { nombre, orden } = req.query;
+      const { nombre, orden, pagina, cantidadRegistros } = req.query;
       const filters: any = {};
 
       if (typeof nombre === 'string' && nombre.trim()) {
@@ -13,6 +13,20 @@ export class GenreController {
 
       if (typeof orden === 'string' && orden.trim()) {
         filters.orden = orden.trim();
+      }
+
+      if (pagina !== undefined) {
+        const parsedPagina = parseInt(pagina as string, 10);
+        if (!isNaN(parsedPagina)) {
+          filters.pagina = parsedPagina;
+        }
+      }
+
+      if (cantidadRegistros !== undefined) {
+        const parsedLimit = parseInt(cantidadRegistros as string, 10);
+        if (!isNaN(parsedLimit)) {
+          filters.cantidadRegistros = parsedLimit;
+        }
       }
 
       const genres = await GenreService.getAll(filters);

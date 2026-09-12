@@ -13,4 +13,6 @@ export interface GameFilterDTO {
   generoId?: number;
   generoNombre?: string;
   orden?: string;
+  pagina?: number;
+  cantidadRegistros?: number;
 }

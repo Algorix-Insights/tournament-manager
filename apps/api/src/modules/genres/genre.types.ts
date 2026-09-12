@@ -9,4 +9,6 @@ export interface UpdateGenreDTO {
 export interface GenreFilterDTO {
   nombre?: string;
   orden?: string;
+  pagina?: number;
+  cantidadRegistros?: number;
 }

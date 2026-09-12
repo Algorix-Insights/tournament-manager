@@ -2,6 +2,7 @@ import { prisma } from '../../core/prisma';
 import { CreatePlayerDTO, PlayerFilterDTO, UpdatePlayerDTO } from './player.types';
 import { buildDateFilter } from '../../core/utils/date-filter.util';
 import { parseOrderBy } from '../../core/utils/order-by.util';
+import { parsePaginationParams, formatPaginatedResponse } from '../../core/utils/pagination.util';
 
 export class PlayerService {
   static async getAll(filters?: PlayerFilterDTO) {
@@ -37,17 +38,26 @@ export class PlayerService {
       { fechaRegistro: 'desc' }
     );
 
-    return prisma.jugador.findMany({
-      where,
-      select: {
-        id: true,
-        nombre: true,
-        gamertag: true,
-        correo: true,
-        fechaRegistro: true,
-      },
-      orderBy,
-    });
+    const { skip, take } = parsePaginationParams(filters);
+
+    const [data, totalRecords] = await Promise.all([
+      prisma.jugador.findMany({
+        where,
+        select: {
+          id: true,
+          nombre: true,
+          gamertag: true,
+          correo: true,
+          fechaRegistro: true,
+        },
+        orderBy,
+        skip,
+        take,
+      }),
+      prisma.jugador.count({ where }),
+    ]);
+
+    return formatPaginatedResponse(data, totalRecords);
   }
 
   static async getById(id: number) {

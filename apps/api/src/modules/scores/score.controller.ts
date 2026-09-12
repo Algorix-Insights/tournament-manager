@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { ScoreService } from './score.service';
 
 function parseScoreFilters(query: any) {
-  const { jugadorId, videojuegoId, gameId, generoId, minScore, maxScore, periodo, fechaInicio, fechaFin, orden } = query;
+  const { jugadorId, videojuegoId, gameId, generoId, minScore, maxScore, periodo, fechaInicio, fechaFin, orden, pagina, cantidadRegistros } = query;
   const filters: any = {};
 
   if (jugadorId !== undefined && !isNaN(Number(jugadorId))) {
@@ -39,6 +39,20 @@ function parseScoreFilters(query: any) {
 
   if (typeof orden === 'string' && orden.trim()) {
     filters.orden = orden.trim();
+  }
+
+  if (pagina !== undefined) {
+    const parsedPagina = parseInt(pagina as string, 10);
+    if (!isNaN(parsedPagina)) {
+      filters.pagina = parsedPagina;
+    }
+  }
+
+  if (cantidadRegistros !== undefined) {
+    const parsedLimit = parseInt(cantidadRegistros as string, 10);
+    if (!isNaN(parsedLimit)) {
+      filters.cantidadRegistros = parsedLimit;
+    }
   }
 
   return filters;

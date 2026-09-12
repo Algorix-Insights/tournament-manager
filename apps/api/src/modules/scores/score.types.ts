@@ -14,6 +14,8 @@ export interface RankingFilterDTO {
   fechaInicio?: string;
   fechaFin?: string;
   orden?: string;
+  pagina?: number;
+  cantidadRegistros?: number;
 }
 
 export type ScoreFilterDTO = RankingFilterDTO;

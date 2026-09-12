@@ -18,4 +18,6 @@ export interface PlayerFilterDTO {
   fechaInicio?: string;
   fechaFin?: string;
   orden?: string;
+  pagina?: number;
+  cantidadRegistros?: number;
 }

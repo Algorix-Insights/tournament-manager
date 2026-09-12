@@ -1,6 +1,7 @@
 import { prisma } from '../../core/prisma';
 import { CreateGameDTO, GameFilterDTO, UpdateGameDTO } from './game.types';
 import { parseOrderBy } from '../../core/utils/order-by.util';
+import { parsePaginationParams, formatPaginatedResponse } from '../../core/utils/pagination.util';
 
 export class GameService {
   static async getAll(filters?: GameFilterDTO) {
@@ -31,13 +32,22 @@ export class GameService {
       { nombre: 'asc' }
     );
 
-    return prisma.videojuego.findMany({
-      where,
-      include: {
-        genero: true,
-      },
-      orderBy,
-    });
+    const { skip, take } = parsePaginationParams(filters);
+
+    const [data, totalRecords] = await Promise.all([
+      prisma.videojuego.findMany({
+        where,
+        include: {
+          genero: true,
+        },
+        orderBy,
+        skip,
+        take,
+      }),
+      prisma.videojuego.count({ where }),
+    ]);
+
+    return formatPaginatedResponse(data, totalRecords);
   }
 
   static async getById(id: number) {

@@ -2,6 +2,7 @@ import { prisma } from '../../core/prisma';
 import { CreateScoreDTO, RankingFilterDTO, ScoreFilterDTO } from './score.types';
 import { buildDateFilter } from '../../core/utils/date-filter.util';
 import { parseOrderBy } from '../../core/utils/order-by.util';
+import { parsePaginationParams, formatPaginatedResponse } from '../../core/utils/pagination.util';
 
 function buildScoreWhere(filters?: ScoreFilterDTO) {
   const where: any = {};
@@ -51,27 +52,35 @@ export class ScoreService {
   static async getAll(filters?: ScoreFilterDTO) {
     const where = buildScoreWhere(filters);
     const orderBy = parseOrderBy(filters?.orden, scoreFieldMapping, { fecha: 'desc' });
+    const { skip, take } = parsePaginationParams(filters);
 
-    return prisma.puntuacion.findMany({
-      where,
-      include: {
-        jugador: {
-          select: {
-            id: true,
-            nombre: true,
-            gamertag: true,
+    const [data, totalRecords] = await Promise.all([
+      prisma.puntuacion.findMany({
+        where,
+        include: {
+          jugador: {
+            select: {
+              id: true,
+              nombre: true,
+              gamertag: true,
+            },
+          },
+          videojuego: {
+            select: {
+              id: true,
+              nombre: true,
+              genero: true,
+            },
           },
         },
-        videojuego: {
-          select: {
-            id: true,
-            nombre: true,
-            genero: true,
-          },
-        },
-      },
-      orderBy,
-    });
+        orderBy,
+        skip,
+        take,
+      }),
+      prisma.puntuacion.count({ where }),
+    ]);
+
+    return formatPaginatedResponse(data, totalRecords);
   }
 
   static async create(data: CreateScoreDTO) {
@@ -99,30 +108,36 @@ export class ScoreService {
   static async getRanking(filters?: RankingFilterDTO) {
     const where = buildScoreWhere(filters);
     const orderBy = parseOrderBy(filters?.orden, scoreFieldMapping, { puntuacion: 'desc' });
+    const { skip, take } = parsePaginationParams(filters);
 
-    const scores = await prisma.puntuacion.findMany({
-      where,
-      include: {
-        jugador: {
-          select: {
-            id: true,
-            gamertag: true,
-            nombre: true,
+    const [scores, totalRecords] = await Promise.all([
+      prisma.puntuacion.findMany({
+        where,
+        include: {
+          jugador: {
+            select: {
+              id: true,
+              gamertag: true,
+              nombre: true,
+            },
+          },
+          videojuego: {
+            select: {
+              id: true,
+              nombre: true,
+              genero: true,
+            },
           },
         },
-        videojuego: {
-          select: {
-            id: true,
-            nombre: true,
-            genero: true,
-          },
-        },
-      },
-      orderBy,
-    });
+        orderBy,
+        skip,
+        take,
+      }),
+      prisma.puntuacion.count({ where }),
+    ]);
 
-    return scores.map((item, index) => ({
-      posicion: index + 1,
+    const formattedRanking = scores.map((item, index) => ({
+      posicion: skip + index + 1,
       jugadorId: item.jugador.id,
       jugador: item.jugador.gamertag,
       nombreJugador: item.jugador.nombre,
@@ -132,6 +147,8 @@ export class ScoreService {
       puntuacion: item.puntuacion,
       fecha: item.fecha,
     }));
+
+    return formatPaginatedResponse(formattedRanking, totalRecords);
   }
 
   static async getStats() {
