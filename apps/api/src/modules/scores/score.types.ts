@@ -5,7 +5,14 @@ export interface CreateScoreDTO {
 }
 
 export interface RankingFilterDTO {
+  jugadorId?: number;
   videojuegoId?: number;
+  generoId?: number;
   minScore?: number;
   maxScore?: number;
+  periodo?: number;
+  fechaInicio?: string;
+  fechaFin?: string;
 }
+
+export type ScoreFilterDTO = RankingFilterDTO;

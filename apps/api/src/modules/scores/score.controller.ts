@@ -1,10 +1,50 @@
 import { Request, Response } from 'express';
 import { ScoreService } from './score.service';
 
+function parseScoreFilters(query: any) {
+  const { jugadorId, videojuegoId, gameId, generoId, minScore, maxScore, periodo, fechaInicio, fechaFin } = query;
+  const filters: any = {};
+
+  if (jugadorId !== undefined && !isNaN(Number(jugadorId))) {
+    filters.jugadorId = Number(jugadorId);
+  }
+
+  const rawGameId = videojuegoId || gameId;
+  if (rawGameId !== undefined && !isNaN(Number(rawGameId))) {
+    filters.videojuegoId = Number(rawGameId);
+  }
+
+  if (generoId !== undefined && !isNaN(Number(generoId))) {
+    filters.generoId = Number(generoId);
+  }
+
+  if (minScore !== undefined && !isNaN(Number(minScore))) {
+    filters.minScore = Number(minScore);
+  }
+
+  if (maxScore !== undefined && !isNaN(Number(maxScore))) {
+    filters.maxScore = Number(maxScore);
+  }
+
+  if (periodo !== undefined && !isNaN(Number(periodo))) {
+    filters.periodo = Number(periodo);
+  }
+
+  if (typeof fechaInicio === 'string') {
+    filters.fechaInicio = fechaInicio;
+  }
+  if (typeof fechaFin === 'string') {
+    filters.fechaFin = fechaFin;
+  }
+
+  return filters;
+}
+
 export class ScoreController {
-  static async getAll(_req: Request, res: Response): Promise<void> {
+  static async getAll(req: Request, res: Response): Promise<void> {
     try {
-      const scores = await ScoreService.getAll();
+      const filters = parseScoreFilters(req.query);
+      const scores = await ScoreService.getAll(filters);
       res.json(scores);
     } catch (error) {
       res.status(500).json({ error: 'Error al obtener puntuaciones' });
@@ -44,23 +84,7 @@ export class ScoreController {
 
   static async getRanking(req: Request, res: Response): Promise<void> {
     try {
-      const { videojuegoId, gameId, minScore, maxScore } = req.query;
-
-      const filters: any = {};
-
-      const rawGameId = videojuegoId || gameId;
-      if (rawGameId !== undefined && !isNaN(Number(rawGameId))) {
-        filters.videojuegoId = Number(rawGameId);
-      }
-
-      if (minScore !== undefined && !isNaN(Number(minScore))) {
-        filters.minScore = Number(minScore);
-      }
-
-      if (maxScore !== undefined && !isNaN(Number(maxScore))) {
-        filters.maxScore = Number(maxScore);
-      }
-
+      const filters = parseScoreFilters(req.query);
       const ranking = await ScoreService.getRanking(filters);
       res.json(ranking);
     } catch (error) {

@@ -1,9 +1,16 @@
 import { prisma } from '../../core/prisma';
-import { CreateGenreDTO, UpdateGenreDTO } from './genre.types';
+import { CreateGenreDTO, GenreFilterDTO, UpdateGenreDTO } from './genre.types';
 
 export class GenreService {
-  static async getAll() {
+  static async getAll(filters?: GenreFilterDTO) {
+    const where: any = {};
+
+    if (filters?.nombre) {
+      where.nombre = { contains: filters.nombre.trim() };
+    }
+
     return prisma.genero.findMany({
+      where,
       orderBy: {
         nombre: 'asc',
       },

@@ -1,29 +1,36 @@
 import { prisma } from '../../core/prisma';
-import { CreatePlayerDTO, UpdatePlayerDTO } from './player.types';
+import { CreatePlayerDTO, PlayerFilterDTO, UpdatePlayerDTO } from './player.types';
+import { buildDateFilter } from '../../core/utils/date-filter.util';
 
 export class PlayerService {
-  static async getAll() {
+  static async getAll(filters?: PlayerFilterDTO) {
+    const where: any = {};
+
+    if (filters?.nombre) {
+      where.nombre = { contains: filters.nombre.trim() };
+    }
+
+    if (filters?.gamertag) {
+      where.gamertag = { contains: filters.gamertag.trim() };
+    }
+
+    if (filters?.correo) {
+      where.correo = { contains: filters.correo.trim() };
+    }
+
+    const dateRange = buildDateFilter(filters?.periodo, filters?.fechaInicio, filters?.fechaFin);
+    if (dateRange) {
+      where.fechaRegistro = dateRange;
+    }
+
     return prisma.jugador.findMany({
+      where,
       select: {
         id: true,
         nombre: true,
         gamertag: true,
         correo: true,
         fechaRegistro: true,
-      },
-      orderBy: {
-        fechaRegistro: 'desc',
-      },
-    });
-  }
-
-  static async search(query: string) {
-    return prisma.jugador.findMany({
-      where: {
-        OR: [
-          { nombre: { contains: query } },
-          { gamertag: { contains: query } },
-        ],
       },
       orderBy: {
         fechaRegistro: 'desc',

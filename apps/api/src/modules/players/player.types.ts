@@ -9,3 +9,12 @@ export interface UpdatePlayerDTO {
   gamertag?: string;
   correo?: string;
 }
+
+export interface PlayerFilterDTO {
+  nombre?: string;
+  gamertag?: string;
+  correo?: string;
+  periodo?: number;
+  fechaInicio?: string;
+  fechaFin?: string;
+}

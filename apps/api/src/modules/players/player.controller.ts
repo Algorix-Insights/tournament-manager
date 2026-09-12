@@ -4,13 +4,40 @@ import { PlayerService } from './player.service';
 export class PlayerController {
   static async getAll(req: Request, res: Response): Promise<void> {
     try {
-      const { search } = req.query;
-      if (search && typeof search === 'string') {
-        const players = await PlayerService.search(search);
-        res.json(players);
-        return;
+      const { nombre, gamertag, correo, periodo, fechaInicio, fechaFin, search } = req.query;
+
+      const filters: any = {};
+
+      if (typeof nombre === 'string' && nombre.trim()) {
+        filters.nombre = nombre.trim();
       }
-      const players = await PlayerService.getAll();
+      if (typeof gamertag === 'string' && gamertag.trim()) {
+        filters.gamertag = gamertag.trim();
+      }
+      if (typeof correo === 'string' && correo.trim()) {
+        filters.correo = correo.trim();
+      }
+
+      // Si enviaron 'search' pero no nombre/gamertag específicos, usarlo para ambos como alternativa
+      if (search && typeof search === 'string' && !filters.nombre && !filters.gamertag) {
+        filters.nombre = search.trim();
+      }
+
+      if (periodo !== undefined) {
+        const parsedPeriodo = parseInt(periodo as string, 10);
+        if (!isNaN(parsedPeriodo)) {
+          filters.periodo = parsedPeriodo;
+        }
+      }
+
+      if (typeof fechaInicio === 'string') {
+        filters.fechaInicio = fechaInicio;
+      }
+      if (typeof fechaFin === 'string') {
+        filters.fechaFin = fechaFin;
+      }
+
+      const players = await PlayerService.getAll(filters);
       res.json(players);
     } catch (error) {
       res.status(500).json({ error: 'Error al obtener los jugadores' });

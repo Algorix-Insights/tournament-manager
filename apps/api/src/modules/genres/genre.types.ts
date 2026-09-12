@@ -5,3 +5,7 @@ export interface CreateGenreDTO {
 export interface UpdateGenreDTO {
   nombre?: string;
 }
+
+export interface GenreFilterDTO {
+  nombre?: string;
+}

@@ -2,9 +2,27 @@ import { Request, Response } from 'express';
 import { GameService } from './game.service';
 
 export class GameController {
-  static async getAll(_req: Request, res: Response): Promise<void> {
+  static async getAll(req: Request, res: Response): Promise<void> {
     try {
-      const games = await GameService.getAll();
+      const { nombre, generoId, generoNombre } = req.query;
+      const filters: any = {};
+
+      if (typeof nombre === 'string' && nombre.trim()) {
+        filters.nombre = nombre.trim();
+      }
+
+      if (generoId !== undefined) {
+        const parsedId = parseInt(generoId as string, 10);
+        if (!isNaN(parsedId)) {
+          filters.generoId = parsedId;
+        }
+      }
+
+      if (typeof generoNombre === 'string' && generoNombre.trim()) {
+        filters.generoNombre = generoNombre.trim();
+      }
+
+      const games = await GameService.getAll(filters);
       res.json(games);
     } catch (error) {
       res.status(500).json({ error: 'Error al obtener videojuegos' });

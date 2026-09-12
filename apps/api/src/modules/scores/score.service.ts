@@ -1,9 +1,48 @@
 import { prisma } from '../../core/prisma';
-import { CreateScoreDTO, RankingFilterDTO } from './score.types';
+import { CreateScoreDTO, RankingFilterDTO, ScoreFilterDTO } from './score.types';
+import { buildDateFilter } from '../../core/utils/date-filter.util';
+
+function buildScoreWhere(filters?: ScoreFilterDTO) {
+  const where: any = {};
+
+  if (filters?.jugadorId !== undefined) {
+    where.jugadorId = filters.jugadorId;
+  }
+
+  if (filters?.videojuegoId !== undefined) {
+    where.videojuegoId = filters.videojuegoId;
+  }
+
+  if (filters?.generoId !== undefined) {
+    where.videojuego = {
+      generoId: filters.generoId,
+    };
+  }
+
+  if (filters?.minScore !== undefined || filters?.maxScore !== undefined) {
+    where.puntuacion = {};
+    if (filters.minScore !== undefined) {
+      where.puntuacion.gte = filters.minScore;
+    }
+    if (filters.maxScore !== undefined) {
+      where.puntuacion.lte = filters.maxScore;
+    }
+  }
+
+  const dateRange = buildDateFilter(filters?.periodo, filters?.fechaInicio, filters?.fechaFin);
+  if (dateRange) {
+    where.fecha = dateRange;
+  }
+
+  return where;
+}
 
 export class ScoreService {
-  static async getAll() {
+  static async getAll(filters?: ScoreFilterDTO) {
+    const where = buildScoreWhere(filters);
+
     return prisma.puntuacion.findMany({
+      where,
       include: {
         jugador: {
           select: {
@@ -49,21 +88,7 @@ export class ScoreService {
   }
 
   static async getRanking(filters?: RankingFilterDTO) {
-    const where: any = {};
-
-    if (filters?.videojuegoId !== undefined) {
-      where.videojuegoId = filters.videojuegoId;
-    }
-
-    if (filters?.minScore !== undefined || filters?.maxScore !== undefined) {
-      where.puntuacion = {};
-      if (filters.minScore !== undefined) {
-        where.puntuacion.gte = filters.minScore;
-      }
-      if (filters.maxScore !== undefined) {
-        where.puntuacion.lte = filters.maxScore;
-      }
-    }
+    const where = buildScoreWhere(filters);
 
     const scores = await prisma.puntuacion.findMany({
       where,

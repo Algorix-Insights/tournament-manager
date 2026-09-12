@@ -2,9 +2,16 @@ import { Request, Response } from 'express';
 import { GenreService } from './genre.service';
 
 export class GenreController {
-  static async getAll(_req: Request, res: Response): Promise<void> {
+  static async getAll(req: Request, res: Response): Promise<void> {
     try {
-      const genres = await GenreService.getAll();
+      const { nombre } = req.query;
+      const filters: any = {};
+
+      if (typeof nombre === 'string' && nombre.trim()) {
+        filters.nombre = nombre.trim();
+      }
+
+      const genres = await GenreService.getAll(filters);
       res.json(genres);
     } catch (error) {
       res.status(500).json({ error: 'Error al obtener géneros' });

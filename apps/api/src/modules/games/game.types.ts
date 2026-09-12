@@ -7,3 +7,9 @@ export interface UpdateGameDTO {
   nombre?: string;
   generoId?: number;
 }
+
+export interface GameFilterDTO {
+  nombre?: string;
+  generoId?: number;
+  generoNombre?: string;
+}

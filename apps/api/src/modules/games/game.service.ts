@@ -1,9 +1,26 @@
 import { prisma } from '../../core/prisma';
-import { CreateGameDTO, UpdateGameDTO } from './game.types';
+import { CreateGameDTO, GameFilterDTO, UpdateGameDTO } from './game.types';
 
 export class GameService {
-  static async getAll() {
+  static async getAll(filters?: GameFilterDTO) {
+    const where: any = {};
+
+    if (filters?.nombre) {
+      where.nombre = { contains: filters.nombre.trim() };
+    }
+
+    if (filters?.generoId !== undefined) {
+      where.generoId = filters.generoId;
+    }
+
+    if (filters?.generoNombre) {
+      where.genero = {
+        nombre: { contains: filters.generoNombre.trim() },
+      };
+    }
+
     return prisma.videojuego.findMany({
+      where,
       include: {
         genero: true,
       },
