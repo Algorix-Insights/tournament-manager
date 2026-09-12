@@ -43,10 +43,27 @@ export class ScoreController {
     }
   }
 
-  // RF06: Mostrar clasificación
-  static async getRanking(_req: Request, res: Response): Promise<void> {
+  // RF06: Scoreboard / Clasificación con filtros opcionales
+  static async getRanking(req: Request, res: Response): Promise<void> {
     try {
-      const ranking = await ScoreService.getRanking();
+      const { videojuegoId, gameId, minScore, maxScore } = req.query;
+
+      const filters: any = {};
+
+      const rawGameId = videojuegoId || gameId;
+      if (rawGameId !== undefined && !isNaN(Number(rawGameId))) {
+        filters.videojuegoId = Number(rawGameId);
+      }
+
+      if (minScore !== undefined && !isNaN(Number(minScore))) {
+        filters.minScore = Number(minScore);
+      }
+
+      if (maxScore !== undefined && !isNaN(Number(maxScore))) {
+        filters.maxScore = Number(maxScore);
+      }
+
+      const ranking = await ScoreService.getRanking(filters);
       res.json(ranking);
     } catch (error) {
       res.status(500).json({ error: 'Error al generar el ranking de clasificación' });

@@ -1,5 +1,5 @@
 import { prisma } from '../../core/prisma';
-import { CreateScoreDTO } from './score.types';
+import { CreateScoreDTO, RankingFilterDTO } from './score.types';
 
 export class ScoreService {
   static async getAll() {
@@ -45,19 +45,39 @@ export class ScoreService {
     });
   }
 
-  // RF06: Mostrar clasificación / Ranking
-  static async getRanking() {
+  // RF06: Scoreboard / Ranking con soporte de filtros opcionales (videojuego, rango de puntaje)
+  static async getRanking(filters?: RankingFilterDTO) {
+    const where: any = {};
+
+    if (filters?.videojuegoId !== undefined) {
+      where.videojuegoId = filters.videojuegoId;
+    }
+
+    if (filters?.minScore !== undefined || filters?.maxScore !== undefined) {
+      where.puntuacion = {};
+      if (filters.minScore !== undefined) {
+        where.puntuacion.gte = filters.minScore;
+      }
+      if (filters.maxScore !== undefined) {
+        where.puntuacion.lte = filters.maxScore;
+      }
+    }
+
     const scores = await prisma.puntuacion.findMany({
+      where,
       include: {
         jugador: {
           select: {
+            id: true,
             gamertag: true,
             nombre: true,
           },
         },
         videojuego: {
           select: {
+            id: true,
             nombre: true,
+            genero: true,
           },
         },
       },
@@ -68,9 +88,12 @@ export class ScoreService {
 
     return scores.map((item, index) => ({
       posicion: index + 1,
+      jugadorId: item.jugador.id,
       jugador: item.jugador.gamertag,
       nombreJugador: item.jugador.nombre,
+      videojuegoId: item.videojuego.id,
       videojuego: item.videojuego.nombre,
+      genero: item.videojuego.genero,
       puntuacion: item.puntuacion,
       fecha: item.fecha,
     }));
