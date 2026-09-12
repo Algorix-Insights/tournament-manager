@@ -15,5 +15,5 @@ export default function AppRoutes() {
       <Route path="/scores/*" element={<ScoresRoutes />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
-  )
+  );
 }

@@ -1,14 +1,14 @@
-import { expect, test } from '@jest/globals'
-import { render, screen } from '@testing-library/react'
-import { MemoryRouter } from 'react-router'
-import PlayersRoutes from '@/routes/players.routes'
+import { expect, test } from "@jest/globals";
+import { render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router";
+import PlayersRoutes from "@/routes/players.routes";
 
-test('renders PlayersPage at root of players module', () => {
+test("renders PlayersPage at root of players module", () => {
   render(
-    <MemoryRouter initialEntries={['/']}>
+    <MemoryRouter initialEntries={["/"]}>
       <PlayersRoutes />
     </MemoryRouter>,
-  )
+  );
 
-  expect(screen.getByRole('heading', { name: 'Players' })).toBeInTheDocument()
-})
+  expect(screen.getByRole("heading", { name: "Players" })).toBeInTheDocument();
+});
