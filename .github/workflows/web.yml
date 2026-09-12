@@ -1,4 +1,4 @@
-name: Aplicacion Web
+name: Web Applications - CI
 
 on:
   push:
