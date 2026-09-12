@@ -1,0 +1,56 @@
+name: API - CI
+
+on:
+  push:
+    branches:
+      - develop
+      - 'feature/**'
+      - 'bugfix/**'
+      - 'hotfix/**'
+      - 'release/**'
+    paths:
+      - 'apps/api/**'
+      - 'docker/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'turbo.json'
+      - '.github/workflows/api.yml'
+  pull_request:
+    branches:
+      - develop
+      - main
+      - 'release/**'
+      - 'hotfix/**'
+    paths:
+      - 'apps/api/**'
+      - 'docker/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'turbo.json'
+      - '.github/workflows/api.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate API workspace
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test and build API workspace
+        run: npx turbo run test build --filter=api

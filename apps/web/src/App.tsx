@@ -1,6 +1,1 @@
-export default function App() {
-  return (
-    <main className="">
-    </main>
-  )
-}
+export { default } from '@/app/App'

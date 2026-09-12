@@ -1,0 +1,22 @@
+{
+  "name": "tournament-manager",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "npm@11.19.0",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "turbo watch dev",
+    "dev:api": "turbo watch dev --filter=api",
+    "dev:web": "turbo run dev --filter=web",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "check": "turbo run lint test build",
+    "postinstall": "npm run --workspace=api prisma:generate"
+  },
+  "devDependencies": {
+    "turbo": "~2.8.21"
+  }
+}

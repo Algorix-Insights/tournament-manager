@@ -1,0 +1,56 @@
+name: Web Applications - CI
+
+on:
+  push:
+    branches:
+      - develop
+      - 'feature/**'
+      - 'bugfix/**'
+      - 'hotfix/**'
+      - 'release/**'
+    paths:
+      - 'apps/web/**'
+      - 'docker/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'turbo.json'
+      - '.github/workflows/web.yml'
+  pull_request:
+    branches:
+      - develop
+      - main
+      - 'release/**'
+      - 'hotfix/**'
+    paths:
+      - 'apps/web/**'
+      - 'docker/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'turbo.json'
+      - '.github/workflows/web.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate Web workspace
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint, test, and build Web workspace
+        run: npx turbo run lint test build --filter=web
