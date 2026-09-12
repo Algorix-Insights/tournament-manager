@@ -1,6 +1,8 @@
 module.exports = {
+  extensionsToTreatAsEsm: ['.ts', '.tsx'],
   testEnvironment: 'jsdom',
   moduleNameMapper: { '^@/(.*)$': '<rootDir>/src/$1' },
+  setupFilesAfterEnv: ['<rootDir>/src/tests/setup.ts'],
   transform: {
     '^.+\\.tsx?$': [
       'ts-jest',
@@ -8,10 +10,10 @@ module.exports = {
         tsconfig: {
           esModuleInterop: true,
           jsx: 'react-jsx',
-          module: 'CommonJS',
+          module: 'ESNext',
           paths: { '@/*': ['./src/*'] },
-          verbatimModuleSyntax: false,
         },
+        useESM: true,
       },
     ],
   },
