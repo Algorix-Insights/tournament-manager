@@ -3,127 +3,127 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Iniciando la siembra de datos (seed) en la base de datos MySQL...');
+  console.log('🌱 Starting database seeding in MySQL...');
 
-  // 1. Limpiar datos existentes
-  await prisma.puntuacion.deleteMany();
-  await prisma.jugador.deleteMany();
-  await prisma.videojuego.deleteMany();
-  await prisma.genero.deleteMany();
+  // 1. Clear existing data
+  await prisma.score.deleteMany();
+  await prisma.player.deleteMany();
+  await prisma.game.deleteMany();
+  await prisma.genre.deleteMany();
 
-  // 2. Crear Géneros del Catálogo
-  const peleas = await prisma.genero.create({
-    data: { nombre: 'Peleas' },
+  // 2. Create Genres Catalog
+  const fighting = await prisma.genre.create({
+    data: { name: 'Fighting' },
   });
-  const shooter = await prisma.genero.create({
-    data: { nombre: 'Shooter' },
+  const shooter = await prisma.genre.create({
+    data: { name: 'Shooter' },
   });
-  const deportes = await prisma.genero.create({
-    data: { nombre: 'Deportes' },
+  const sports = await prisma.genre.create({
+    data: { name: 'Sports' },
   });
-  console.log('✅ Géneros creados.');
+  console.log('✅ Genres created.');
 
-  // 3. Crear Jugadores
-  const shadow = await prisma.jugador.create({
+  // 3. Create Players
+  const shadow = await prisma.player.create({
     data: {
-      nombre: 'Carlos Mendoza',
+      name: 'Carlos Mendoza',
       gamertag: 'Shadow',
-      correo: 'shadow@example.com',
+      email: 'shadow@example.com',
     },
   });
 
-  const nova = await prisma.jugador.create({
+  const nova = await prisma.player.create({
     data: {
-      nombre: 'Valeria Gómez',
+      name: 'Valeria Gómez',
       gamertag: 'Nova',
-      correo: 'nova@example.com',
+      email: 'nova@example.com',
     },
   });
 
-  const ghost = await prisma.jugador.create({
+  const ghost = await prisma.player.create({
     data: {
-      nombre: 'Gabriel Torres',
+      name: 'Gabriel Torres',
       gamertag: 'Ghost',
-      correo: 'ghost@example.com',
+      email: 'ghost@example.com',
     },
   });
 
-  const apex = await prisma.jugador.create({
+  const apex = await prisma.player.create({
     data: {
-      nombre: 'Ana Martínez',
+      name: 'Ana Martínez',
       gamertag: 'Apex',
-      correo: 'apex@example.com',
+      email: 'apex@example.com',
     },
   });
 
-  const titan = await prisma.jugador.create({
+  const titan = await prisma.player.create({
     data: {
-      nombre: 'Luis Hernández',
+      name: 'Luis Hernández',
       gamertag: 'Titan',
-      correo: 'titan@example.com',
+      email: 'titan@example.com',
     },
   });
 
-  console.log('✅ Jugadores creados.');
+  console.log('✅ Players created.');
 
-  // 4. Crear Videojuegos
-  const tekken = await prisma.videojuego.create({
+  // 4. Create Games
+  const tekken = await prisma.game.create({
     data: {
-      nombre: 'Tekken 8',
-      generoId: peleas.id,
+      name: 'Tekken 8',
+      genreId: fighting.id,
     },
   });
 
-  const sf6 = await prisma.videojuego.create({
+  const sf6 = await prisma.game.create({
     data: {
-      nombre: 'Street Fighter 6',
-      generoId: peleas.id,
+      name: 'Street Fighter 6',
+      genreId: fighting.id,
     },
   });
 
-  const smash = await prisma.videojuego.create({
+  const smash = await prisma.game.create({
     data: {
-      nombre: 'Super Smash Bros. Ultimate',
-      generoId: peleas.id,
+      name: 'Super Smash Bros. Ultimate',
+      genreId: fighting.id,
     },
   });
 
-  const halo = await prisma.videojuego.create({
+  const halo = await prisma.game.create({
     data: {
-      nombre: 'Halo Infinite',
-      generoId: shooter.id,
+      name: 'Halo Infinite',
+      genreId: shooter.id,
     },
   });
 
-  await prisma.videojuego.create({
+  await prisma.game.create({
     data: {
-      nombre: 'FIFA 24',
-      generoId: deportes.id,
+      name: 'FIFA 24',
+      genreId: sports.id,
     },
   });
 
-  console.log('✅ Videojuegos creados.');
+  console.log('✅ Games created.');
 
-  // 4. Crear Puntuaciones
-  await prisma.puntuacion.createMany({
+  // 5. Create Scores
+  await prisma.score.createMany({
     data: [
-      { jugadorId: shadow.id, videojuegoId: smash.id, puntuacion: 990 },
-      { jugadorId: shadow.id, videojuegoId: tekken.id, puntuacion: 950 },
-      { jugadorId: titan.id, videojuegoId: halo.id, puntuacion: 910 },
-      { jugadorId: apex.id, videojuegoId: sf6.id, puntuacion: 890 },
-      { jugadorId: nova.id, videojuegoId: tekken.id, puntuacion: 820 },
-      { jugadorId: ghost.id, videojuegoId: tekken.id, puntuacion: 760 },
-      { jugadorId: nova.id, videojuegoId: sf6.id, puntuacion: 750 },
+      { playerId: shadow.id, gameId: smash.id, score: 990 },
+      { playerId: shadow.id, gameId: tekken.id, score: 950 },
+      { playerId: titan.id, gameId: halo.id, score: 910 },
+      { playerId: apex.id, gameId: sf6.id, score: 890 },
+      { playerId: nova.id, gameId: tekken.id, score: 820 },
+      { playerId: ghost.id, gameId: tekken.id, score: 760 },
+      { playerId: nova.id, gameId: sf6.id, score: 750 },
     ],
   });
 
-  console.log('✅ Puntuaciones iniciales registradas.');
-  console.log('🎉 Siembra de datos completada exitosamente.');
+  console.log('✅ Initial scores registered.');
+  console.log('🎉 Data seeding completed successfully.');
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Error sembrando datos:', e);
+    console.error('❌ Error seeding data:', e);
     process.exit(1);
   })
   .finally(async () => {

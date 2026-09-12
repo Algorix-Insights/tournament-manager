@@ -1,70 +1,70 @@
 -- ============================================================
--- Sistema de Torneo de Videojuegos - Esquema de Base de Datos
--- Motor: MySQL (Normalizado 3NF / ACID con Catálogo de Géneros)
+-- Video Game Tournament System - Database Schema
+-- Engine: MySQL (Normalized 3NF / ACID with Genre Catalog)
 -- ============================================================
 
-CREATE DATABASE IF NOT EXISTS torneo_db
+CREATE DATABASE IF NOT EXISTS tournament_db
   CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci;
 
-USE torneo_db;
+USE tournament_db;
 
 -- ------------------------------------------------------------
--- Eliminar tablas si existen
+-- Drop tables if they exist
 -- ------------------------------------------------------------
-DROP TABLE IF EXISTS puntuaciones;
-DROP TABLE IF EXISTS videojuegos;
-DROP TABLE IF EXISTS generos;
-DROP TABLE IF EXISTS jugadores;
+DROP TABLE IF EXISTS scores;
+DROP TABLE IF EXISTS games;
+DROP TABLE IF EXISTS genres;
+DROP TABLE IF EXISTS players;
 
 -- ------------------------------------------------------------
--- Tabla: jugadores (RF01)
+-- Table: players (FR01)
 -- ------------------------------------------------------------
-CREATE TABLE jugadores (
+CREATE TABLE players (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
+    name VARCHAR(100) NOT NULL,
     gamertag VARCHAR(50) NOT NULL UNIQUE,
-    correo VARCHAR(100) NOT NULL,
-    fecha_registro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    email VARCHAR(100) NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ------------------------------------------------------------
--- Tabla Catálogo: generos
+-- Catalog Table: genres
 -- ------------------------------------------------------------
-CREATE TABLE generos (
+CREATE TABLE genres (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(50) NOT NULL UNIQUE
+    name VARCHAR(50) NOT NULL UNIQUE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ------------------------------------------------------------
--- Tabla: videojuegos (RF02)
+-- Table: games (FR02)
 -- ------------------------------------------------------------
-CREATE TABLE videojuegos (
+CREATE TABLE games (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL UNIQUE,
-    genero_id INT NOT NULL,
-    CONSTRAINT fk_videojuegos_genero FOREIGN KEY (genero_id) 
-        REFERENCES generos(id) 
+    name VARCHAR(100) NOT NULL UNIQUE,
+    genre_id INT NOT NULL,
+    CONSTRAINT fk_games_genre FOREIGN KEY (genre_id) 
+        REFERENCES genres(id) 
         ON DELETE RESTRICT 
         ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ------------------------------------------------------------
--- Tabla: puntuaciones (RF03)
+-- Table: scores (FR03)
 -- ------------------------------------------------------------
-CREATE TABLE puntuaciones (
+CREATE TABLE scores (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    jugador_id INT NOT NULL,
-    videojuego_id INT NOT NULL,
-    puntuacion INT NOT NULL,
-    fecha DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT chk_puntuacion_positiva CHECK (puntuacion >= 0),
-    CONSTRAINT fk_puntuaciones_jugador FOREIGN KEY (jugador_id) 
-        REFERENCES jugadores(id) 
+    player_id INT NOT NULL,
+    game_id INT NOT NULL,
+    score INT NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_score_positive CHECK (score >= 0),
+    CONSTRAINT fk_scores_player FOREIGN KEY (player_id) 
+        REFERENCES players(id) 
         ON DELETE CASCADE 
         ON UPDATE CASCADE,
-    CONSTRAINT fk_puntuaciones_videojuego FOREIGN KEY (videojuego_id) 
-        REFERENCES videojuegos(id) 
+    CONSTRAINT fk_scores_game FOREIGN KEY (game_id) 
+        REFERENCES games(id) 
         ON DELETE CASCADE 
         ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
