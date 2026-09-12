@@ -1,5 +1,5 @@
-// Prisma Schema para el Sistema de Torneo de Videojuegos
-// Base de datos: MySQL
+// Prisma Schema for Video Game Tournament System
+// Database: MySQL
 
 generator client {
   provider = "prisma-client-js"
@@ -10,35 +10,44 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Jugador {
-  id            Int          @id @default(autoincrement())
-  nombre        String       @db.VarChar(100)
-  gamertag      String       @unique @db.VarChar(50)
-  correo        String       @db.VarChar(100)
-  fechaRegistro DateTime     @default(now()) @map("fecha_registro")
-  puntuaciones  Puntuacion[]
+model Player {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(100)
+  gamertag  String   @unique @db.VarChar(50)
+  email     String   @db.VarChar(100)
+  createdAt DateTime @default(now()) @map("created_at")
+  scores    Score[]
 
-  @@map("jugadores")
+  @@map("players")
 }
 
-model Videojuego {
-  id           Int          @id @default(autoincrement())
-  nombre       String       @unique @db.VarChar(100)
-  genero       String       @db.VarChar(50)
-  puntuaciones Puntuacion[]
+model Genre {
+  id    Int    @id @default(autoincrement())
+  name  String @unique @db.VarChar(50)
+  games Game[]
 
-  @@map("videojuegos")
+  @@map("genres")
 }
 
-model Puntuacion {
-  id           Int        @id @default(autoincrement())
-  jugadorId    Int        @map("jugador_id")
-  videojuegoId Int        @map("videojuego_id")
-  puntuacion   Int
-  fecha        DateTime   @default(now())
+model Game {
+  id      Int     @id @default(autoincrement())
+  name    String  @unique @db.VarChar(100)
+  genreId Int     @map("genre_id")
+  genre   Genre   @relation(fields: [genreId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  scores  Score[]
 
-  jugador    Jugador    @relation(fields: [jugadorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  videojuego Videojuego @relation(fields: [videojuegoId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  @@map("games")
+}
 
-  @@map("puntuaciones")
+model Score {
+  id        Int      @id @default(autoincrement())
+  playerId  Int      @map("player_id")
+  gameId    Int      @map("game_id")
+  score     Int
+  createdAt DateTime @default(now()) @map("created_at")
+
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  game   Game   @relation(fields: [gameId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("scores")
 }
