@@ -21,10 +21,19 @@ model Jugador {
   @@map("jugadores")
 }
 
+model Genero {
+  id          Int          @id @default(autoincrement())
+  nombre      String       @unique @db.VarChar(50)
+  videojuegos Videojuego[]
+
+  @@map("generos")
+}
+
 model Videojuego {
   id           Int          @id @default(autoincrement())
   nombre       String       @unique @db.VarChar(100)
-  genero       String       @db.VarChar(50)
+  generoId     Int          @map("genero_id")
+  genero       Genero       @relation(fields: [generoId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   puntuaciones Puntuacion[]
 
   @@map("videojuegos")

@@ -39,7 +39,11 @@ export class ScoreService {
       },
       include: {
         jugador: true,
-        videojuego: true,
+        videojuego: {
+          include: {
+            genero: true,
+          },
+        },
       },
     });
   }
@@ -91,7 +95,7 @@ export class ScoreService {
       nombreJugador: item.jugador.nombre,
       videojuegoId: item.videojuego.id,
       videojuego: item.videojuego.nombre,
-      genero: item.videojuego.genero,
+      genero: item.videojuego.genero.nombre,
       puntuacion: item.puntuacion,
       fecha: item.fecha,
     }));

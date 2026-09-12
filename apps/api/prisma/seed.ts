@@ -9,8 +9,21 @@ async function main() {
   await prisma.puntuacion.deleteMany();
   await prisma.jugador.deleteMany();
   await prisma.videojuego.deleteMany();
+  await prisma.genero.deleteMany();
 
-  // 2. Crear Jugadores
+  // 2. Crear Géneros del Catálogo
+  const peleas = await prisma.genero.create({
+    data: { nombre: 'Peleas' },
+  });
+  const shooter = await prisma.genero.create({
+    data: { nombre: 'Shooter' },
+  });
+  const deportes = await prisma.genero.create({
+    data: { nombre: 'Deportes' },
+  });
+  console.log('✅ Géneros creados.');
+
+  // 3. Crear Jugadores
   const shadow = await prisma.jugador.create({
     data: {
       nombre: 'Carlos Mendoza',
@@ -53,39 +66,39 @@ async function main() {
 
   console.log('✅ Jugadores creados.');
 
-  // 3. Crear Videojuegos
+  // 4. Crear Videojuegos
   const tekken = await prisma.videojuego.create({
     data: {
       nombre: 'Tekken 8',
-      genero: 'Peleas',
+      generoId: peleas.id,
     },
   });
 
   const sf6 = await prisma.videojuego.create({
     data: {
       nombre: 'Street Fighter 6',
-      genero: 'Peleas',
+      generoId: peleas.id,
     },
   });
 
   const smash = await prisma.videojuego.create({
     data: {
       nombre: 'Super Smash Bros. Ultimate',
-      genero: 'Peleas',
+      generoId: peleas.id,
     },
   });
 
   const halo = await prisma.videojuego.create({
     data: {
       nombre: 'Halo Infinite',
-      genero: 'Shooter',
+      generoId: shooter.id,
     },
   });
 
   await prisma.videojuego.create({
     data: {
       nombre: 'FIFA 24',
-      genero: 'Deportes',
+      generoId: deportes.id,
     },
   });
 

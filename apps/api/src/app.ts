@@ -3,6 +3,7 @@ import cors from 'cors';
 import playerRouter from './modules/players/player.router';
 import gameRouter from './modules/games/game.router';
 import scoreRouter from './modules/scores/score.router';
+import genreRouter from './modules/genres/genre.router';
 
 const app = express();
 
@@ -13,6 +14,8 @@ app.use(express.json());
 app.use('/api/players', playerRouter);
 app.use('/api/games', gameRouter);
 app.use('/api/scores', scoreRouter);
+app.use('/api/genres', genreRouter);
+app.use('/api/generos', genreRouter);
 
 app.get('/', (_req, res) => {
   res.json({
@@ -21,6 +24,7 @@ app.get('/', (_req, res) => {
       players: '/api/players',
       games: '/api/games',
       scores: '/api/scores',
+      genres: '/api/genres',
       ranking: '/api/scores/ranking',
       stats: '/api/scores/stats',
     },

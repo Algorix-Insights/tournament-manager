@@ -1,9 +1,9 @@
 export interface CreateGameDTO {
   nombre: string;
-  genero: string;
+  generoId: number;
 }
 
 export interface UpdateGameDTO {
   nombre?: string;
-  genero?: string;
+  generoId?: number;
 }

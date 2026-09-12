@@ -37,7 +37,11 @@ export class PlayerService {
       include: {
         puntuaciones: {
           include: {
-            videojuego: true,
+            videojuego: {
+              include: {
+                genero: true,
+              },
+            },
           },
         },
       },
