@@ -7,57 +7,64 @@ export class GameService {
   static async getAll(filters?: GameFilterDTO) {
     const where: any = {};
 
-    if (filters?.nombre) {
-      where.nombre = { contains: filters.nombre.trim() };
+    const name = filters?.name ?? filters?.nombre;
+    if (name) {
+      where.name = { contains: name.trim() };
     }
 
-    if (filters?.generoId !== undefined) {
-      where.generoId = filters.generoId;
+    const genreId = filters?.genreId ?? filters?.generoId;
+    if (genreId !== undefined) {
+      where.genreId = genreId;
     }
 
-    if (filters?.generoNombre) {
-      where.genero = {
-        nombre: { contains: filters.generoNombre.trim() },
+    const genreName = filters?.genreName ?? filters?.generoNombre;
+    if (genreName) {
+      where.genre = {
+        name: { contains: genreName.trim() },
       };
     }
 
+    const order = filters?.order ?? filters?.orden;
     const orderBy = parseOrderBy(
-      filters?.orden,
+      order,
       {
         id: 'id',
-        nombre: 'nombre',
-        generoId: 'generoId',
-        genero: { genero: 'nombre' },
+        name: 'name',
+        nombre: 'name',
+        genreId: 'genreId',
+        generoId: 'genreId',
+        genre: { genre: 'name' },
+        genero: { genre: 'name' },
       },
-      { nombre: 'asc' }
+      { name: 'asc' }
     );
 
     const { skip, take } = parsePaginationParams(filters);
 
     const [data, totalRecords] = await Promise.all([
-      prisma.videojuego.findMany({
+      prisma.game.findMany({
         where,
         include: {
-          genero: true,
+          genre: true,
         },
         orderBy,
         skip,
         take,
       }),
-      prisma.videojuego.count({ where }),
+      prisma.game.count({ where }),
     ]);
 
     return formatPaginatedResponse(data, totalRecords);
   }
 
   static async getById(id: number) {
-    return prisma.videojuego.findUnique({
+    return prisma.game.findUnique({
       where: { id },
       include: {
-        genero: true,
-        puntuaciones: {
+        genre: true,
+        scores: {
           include: {
-            jugador: true,
+            player: true,
           },
         },
       },
@@ -65,32 +72,32 @@ export class GameService {
   }
 
   static async create(data: CreateGameDTO) {
-    return prisma.videojuego.create({
+    return prisma.game.create({
       data: {
-        nombre: data.nombre.trim(),
-        generoId: data.generoId,
+        name: data.name.trim(),
+        genreId: data.genreId,
       },
       include: {
-        genero: true,
+        genre: true,
       },
     });
   }
 
   static async update(id: number, data: UpdateGameDTO) {
-    return prisma.videojuego.update({
+    return prisma.game.update({
       where: { id },
       data: {
-        ...(data.nombre && { nombre: data.nombre.trim() }),
-        ...(data.generoId !== undefined && { generoId: data.generoId }),
+        ...(data.name && { name: data.name.trim() }),
+        ...(data.genreId !== undefined && { genreId: data.genreId }),
       },
       include: {
-        genero: true,
+        genre: true,
       },
     });
   }
 
   static async delete(id: number) {
-    return prisma.videojuego.delete({
+    return prisma.game.delete({
       where: { id },
     });
   }

@@ -8,67 +8,78 @@ export class PlayerService {
   static async getAll(filters?: PlayerFilterDTO) {
     const where: any = {};
 
-    if (filters?.nombre) {
-      where.nombre = { contains: filters.nombre.trim() };
+    const name = filters?.name ?? filters?.nombre;
+    if (name) {
+      where.name = { contains: name.trim() };
     }
 
     if (filters?.gamertag) {
       where.gamertag = { contains: filters.gamertag.trim() };
     }
 
-    if (filters?.correo) {
-      where.correo = { contains: filters.correo.trim() };
+    const email = filters?.email ?? filters?.correo;
+    if (email) {
+      where.email = { contains: email.trim() };
     }
 
-    const dateRange = buildDateFilter(filters?.periodo, filters?.fechaInicio, filters?.fechaFin);
+    const period = filters?.period ?? filters?.periodo;
+    const startDate = filters?.startDate ?? filters?.fechaInicio;
+    const endDate = filters?.endDate ?? filters?.fechaFin;
+
+    const dateRange = buildDateFilter(period, startDate, endDate);
     if (dateRange) {
-      where.fechaRegistro = dateRange;
+      where.createdAt = dateRange;
     }
 
+    const order = filters?.order ?? filters?.orden;
     const orderBy = parseOrderBy(
-      filters?.orden,
+      order,
       {
         id: 'id',
-        nombre: 'nombre',
+        name: 'name',
+        nombre: 'name',
         gamertag: 'gamertag',
-        correo: 'correo',
-        fechaRegistro: 'fechaRegistro',
-        fecha: 'fechaRegistro',
+        email: 'email',
+        correo: 'email',
+        createdAt: 'createdAt',
+        fechaRegistro: 'createdAt',
+        date: 'createdAt',
+        fecha: 'createdAt',
       },
-      { fechaRegistro: 'desc' }
+      { createdAt: 'desc' }
     );
 
     const { skip, take } = parsePaginationParams(filters);
 
     const [data, totalRecords] = await Promise.all([
-      prisma.jugador.findMany({
+      prisma.player.findMany({
         where,
         select: {
           id: true,
-          nombre: true,
+          name: true,
           gamertag: true,
-          correo: true,
-          fechaRegistro: true,
+          email: true,
+          createdAt: true,
         },
         orderBy,
         skip,
         take,
       }),
-      prisma.jugador.count({ where }),
+      prisma.player.count({ where }),
     ]);
 
     return formatPaginatedResponse(data, totalRecords);
   }
 
   static async getById(id: number) {
-    return prisma.jugador.findUnique({
+    return prisma.player.findUnique({
       where: { id },
       include: {
-        puntuaciones: {
+        scores: {
           include: {
-            videojuego: {
+            game: {
               include: {
-                genero: true,
+                genre: true,
               },
             },
           },
@@ -78,24 +89,28 @@ export class PlayerService {
   }
 
   static async create(data: CreatePlayerDTO) {
-    return prisma.jugador.create({
+    return prisma.player.create({
       data: {
-        nombre: data.nombre.trim(),
+        name: data.name.trim(),
         gamertag: data.gamertag.trim(),
-        correo: data.correo.trim(),
+        email: data.email.trim(),
       },
     });
   }
 
   static async update(id: number, data: UpdatePlayerDTO) {
-    return prisma.jugador.update({
+    return prisma.player.update({
       where: { id },
-      data,
+      data: {
+        ...(data.name !== undefined && { name: data.name.trim() }),
+        ...(data.gamertag !== undefined && { gamertag: data.gamertag.trim() }),
+        ...(data.email !== undefined && { email: data.email.trim() }),
+      },
     });
   }
 
   static async delete(id: number) {
-    return prisma.jugador.delete({
+    return prisma.player.delete({
       where: { id },
     });
   }

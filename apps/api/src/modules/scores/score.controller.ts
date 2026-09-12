@@ -2,20 +2,44 @@ import { Request, Response } from 'express';
 import { ScoreService } from './score.service';
 
 function parseScoreFilters(query: any) {
-  const { jugadorId, videojuegoId, gameId, generoId, minScore, maxScore, periodo, fechaInicio, fechaFin, orden, pagina, cantidadRegistros } = query;
+  const {
+    playerId,
+    jugadorId,
+    gameId,
+    videojuegoId,
+    genreId,
+    generoId,
+    minScore,
+    maxScore,
+    period,
+    periodo,
+    startDate,
+    fechaInicio,
+    endDate,
+    fechaFin,
+    order,
+    orden,
+    page,
+    pagina,
+    limit,
+    cantidadRegistros,
+  } = query;
+
   const filters: any = {};
 
-  if (jugadorId !== undefined && !isNaN(Number(jugadorId))) {
-    filters.jugadorId = Number(jugadorId);
+  const rawPlayerId = playerId ?? jugadorId;
+  if (rawPlayerId !== undefined && !isNaN(Number(rawPlayerId))) {
+    filters.playerId = Number(rawPlayerId);
   }
 
-  const rawGameId = videojuegoId || gameId;
+  const rawGameId = gameId ?? videojuegoId;
   if (rawGameId !== undefined && !isNaN(Number(rawGameId))) {
-    filters.videojuegoId = Number(rawGameId);
+    filters.gameId = Number(rawGameId);
   }
 
-  if (generoId !== undefined && !isNaN(Number(generoId))) {
-    filters.generoId = Number(generoId);
+  const rawGenreId = genreId ?? generoId;
+  if (rawGenreId !== undefined && !isNaN(Number(rawGenreId))) {
+    filters.genreId = Number(rawGenreId);
   }
 
   if (minScore !== undefined && !isNaN(Number(minScore))) {
@@ -26,32 +50,39 @@ function parseScoreFilters(query: any) {
     filters.maxScore = Number(maxScore);
   }
 
-  if (periodo !== undefined && !isNaN(Number(periodo))) {
-    filters.periodo = Number(periodo);
+  const rawPeriod = period ?? periodo;
+  if (rawPeriod !== undefined && !isNaN(Number(rawPeriod))) {
+    filters.period = Number(rawPeriod);
   }
 
-  if (typeof fechaInicio === 'string') {
-    filters.fechaInicio = fechaInicio;
-  }
-  if (typeof fechaFin === 'string') {
-    filters.fechaFin = fechaFin;
+  const rawStartDate = (startDate ?? fechaInicio) as string;
+  if (typeof rawStartDate === 'string') {
+    filters.startDate = rawStartDate;
   }
 
-  if (typeof orden === 'string' && orden.trim()) {
-    filters.orden = orden.trim();
+  const rawEndDate = (endDate ?? fechaFin) as string;
+  if (typeof rawEndDate === 'string') {
+    filters.endDate = rawEndDate;
   }
 
-  if (pagina !== undefined) {
-    const parsedPagina = parseInt(pagina as string, 10);
-    if (!isNaN(parsedPagina)) {
-      filters.pagina = parsedPagina;
+  const rawOrder = (order ?? orden) as string;
+  if (typeof rawOrder === 'string' && rawOrder.trim()) {
+    filters.order = rawOrder.trim();
+  }
+
+  const rawPage = page ?? pagina;
+  if (rawPage !== undefined) {
+    const parsedPage = parseInt(rawPage as string, 10);
+    if (!isNaN(parsedPage)) {
+      filters.page = parsedPage;
     }
   }
 
-  if (cantidadRegistros !== undefined) {
-    const parsedLimit = parseInt(cantidadRegistros as string, 10);
+  const rawLimit = limit ?? cantidadRegistros;
+  if (rawLimit !== undefined) {
+    const parsedLimit = parseInt(rawLimit as string, 10);
     if (!isNaN(parsedLimit)) {
-      filters.cantidadRegistros = parsedLimit;
+      filters.limit = parsedLimit;
     }
   }
 
@@ -65,38 +96,40 @@ export class ScoreController {
       const scores = await ScoreService.getAll(filters);
       res.json(scores);
     } catch (error) {
-      res.status(500).json({ error: 'Error al obtener puntuaciones' });
+      res.status(500).json({ error: 'Error fetching scores' });
     }
   }
 
   static async create(req: Request, res: Response): Promise<void> {
     try {
-      const { jugadorId, videojuegoId, puntuacion } = req.body;
+      const rawPlayerId = req.body.playerId ?? req.body.jugadorId;
+      const rawGameId = req.body.gameId ?? req.body.videojuegoId;
+      const rawScore = req.body.score ?? req.body.puntuacion;
 
-      if (jugadorId === undefined || videojuegoId === undefined || puntuacion === undefined) {
-        res.status(400).json({ error: 'Jugador, Videojuego y Puntuación son obligatorios' });
+      if (rawPlayerId === undefined || rawGameId === undefined || rawScore === undefined) {
+        res.status(400).json({ error: 'Player, Game, and Score are required' });
         return;
       }
 
-      const parsedScore = Number(puntuacion);
+      const parsedScore = Number(rawScore);
       if (isNaN(parsedScore) || parsedScore < 0) {
-        res.status(400).json({ error: 'La puntuación no puede ser negativa' });
+        res.status(400).json({ error: 'Score cannot be negative' });
         return;
       }
 
       const score = await ScoreService.create({
-        jugadorId: Number(jugadorId),
-        videojuegoId: Number(videojuegoId),
-        puntuacion: parsedScore,
+        playerId: Number(rawPlayerId),
+        gameId: Number(rawGameId),
+        score: parsedScore,
       });
 
       res.status(201).json(score);
     } catch (error: any) {
       if (error.code === 'P2003') {
-        res.status(400).json({ error: 'El jugador o el videojuego especificado no existen' });
+        res.status(400).json({ error: 'The specified player or game does not exist' });
         return;
       }
-      res.status(500).json({ error: error.message || 'Error al registrar puntuación' });
+      res.status(500).json({ error: error.message || 'Error registering score' });
     }
   }
 
@@ -106,7 +139,7 @@ export class ScoreController {
       const ranking = await ScoreService.getRanking(filters);
       res.json(ranking);
     } catch (error) {
-      res.status(500).json({ error: 'Error al generar el ranking de clasificación' });
+      res.status(500).json({ error: 'Error generating ranking table' });
     }
   }
 
@@ -115,7 +148,7 @@ export class ScoreController {
       const stats = await ScoreService.getStats();
       res.json(stats);
     } catch (error) {
-      res.status(500).json({ error: 'Error al calcular las estadísticas' });
+      res.status(500).json({ error: 'Error calculating tournament statistics' });
     }
   }
 
@@ -124,17 +157,17 @@ export class ScoreController {
       const paramId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
       const id = parseInt(paramId, 10);
       if (isNaN(id)) {
-        res.status(400).json({ error: 'ID de puntuación inválido' });
+        res.status(400).json({ error: 'Invalid score ID' });
         return;
       }
       await ScoreService.delete(id);
-      res.json({ message: 'Puntuación eliminada exitosamente' });
+      res.json({ message: 'Score deleted successfully' });
     } catch (error: any) {
       if (error.code === 'P2025') {
-        res.status(404).json({ error: 'Puntuación no encontrada' });
+        res.status(404).json({ error: 'Score not found' });
         return;
       }
-      res.status(500).json({ error: 'Error al eliminar puntuación' });
+      res.status(500).json({ error: 'Error deleting score' });
     }
   }
 }

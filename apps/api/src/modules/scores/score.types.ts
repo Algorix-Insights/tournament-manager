@@ -1,15 +1,31 @@
 export interface CreateScoreDTO {
-  jugadorId: number;
-  videojuegoId: number;
-  puntuacion: number;
+  playerId: number;
+  gameId: number;
+  score: number;
+
+  // Legacy compatibility
+  jugadorId?: number;
+  videojuegoId?: number;
+  puntuacion?: number;
 }
 
 export interface RankingFilterDTO {
+  playerId?: number;
+  gameId?: number;
+  genreId?: number;
+  minScore?: number;
+  maxScore?: number;
+  period?: number;
+  startDate?: string;
+  endDate?: string;
+  order?: string;
+  page?: number;
+  limit?: number;
+
+  // Legacy compatibility
   jugadorId?: number;
   videojuegoId?: number;
   generoId?: number;
-  minScore?: number;
-  maxScore?: number;
   periodo?: number;
   fechaInicio?: string;
   fechaFin?: string;

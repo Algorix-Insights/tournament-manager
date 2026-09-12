@@ -1,18 +1,28 @@
 export interface CreatePlayerDTO {
-  nombre: string;
+  name: string;
   gamertag: string;
-  correo: string;
+  email: string;
 }
 
 export interface UpdatePlayerDTO {
-  nombre?: string;
+  name?: string;
   gamertag?: string;
-  correo?: string;
+  email?: string;
 }
 
 export interface PlayerFilterDTO {
-  nombre?: string;
+  name?: string;
   gamertag?: string;
+  email?: string;
+  period?: number;
+  startDate?: string;
+  endDate?: string;
+  order?: string;
+  page?: number;
+  limit?: number;
+
+  // Legacy compatibility
+  nombre?: string;
   correo?: string;
   periodo?: number;
   fechaInicio?: string;

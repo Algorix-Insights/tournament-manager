@@ -11,16 +11,15 @@ app.use(cors());
 app.use(express.json());
 app.disable('x-powered-by');
 
-// Endpoints base de la API
+// Base API Endpoints
 app.use('/api/players', playerRouter);
 app.use('/api/games', gameRouter);
 app.use('/api/scores', scoreRouter);
 app.use('/api/genres', genreRouter);
-app.use('/api/generos', genreRouter);
 
 app.get('/', (_req, res) => {
   res.json({
-    message: 'API del Sistema de Torneo de Videojuegos lista',
+    message: 'Tournament Manager API ready',
     endpoints: {
       players: '/api/players',
       games: '/api/games',
@@ -36,7 +35,7 @@ const PORT = process.env.PORT || 3000;
 
 if (process.env.NODE_ENV !== 'test') {
   app.listen(PORT, () => {
-    console.log(`🎮 Server corriendo exitosamente en el puerto ${PORT}`);
+    console.log(`🎮 Server running successfully on port ${PORT}`);
   });
 }
 

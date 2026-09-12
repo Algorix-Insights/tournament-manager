@@ -7,67 +7,70 @@ export class GenreService {
   static async getAll(filters?: GenreFilterDTO) {
     const where: any = {};
 
-    if (filters?.nombre) {
-      where.nombre = { contains: filters.nombre.trim() };
+    const name = filters?.name ?? filters?.nombre;
+    if (name) {
+      where.name = { contains: name.trim() };
     }
 
+    const order = filters?.order ?? filters?.orden;
     const orderBy = parseOrderBy(
-      filters?.orden,
+      order,
       {
         id: 'id',
-        nombre: 'nombre',
+        name: 'name',
+        nombre: 'name',
       },
-      { nombre: 'asc' }
+      { name: 'asc' }
     );
 
     const { skip, take } = parsePaginationParams(filters);
 
     const [data, totalRecords] = await Promise.all([
-      prisma.genero.findMany({
+      prisma.genre.findMany({
         where,
         orderBy,
         skip,
         take,
         include: {
           _count: {
-            select: { videojuegos: true },
+            select: { games: true },
           },
         },
       }),
-      prisma.genero.count({ where }),
+      prisma.genre.count({ where }),
     ]);
 
     return formatPaginatedResponse(data, totalRecords);
   }
 
   static async getById(id: number) {
-    return prisma.genero.findUnique({
+    return prisma.genre.findUnique({
       where: { id },
       include: {
-        videojuegos: true,
+        games: true,
       },
     });
   }
 
   static async create(data: CreateGenreDTO) {
-    return prisma.genero.create({
+    return prisma.genre.create({
       data: {
-        nombre: data.nombre.trim(),
+        name: data.name.trim(),
       },
     });
   }
 
   static async update(id: number, data: UpdateGenreDTO) {
-    return prisma.genero.update({
+    return prisma.genre.update({
       where: { id },
       data: {
-        ...(data.nombre && { nombre: data.nombre.trim() }),
+        ...(data.name && { name: data.name.trim() }),
       },
     });
   }
 
   static async delete(id: number) {
-    return prisma.genero.delete({
+    return prisma.genre.delete({
       where: { id },
     });
   }

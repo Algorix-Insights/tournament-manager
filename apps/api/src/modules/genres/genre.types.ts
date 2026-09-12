@@ -1,12 +1,18 @@
 export interface CreateGenreDTO {
-  nombre: string;
+  name: string;
 }
 
 export interface UpdateGenreDTO {
-  nombre?: string;
+  name?: string;
 }
 
 export interface GenreFilterDTO {
+  name?: string;
+  order?: string;
+  page?: number;
+  limit?: number;
+
+  // Legacy compatibility
   nombre?: string;
   orden?: string;
   pagina?: number;

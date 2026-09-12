@@ -4,35 +4,39 @@ import { GenreService } from './genre.service';
 export class GenreController {
   static async getAll(req: Request, res: Response): Promise<void> {
     try {
-      const { nombre, orden, pagina, cantidadRegistros } = req.query;
+      const { name, nombre, order, orden, page, pagina, limit, cantidadRegistros } = req.query;
       const filters: any = {};
 
-      if (typeof nombre === 'string' && nombre.trim()) {
-        filters.nombre = nombre.trim();
+      const rawName = (name ?? nombre) as string;
+      if (typeof rawName === 'string' && rawName.trim()) {
+        filters.name = rawName.trim();
       }
 
-      if (typeof orden === 'string' && orden.trim()) {
-        filters.orden = orden.trim();
+      const rawOrder = (order ?? orden) as string;
+      if (typeof rawOrder === 'string' && rawOrder.trim()) {
+        filters.order = rawOrder.trim();
       }
 
-      if (pagina !== undefined) {
-        const parsedPagina = parseInt(pagina as string, 10);
-        if (!isNaN(parsedPagina)) {
-          filters.pagina = parsedPagina;
+      const rawPage = page ?? pagina;
+      if (rawPage !== undefined) {
+        const parsedPage = parseInt(rawPage as string, 10);
+        if (!isNaN(parsedPage)) {
+          filters.page = parsedPage;
         }
       }
 
-      if (cantidadRegistros !== undefined) {
-        const parsedLimit = parseInt(cantidadRegistros as string, 10);
+      const rawLimit = limit ?? cantidadRegistros;
+      if (rawLimit !== undefined) {
+        const parsedLimit = parseInt(rawLimit as string, 10);
         if (!isNaN(parsedLimit)) {
-          filters.cantidadRegistros = parsedLimit;
+          filters.limit = parsedLimit;
         }
       }
 
       const genres = await GenreService.getAll(filters);
       res.json(genres);
     } catch (error) {
-      res.status(500).json({ error: 'Error al obtener géneros' });
+      res.status(500).json({ error: 'Error fetching genres' });
     }
   }
 
@@ -41,37 +45,37 @@ export class GenreController {
       const paramId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
       const id = parseInt(paramId, 10);
       if (isNaN(id)) {
-        res.status(400).json({ error: 'ID de género inválido' });
+        res.status(400).json({ error: 'Invalid genre ID' });
         return;
       }
       const genre = await GenreService.getById(id);
       if (!genre) {
-        res.status(404).json({ error: 'Género no encontrado' });
+        res.status(404).json({ error: 'Genre not found' });
         return;
       }
       res.json(genre);
     } catch (error) {
-      res.status(500).json({ error: 'Error al obtener género' });
+      res.status(500).json({ error: 'Error fetching genre' });
     }
   }
 
   static async create(req: Request, res: Response): Promise<void> {
     try {
-      const { nombre } = req.body;
+      const name = req.body.name ?? req.body.nombre;
 
-      if (!nombre || typeof nombre !== 'string' || !nombre.trim()) {
-        res.status(400).json({ error: 'El nombre del género es obligatorio' });
+      if (!name || typeof name !== 'string' || !name.trim()) {
+        res.status(400).json({ error: 'Genre name is required' });
         return;
       }
 
-      const genre = await GenreService.create({ nombre });
+      const genre = await GenreService.create({ name });
       res.status(201).json(genre);
     } catch (error: any) {
       if (error.code === 'P2002') {
-        res.status(400).json({ error: 'Ya existe un género con ese nombre' });
+        res.status(400).json({ error: 'A genre with that name already exists' });
         return;
       }
-      res.status(500).json({ error: 'Error al registrar el género' });
+      res.status(500).json({ error: 'Error registering genre' });
     }
   }
 
@@ -80,28 +84,28 @@ export class GenreController {
       const paramId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
       const id = parseInt(paramId, 10);
       if (isNaN(id)) {
-        res.status(400).json({ error: 'ID de género inválido' });
+        res.status(400).json({ error: 'Invalid genre ID' });
         return;
       }
 
-      const { nombre } = req.body;
-      if (nombre !== undefined && (typeof nombre !== 'string' || !nombre.trim())) {
-        res.status(400).json({ error: 'Nombre de género inválido' });
+      const name = req.body.name ?? req.body.nombre;
+      if (name !== undefined && (typeof name !== 'string' || !name.trim())) {
+        res.status(400).json({ error: 'Invalid genre name' });
         return;
       }
 
-      const updated = await GenreService.update(id, { nombre });
+      const updated = await GenreService.update(id, { name });
       res.json(updated);
     } catch (error: any) {
       if (error.code === 'P2025') {
-        res.status(404).json({ error: 'Género no encontrado' });
+        res.status(404).json({ error: 'Genre not found' });
         return;
       }
       if (error.code === 'P2002') {
-        res.status(400).json({ error: 'Ya existe un género con ese nombre' });
+        res.status(400).json({ error: 'A genre with that name already exists' });
         return;
       }
-      res.status(500).json({ error: 'Error al actualizar el género' });
+      res.status(500).json({ error: 'Error updating genre' });
     }
   }
 
@@ -110,21 +114,21 @@ export class GenreController {
       const paramId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
       const id = parseInt(paramId, 10);
       if (isNaN(id)) {
-        res.status(400).json({ error: 'ID de género inválido' });
+        res.status(400).json({ error: 'Invalid genre ID' });
         return;
       }
       await GenreService.delete(id);
-      res.json({ message: 'Género eliminado exitosamente' });
+      res.json({ message: 'Genre deleted successfully' });
     } catch (error: any) {
       if (error.code === 'P2025') {
-        res.status(404).json({ error: 'Género no encontrado' });
+        res.status(404).json({ error: 'Genre not found' });
         return;
       }
       if (error.code === 'P2003') {
-        res.status(400).json({ error: 'No se puede eliminar el género porque tiene videojuegos asociados' });
+        res.status(400).json({ error: 'Cannot delete genre because it has associated games' });
         return;
       }
-      res.status(500).json({ error: 'Error al eliminar género' });
+      res.status(500).json({ error: 'Error deleting genre' });
     }
   }
 }

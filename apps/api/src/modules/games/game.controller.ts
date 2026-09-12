@@ -4,46 +4,66 @@ import { GameService } from './game.service';
 export class GameController {
   static async getAll(req: Request, res: Response): Promise<void> {
     try {
-      const { nombre, generoId, generoNombre, orden, pagina, cantidadRegistros } = req.query;
+      const {
+        name,
+        nombre,
+        genreId,
+        generoId,
+        genreName,
+        generoNombre,
+        order,
+        orden,
+        page,
+        pagina,
+        limit,
+        cantidadRegistros,
+      } = req.query;
+
       const filters: any = {};
 
-      if (typeof nombre === 'string' && nombre.trim()) {
-        filters.nombre = nombre.trim();
+      const rawName = (name ?? nombre) as string;
+      if (typeof rawName === 'string' && rawName.trim()) {
+        filters.name = rawName.trim();
       }
 
-      if (generoId !== undefined) {
-        const parsedId = parseInt(generoId as string, 10);
+      const rawGenreId = genreId ?? generoId;
+      if (rawGenreId !== undefined) {
+        const parsedId = parseInt(rawGenreId as string, 10);
         if (!isNaN(parsedId)) {
-          filters.generoId = parsedId;
+          filters.genreId = parsedId;
         }
       }
 
-      if (typeof generoNombre === 'string' && generoNombre.trim()) {
-        filters.generoNombre = generoNombre.trim();
+      const rawGenreName = (genreName ?? generoNombre) as string;
+      if (typeof rawGenreName === 'string' && rawGenreName.trim()) {
+        filters.genreName = rawGenreName.trim();
       }
 
-      if (typeof orden === 'string' && orden.trim()) {
-        filters.orden = orden.trim();
+      const rawOrder = (order ?? orden) as string;
+      if (typeof rawOrder === 'string' && rawOrder.trim()) {
+        filters.order = rawOrder.trim();
       }
 
-      if (pagina !== undefined) {
-        const parsedPagina = parseInt(pagina as string, 10);
-        if (!isNaN(parsedPagina)) {
-          filters.pagina = parsedPagina;
+      const rawPage = page ?? pagina;
+      if (rawPage !== undefined) {
+        const parsedPage = parseInt(rawPage as string, 10);
+        if (!isNaN(parsedPage)) {
+          filters.page = parsedPage;
         }
       }
 
-      if (cantidadRegistros !== undefined) {
-        const parsedLimit = parseInt(cantidadRegistros as string, 10);
+      const rawLimit = limit ?? cantidadRegistros;
+      if (rawLimit !== undefined) {
+        const parsedLimit = parseInt(rawLimit as string, 10);
         if (!isNaN(parsedLimit)) {
-          filters.cantidadRegistros = parsedLimit;
+          filters.limit = parsedLimit;
         }
       }
 
       const games = await GameService.getAll(filters);
       res.json(games);
     } catch (error) {
-      res.status(500).json({ error: 'Error al obtener videojuegos' });
+      res.status(500).json({ error: 'Error fetching games' });
     }
   }
 
@@ -52,42 +72,43 @@ export class GameController {
       const paramId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
       const id = parseInt(paramId, 10);
       if (isNaN(id)) {
-        res.status(400).json({ error: 'ID de videojuego inválido' });
+        res.status(400).json({ error: 'Invalid game ID' });
         return;
       }
       const game = await GameService.getById(id);
       if (!game) {
-        res.status(404).json({ error: 'Videojuego no encontrado' });
+        res.status(404).json({ error: 'Game not found' });
         return;
       }
       res.json(game);
     } catch (error) {
-      res.status(500).json({ error: 'Error al obtener videojuego' });
+      res.status(500).json({ error: 'Error fetching game' });
     }
   }
 
   static async create(req: Request, res: Response): Promise<void> {
     try {
-      const { nombre, generoId } = req.body;
-      const parsedGeneroId = parseInt(generoId, 10);
+      const name = req.body.name ?? req.body.nombre;
+      const genreId = req.body.genreId ?? req.body.generoId;
+      const parsedGenreId = parseInt(genreId, 10);
 
-      if (!nombre || typeof nombre !== 'string' || !nombre.trim() || isNaN(parsedGeneroId)) {
-        res.status(400).json({ error: 'Nombre y generoId válido son obligatorios' });
+      if (!name || typeof name !== 'string' || !name.trim() || isNaN(parsedGenreId)) {
+        res.status(400).json({ error: 'Name and a valid genreId are required' });
         return;
       }
 
-      const game = await GameService.create({ nombre, generoId: parsedGeneroId });
+      const game = await GameService.create({ name, genreId: parsedGenreId });
       res.status(201).json(game);
     } catch (error: any) {
       if (error.code === 'P2002') {
-        res.status(400).json({ error: 'Ya existe un videojuego con ese nombre' });
+        res.status(400).json({ error: 'A game with that name already exists' });
         return;
       }
       if (error.code === 'P2003') {
-        res.status(400).json({ error: 'El generoId especificado no existe' });
+        res.status(400).json({ error: 'The specified genreId does not exist' });
         return;
       }
-      res.status(500).json({ error: 'Error al registrar el videojuego' });
+      res.status(500).json({ error: 'Error registering game' });
     }
   }
 
@@ -96,46 +117,47 @@ export class GameController {
       const paramId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
       const id = parseInt(paramId, 10);
       if (isNaN(id)) {
-        res.status(400).json({ error: 'ID de videojuego inválido' });
+        res.status(400).json({ error: 'Invalid game ID' });
         return;
       }
 
-      const { nombre, generoId } = req.body;
-      const updateData: { nombre?: string; generoId?: number } = {};
+      const name = req.body.name ?? req.body.nombre;
+      const genreId = req.body.genreId ?? req.body.generoId;
+      const updateData: { name?: string; genreId?: number } = {};
 
-      if (nombre !== undefined) {
-        if (typeof nombre !== 'string' || !nombre.trim()) {
-          res.status(400).json({ error: 'Nombre de videojuego inválido' });
+      if (name !== undefined) {
+        if (typeof name !== 'string' || !name.trim()) {
+          res.status(400).json({ error: 'Invalid game name' });
           return;
         }
-        updateData.nombre = nombre;
+        updateData.name = name;
       }
 
-      if (generoId !== undefined) {
-        const parsedGeneroId = parseInt(generoId, 10);
-        if (isNaN(parsedGeneroId)) {
-          res.status(400).json({ error: 'ID de género inválido' });
+      if (genreId !== undefined) {
+        const parsedGenreId = parseInt(genreId, 10);
+        if (isNaN(parsedGenreId)) {
+          res.status(400).json({ error: 'Invalid genre ID' });
           return;
         }
-        updateData.generoId = parsedGeneroId;
+        updateData.genreId = parsedGenreId;
       }
 
       const updated = await GameService.update(id, updateData);
       res.json(updated);
     } catch (error: any) {
       if (error.code === 'P2025') {
-        res.status(404).json({ error: 'Videojuego no encontrado' });
+        res.status(404).json({ error: 'Game not found' });
         return;
       }
       if (error.code === 'P2002') {
-        res.status(400).json({ error: 'Ya existe un videojuego con ese nombre' });
+        res.status(400).json({ error: 'A game with that name already exists' });
         return;
       }
       if (error.code === 'P2003') {
-        res.status(400).json({ error: 'El generoId especificado no existe' });
+        res.status(400).json({ error: 'The specified genreId does not exist' });
         return;
       }
-      res.status(500).json({ error: 'Error al actualizar videojuego' });
+      res.status(500).json({ error: 'Error updating game' });
     }
   }
 
@@ -144,17 +166,17 @@ export class GameController {
       const paramId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
       const id = parseInt(paramId, 10);
       if (isNaN(id)) {
-        res.status(400).json({ error: 'ID de videojuego inválido' });
+        res.status(400).json({ error: 'Invalid game ID' });
         return;
       }
       await GameService.delete(id);
-      res.json({ message: 'Videojuego eliminado exitosamente' });
+      res.json({ message: 'Game deleted successfully' });
     } catch (error: any) {
       if (error.code === 'P2025') {
-        res.status(404).json({ error: 'Videojuego no encontrado' });
+        res.status(404).json({ error: 'Game not found' });
         return;
       }
-      res.status(500).json({ error: 'Error al eliminar videojuego' });
+      res.status(500).json({ error: 'Error deleting game' });
     }
   }
 }

@@ -7,33 +7,40 @@ import { parsePaginationParams, formatPaginatedResponse } from '../../core/utils
 function buildScoreWhere(filters?: ScoreFilterDTO) {
   const where: any = {};
 
-  if (filters?.jugadorId !== undefined) {
-    where.jugadorId = filters.jugadorId;
+  const playerId = filters?.playerId ?? filters?.jugadorId;
+  if (playerId !== undefined) {
+    where.playerId = playerId;
   }
 
-  if (filters?.videojuegoId !== undefined) {
-    where.videojuegoId = filters.videojuegoId;
+  const gameId = filters?.gameId ?? filters?.videojuegoId;
+  if (gameId !== undefined) {
+    where.gameId = gameId;
   }
 
-  if (filters?.generoId !== undefined) {
-    where.videojuego = {
-      generoId: filters.generoId,
+  const genreId = filters?.genreId ?? filters?.generoId;
+  if (genreId !== undefined) {
+    where.game = {
+      genreId,
     };
   }
 
   if (filters?.minScore !== undefined || filters?.maxScore !== undefined) {
-    where.puntuacion = {};
+    where.score = {};
     if (filters.minScore !== undefined) {
-      where.puntuacion.gte = filters.minScore;
+      where.score.gte = filters.minScore;
     }
     if (filters.maxScore !== undefined) {
-      where.puntuacion.lte = filters.maxScore;
+      where.score.lte = filters.maxScore;
     }
   }
 
-  const dateRange = buildDateFilter(filters?.periodo, filters?.fechaInicio, filters?.fechaFin);
+  const period = filters?.period ?? filters?.periodo;
+  const startDate = filters?.startDate ?? filters?.fechaInicio;
+  const endDate = filters?.endDate ?? filters?.fechaFin;
+
+  const dateRange = buildDateFilter(period, startDate, endDate);
   if (dateRange) {
-    where.fecha = dateRange;
+    where.createdAt = dateRange;
   }
 
   return where;
@@ -41,35 +48,42 @@ function buildScoreWhere(filters?: ScoreFilterDTO) {
 
 const scoreFieldMapping = {
   id: 'id',
-  puntuacion: 'puntuacion',
-  fecha: 'fecha',
-  jugador: { jugador: 'gamertag' },
-  jugadorNombre: { jugador: 'nombre' },
-  videojuego: { videojuego: 'nombre' },
+  score: 'score',
+  puntuacion: 'score',
+  createdAt: 'createdAt',
+  date: 'createdAt',
+  fecha: 'createdAt',
+  player: { player: 'gamertag' },
+  jugador: { player: 'gamertag' },
+  playerName: { player: 'name' },
+  jugadorNombre: { player: 'name' },
+  game: { game: 'name' },
+  videojuego: { game: 'name' },
 };
 
 export class ScoreService {
   static async getAll(filters?: ScoreFilterDTO) {
     const where = buildScoreWhere(filters);
-    const orderBy = parseOrderBy(filters?.orden, scoreFieldMapping, { fecha: 'desc' });
+    const order = filters?.order ?? filters?.orden;
+    const orderBy = parseOrderBy(order, scoreFieldMapping, { createdAt: 'desc' });
     const { skip, take } = parsePaginationParams(filters);
 
     const [data, totalRecords] = await Promise.all([
-      prisma.puntuacion.findMany({
+      prisma.score.findMany({
         where,
         include: {
-          jugador: {
+          player: {
             select: {
               id: true,
-              nombre: true,
+              name: true,
               gamertag: true,
             },
           },
-          videojuego: {
+          game: {
             select: {
               id: true,
-              nombre: true,
-              genero: true,
+              name: true,
+              genre: true,
             },
           },
         },
@@ -77,28 +91,28 @@ export class ScoreService {
         skip,
         take,
       }),
-      prisma.puntuacion.count({ where }),
+      prisma.score.count({ where }),
     ]);
 
     return formatPaginatedResponse(data, totalRecords);
   }
 
   static async create(data: CreateScoreDTO) {
-    if (data.puntuacion < 0) {
-      throw new Error('La puntuación no puede ser negativa');
+    if (data.score < 0) {
+      throw new Error('Score cannot be negative');
     }
 
-    return prisma.puntuacion.create({
+    return prisma.score.create({
       data: {
-        jugadorId: data.jugadorId,
-        videojuegoId: data.videojuegoId,
-        puntuacion: data.puntuacion,
+        playerId: data.playerId,
+        gameId: data.gameId,
+        score: data.score,
       },
       include: {
-        jugador: true,
-        videojuego: {
+        player: true,
+        game: {
           include: {
-            genero: true,
+            genre: true,
           },
         },
       },
@@ -107,25 +121,26 @@ export class ScoreService {
 
   static async getRanking(filters?: RankingFilterDTO) {
     const where = buildScoreWhere(filters);
-    const orderBy = parseOrderBy(filters?.orden, scoreFieldMapping, { puntuacion: 'desc' });
+    const order = filters?.order ?? filters?.orden;
+    const orderBy = parseOrderBy(order, scoreFieldMapping, { score: 'desc' });
     const { skip, take } = parsePaginationParams(filters);
 
     const [scores, totalRecords] = await Promise.all([
-      prisma.puntuacion.findMany({
+      prisma.score.findMany({
         where,
         include: {
-          jugador: {
+          player: {
             select: {
               id: true,
               gamertag: true,
-              nombre: true,
+              name: true,
             },
           },
-          videojuego: {
+          game: {
             select: {
               id: true,
-              nombre: true,
-              genero: true,
+              name: true,
+              genre: true,
             },
           },
         },
@@ -133,48 +148,54 @@ export class ScoreService {
         skip,
         take,
       }),
-      prisma.puntuacion.count({ where }),
+      prisma.score.count({ where }),
     ]);
 
     const formattedRanking = scores.map((item, index) => ({
+      position: skip + index + 1,
       posicion: skip + index + 1,
-      jugadorId: item.jugador.id,
-      jugador: item.jugador.gamertag,
-      nombreJugador: item.jugador.nombre,
-      videojuegoId: item.videojuego.id,
-      videojuego: item.videojuego.nombre,
-      genero: item.videojuego.genero.nombre,
-      puntuacion: item.puntuacion,
-      fecha: item.fecha,
+      playerId: item.player.id,
+      player: item.player.gamertag,
+      playerName: item.player.name,
+      gameId: item.game.id,
+      game: item.game.name,
+      genre: item.game.genre.name,
+      score: item.score,
+      createdAt: item.createdAt,
     }));
 
     return formatPaginatedResponse(formattedRanking, totalRecords);
   }
 
   static async getStats() {
-    const totalJugadores = await prisma.jugador.count();
-    const totalVideojuegos = await prisma.videojuego.count();
-    const totalPuntuaciones = await prisma.puntuacion.count();
-    const avgResult = await prisma.puntuacion.aggregate({
+    const totalPlayers = await prisma.player.count();
+    const totalGames = await prisma.game.count();
+    const totalScores = await prisma.score.count();
+    const avgResult = await prisma.score.aggregate({
       _avg: {
-        puntuacion: true,
+        score: true,
       },
     });
 
-    const puntuacionPromedio = avgResult._avg.puntuacion
-      ? Number(avgResult._avg.puntuacion.toFixed(2))
+    const averageScore = avgResult._avg.score
+      ? Number(avgResult._avg.score.toFixed(2))
       : 0;
 
     return {
-      totalJugadores,
-      totalVideojuegos,
-      totalPuntuaciones,
-      puntuacionPromedio,
+      totalPlayers,
+      totalGames,
+      totalScores,
+      averageScore,
+      // Legacy compatibility
+      totalJugadores: totalPlayers,
+      totalVideojuegos: totalGames,
+      totalPuntuaciones: totalScores,
+      puntuacionPromedio: averageScore,
     };
   }
 
   static async delete(id: number) {
-    return prisma.puntuacion.delete({
+    return prisma.score.delete({
       where: { id },
     });
   }
