@@ -74,27 +74,25 @@ The workflow automatically uses `GITHUB_TOKEN` to push images to GitHub Containe
 
 ## CI/CD Pipelines
 
-The pipelines are split into two independent workflows:
+The pipelines are structured into dedicated Continuous Integration (CI) and Continuous Deployment (CD) workflows:
 
-1. **API Workflow (`.github/workflows/api.yml`)**:
-   - Triggered on PRs and pushes to `main` and `develop` when API or core files change (`apps/api/**`, `docker/**`, root manifests).
+1. **API CI (`.github/workflows/api.yml`)**:
+   - Triggered on push to Git Flow development branches (`develop`, `feature/**`, `bugfix/**`, `hotfix/**`, `release/**`) and PRs (`develop`, `main`, `release/**`, `hotfix/**`) when API or core files change (`apps/api/**`, `docker/**`, root manifests).
    - Validates the API workspace (`test` and `build`).
-   - On `main` (or manual `workflow_dispatch`):
-     - Builds and pushes `ghcr.io/<repo>-api:<sha>` and `:latest`.
-     - Copies `docker/compose.prod.yml` to `/opt/tournament-manager/compose.prod.yml`.
-     - Automatically creates a timestamped `mysqldump` backup on the VPS.
-     - Runs Prisma database migrations (`prisma:deploy`).
-     - Updates `API_IMAGE_TAG` in `/opt/tournament-manager/.env` and updates the `api` service.
-     - Verifies health and rolls back `API_IMAGE_TAG` automatically if health checks fail.
 
-2. **Aplicacion Web Workflow (`.github/workflows/web.yml`)**:
-   - Triggered on PRs and pushes to `main` and `develop` when Web or core files change (`apps/web/**`, `docker/**`, root manifests).
+2. **Aplicacion Web CI (`.github/workflows/web.yml`)**:
+   - Triggered on push to Git Flow development branches (`develop`, `feature/**`, `bugfix/**`, `hotfix/**`, `release/**`) and PRs (`develop`, `main`, `release/**`, `hotfix/**`) when Web or core files change (`apps/web/**`, `docker/**`, root manifests).
    - Validates the Web workspace (`lint`, `test`, and `build`).
-   - On `main` (or manual `workflow_dispatch`):
-     - Builds and pushes `ghcr.io/<repo>-web:<sha>` and `:latest`.
-     - Copies `docker/compose.prod.yml` to `/opt/tournament-manager/compose.prod.yml`.
-     - Updates `WEB_IMAGE_TAG` in `/opt/tournament-manager/.env` and updates the `web` service.
-     - Verifies health and rolls back `WEB_IMAGE_TAG` automatically if health checks fail.
+
+3. **Deploy to Production (VPS) (`.github/workflows/cd.yml`)**:
+   - Triggered automatically on push to `main`, or manually via `workflow_dispatch` with target selection (`both`, `api`, or `web`).
+   - Automatically detects affected projects on push.
+   - Builds and publishes container images to GitHub Container Registry (`ghcr.io`).
+   - Connects to production VPS via SSH.
+   - Copies `docker/compose.prod.yml` to `/opt/tournament-manager/compose.prod.yml`.
+   - When deploying API: creates timestamped `mysqldump` backup, runs Prisma database migrations, updates `API_IMAGE_TAG` and restarts `api`.
+   - When deploying Web: updates `WEB_IMAGE_TAG` and restarts `web`.
+   - Verifies health checks for all updated services and triggers automatic rollback if health checks fail.
 
 ## Operations & Maintenance
 

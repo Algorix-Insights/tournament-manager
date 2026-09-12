@@ -3,8 +3,11 @@ name: Aplicacion Web
 on:
   push:
     branches:
-      - main
       - develop
+      - 'feature/**'
+      - 'bugfix/**'
+      - 'hotfix/**'
+      - 'release/**'
     paths:
       - 'apps/web/**'
       - 'docker/**'
@@ -14,8 +17,10 @@ on:
       - '.github/workflows/web.yml'
   pull_request:
     branches:
-      - main
       - develop
+      - main
+      - 'release/**'
+      - 'hotfix/**'
     paths:
       - 'apps/web/**'
       - 'docker/**'
@@ -27,7 +32,6 @@ on:
 
 permissions:
   contents: read
-  packages: write
 
 jobs:
   validate:
@@ -50,142 +54,3 @@ jobs:
 
       - name: Lint, test, and build Web workspace
         run: npx turbo run lint test build --filter=web
-
-  build-and-publish:
-    name: Build and publish Web image
-    needs: validate
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
-    runs-on: ubuntu-latest
-    outputs:
-      image_tag: ${{ steps.vars.outputs.sha }}
-      web_image: ${{ steps.vars.outputs.web_image }}
-    steps:
-      - name: Resolve commit and image references
-        id: vars
-        run: |
-          SHA="${{ github.sha }}"
-          REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
-          echo "web_image=ghcr.io/${REPO_LOWER}-web" >> "$GITHUB_OUTPUT"
-
-      - name: Check out repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ steps.vars.outputs.sha }}
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and publish Web image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: apps/web/Dockerfile
-          push: true
-          tags: |
-            ${{ steps.vars.outputs.web_image }}:${{ steps.vars.outputs.sha }}
-            ${{ steps.vars.outputs.web_image }}:latest
-
-  deploy:
-    name: Deploy Web to production VPS
-    needs: build-and-publish
-    runs-on: ubuntu-latest
-    concurrency:
-      group: production-deployment
-      cancel-in-progress: false
-    steps:
-      - name: Check out deployment definitions
-        uses: actions/checkout@v4
-        with:
-          sparse-checkout: docker
-
-      - name: Configure SSH agent
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan -p "${{ secrets.SSH_PORT || 22 }}" "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
-          eval $(ssh-agent -s)
-          echo "${{ secrets.SSH_KEY }}" | tr -d '\r' | ssh-add -
-          echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> "$GITHUB_ENV"
-          echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> "$GITHUB_ENV"
-
-      - name: Copy Compose configuration
-        run: |
-          scp -P "${{ secrets.SSH_PORT || 22 }}" docker/compose.prod.yml "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/opt/tournament-manager/compose.prod.yml"
-
-      - name: Update Web image and restart service
-        env:
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_USER: ${{ secrets.SSH_USER }}
-          SSH_PORT: ${{ secrets.SSH_PORT || 22 }}
-          RELEASE_SHA: ${{ needs.build-and-publish.outputs.image_tag }}
-          WEB_IMAGE: ${{ needs.build-and-publish.outputs.web_image }}
-        run: |
-          ssh -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" "bash -se" << EOF
-            set -euo pipefail
-            cd /opt/tournament-manager
-
-            # Record previous Web image tag for rollback
-            PREV_WEB_SHA=\$(grep '^WEB_IMAGE_TAG=' .env 2>/dev/null | cut -d'=' -f2- || grep '^IMAGE_TAG=' .env 2>/dev/null | cut -d'=' -f2- || true)
-            echo "PREV_WEB_IMAGE_TAG=\${PREV_WEB_SHA}" > .deploy_state_web
-
-            # Set new Web image configuration
-            sed -i.bak '/^WEB_IMAGE=/d' .env || true
-            sed -i.bak '/^WEB_IMAGE_TAG=/d' .env || true
-            rm -f .env.bak
-
-            echo "WEB_IMAGE=$WEB_IMAGE" >> .env
-            echo "WEB_IMAGE_TAG=$RELEASE_SHA" >> .env
-
-            # Pull new Web image
-            docker compose -f compose.prod.yml pull web
-
-            # Start updated Web service without affecting other containers
-            echo "Starting updated Web service..."
-            docker compose -f compose.prod.yml up -d --no-deps web
-          EOF
-
-      - name: Verify Web health
-        env:
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_USER: ${{ secrets.SSH_USER }}
-          SSH_PORT: ${{ secrets.SSH_PORT || 22 }}
-        run: |
-          ssh -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" 'bash -se' << 'EOF'
-            set -euo pipefail
-            cd /opt/tournament-manager
-
-            echo "Verifying Web health..."
-            SUCCESS=0
-            for i in $(seq 1 30); do
-              WEB_HEALTH=$(docker inspect --format='{{.State.Health.Status}}' $(docker compose -f compose.prod.yml ps -q web 2>/dev/null) 2>/dev/null || echo "unhealthy")
-              if [ "$WEB_HEALTH" = "healthy" ]; then
-                echo "Web service healthy: $WEB_HEALTH"
-                SUCCESS=1
-                break
-              fi
-              sleep 2
-            done
-
-            if [ "$SUCCESS" -ne 1 ]; then
-              echo "Web health check failed! Rolling back Web to previous release..."
-              if [ -f .deploy_state_web ]; then
-                source .deploy_state_web
-                if [ -n "${PREV_WEB_IMAGE_TAG:-}" ]; then
-                  sed -i.bak '/^WEB_IMAGE_TAG=/d' .env || true
-                  echo "WEB_IMAGE_TAG=$PREV_WEB_IMAGE_TAG" >> .env
-                  rm -f .env.bak
-                  docker compose -f compose.prod.yml up -d --no-deps web
-                  echo "Rollback to $PREV_WEB_IMAGE_TAG complete."
-                fi
-              fi
-              exit 1
-            fi
-            echo "Web deployment successful."
-          EOF
