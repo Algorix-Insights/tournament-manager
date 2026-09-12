@@ -51,7 +51,8 @@ Neither Turborepo Remote Cache nor Vercel services are used.
      MYSQL_USER=tourney_admin
      MYSQL_PASSWORD=replace_with_secure_password
      WEB_PORT=80
-     IMAGE_TAG=latest
+     API_IMAGE_TAG=latest
+     WEB_IMAGE_TAG=latest
      ```
 
 5. **Edge Proxy / TLS Termination**:
@@ -71,22 +72,29 @@ Configure the following GitHub Repository Secrets under **Settings > Secrets and
 
 The workflow automatically uses `GITHUB_TOKEN` to push images to GitHub Container Registry.
 
-## CI/CD Pipeline
+## CI/CD Pipelines
 
-1. **Continuous Integration (`.github/workflows/validate-monorepo.yml`)**:
-   - Triggered on PRs and pushes to `main` and `develop`.
-   - Checks out full git history.
-   - Runs `npm ci` with npm cache.
-   - Executes `npm run check -- --affected` (lint, test, build).
+The pipelines are split into two independent workflows:
 
-2. **Continuous Deployment (`.github/workflows/deploy-production-vps.yml`)**:
-   - Triggered on `workflow_run` when validation succeeds on `main`.
-   - Builds immutable Docker images for `api` and `web`, tagged with commit SHA and `latest`.
-   - Copies `deploy/compose.prod.yml` to `/opt/tournament-manager/compose.prod.yml`.
-   - Creates a timestamped `mysqldump` backup on the VPS before applying migrations.
-   - Applies committed Prisma migrations via `docker compose run --rm api npm run --workspace=api prisma:deploy`.
-   - Starts updated containers and polls health checks.
-   - Automatically reverts image tags in `.env` and restarts containers if health checks fail.
+1. **API Workflow (`.github/workflows/api.yml`)**:
+   - Triggered on PRs and pushes to `main` and `develop` when API or core files change (`apps/api/**`, `docker/**`, root manifests).
+   - Validates the API workspace (`test` and `build`).
+   - On `main` (or manual `workflow_dispatch`):
+     - Builds and pushes `ghcr.io/<repo>-api:<sha>` and `:latest`.
+     - Copies `docker/compose.prod.yml` to `/opt/tournament-manager/compose.prod.yml`.
+     - Automatically creates a timestamped `mysqldump` backup on the VPS.
+     - Runs Prisma database migrations (`prisma:deploy`).
+     - Updates `API_IMAGE_TAG` in `/opt/tournament-manager/.env` and updates the `api` service.
+     - Verifies health and rolls back `API_IMAGE_TAG` automatically if health checks fail.
+
+2. **Aplicacion Web Workflow (`.github/workflows/web.yml`)**:
+   - Triggered on PRs and pushes to `main` and `develop` when Web or core files change (`apps/web/**`, `docker/**`, root manifests).
+   - Validates the Web workspace (`lint`, `test`, and `build`).
+   - On `main` (or manual `workflow_dispatch`):
+     - Builds and pushes `ghcr.io/<repo>-web:<sha>` and `:latest`.
+     - Copies `docker/compose.prod.yml` to `/opt/tournament-manager/compose.prod.yml`.
+     - Updates `WEB_IMAGE_TAG` in `/opt/tournament-manager/.env` and updates the `web` service.
+     - Verifies health and rolls back `WEB_IMAGE_TAG` automatically if health checks fail.
 
 ## Operations & Maintenance
 
@@ -109,8 +117,14 @@ docker compose -f compose.prod.yml exec -T db mysql -u root -p"$MYSQL_ROOT_PASSW
 ### Manual Rollback
 If an application rollback is needed manually:
 1. Identify the desired commit SHA image tag from GitHub packages.
-2. Edit `/opt/tournament-manager/.env` and update `IMAGE_TAG=<target_sha>`.
-3. Re-deploy services:
+2. Edit `/opt/tournament-manager/.env` and update the respective service tag:
+   - For API: `API_IMAGE_TAG=<target_sha>`
+   - For Web: `WEB_IMAGE_TAG=<target_sha>`
+3. Re-deploy the specific service:
    ```bash
-   docker compose -f compose.prod.yml up -d
+   # Re-deploy API only:
+   docker compose -f compose.prod.yml up -d --no-deps api
+
+   # Re-deploy Web only:
+   docker compose -f compose.prod.yml up -d --no-deps web
    ```

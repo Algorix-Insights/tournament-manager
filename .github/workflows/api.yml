@@ -1,38 +1,72 @@
-name: Deploy Tournament Manager to production VPS
+name: API
 
 on:
-  workflow_run:
-    workflows: ["Validate affected API and web workspaces"]
-    branches: [main]
-    types: [completed]
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'apps/api/**'
+      - 'docker/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'turbo.json'
+      - '.github/workflows/api.yml'
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'apps/api/**'
+      - 'docker/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'turbo.json'
+      - '.github/workflows/api.yml'
   workflow_dispatch:
-
-concurrency:
-  group: production-deployment
-  cancel-in-progress: false
 
 permissions:
   contents: read
   packages: write
 
 jobs:
+  validate:
+    name: Validate API workspace
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test and build API workspace
+        run: npx turbo run test build --filter=api
+
   build-and-publish:
-    name: Build and publish application images
-    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success') }}
+    name: Build and publish API image
+    needs: validate
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
     outputs:
       image_tag: ${{ steps.vars.outputs.sha }}
       api_image: ${{ steps.vars.outputs.api_image }}
-      web_image: ${{ steps.vars.outputs.web_image }}
     steps:
       - name: Resolve commit and image references
         id: vars
         run: |
-          SHA="${{ github.event.workflow_run.head_sha || github.sha }}"
+          SHA="${{ github.sha }}"
           REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           echo "sha=$SHA" >> "$GITHUB_OUTPUT"
           echo "api_image=ghcr.io/${REPO_LOWER}-api" >> "$GITHUB_OUTPUT"
-          echo "web_image=ghcr.io/${REPO_LOWER}-web" >> "$GITHUB_OUTPUT"
 
       - name: Check out repository
         uses: actions/checkout@v4
@@ -59,25 +93,18 @@ jobs:
             ${{ steps.vars.outputs.api_image }}:${{ steps.vars.outputs.sha }}
             ${{ steps.vars.outputs.api_image }}:latest
 
-      - name: Build and publish Web image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: apps/web/Dockerfile
-          push: true
-          tags: |
-            ${{ steps.vars.outputs.web_image }}:${{ steps.vars.outputs.sha }}
-            ${{ steps.vars.outputs.web_image }}:latest
-
   deploy:
-    name: Deploy to production VPS
+    name: Deploy API to production VPS
     needs: build-and-publish
     runs-on: ubuntu-latest
+    concurrency:
+      group: production-deployment
+      cancel-in-progress: false
     steps:
       - name: Check out deployment definitions
         uses: actions/checkout@v4
         with:
-          sparse-checkout: deploy
+          sparse-checkout: docker
 
       - name: Configure SSH agent
         run: |
@@ -90,7 +117,7 @@ jobs:
 
       - name: Copy Compose configuration
         run: |
-          scp -P "${{ secrets.SSH_PORT || 22 }}" deploy/compose.prod.yml "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/opt/tournament-manager/compose.prod.yml"
+          scp -P "${{ secrets.SSH_PORT || 22 }}" docker/compose.prod.yml "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/opt/tournament-manager/compose.prod.yml"
 
       - name: Back up production MySQL
         env:
@@ -113,35 +140,32 @@ jobs:
             fi
           EOF
 
-      - name: Apply Prisma migrations
+      - name: Apply Prisma migrations and update API image
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_USER: ${{ secrets.SSH_USER }}
           SSH_PORT: ${{ secrets.SSH_PORT || 22 }}
           RELEASE_SHA: ${{ needs.build-and-publish.outputs.image_tag }}
           API_IMAGE: ${{ needs.build-and-publish.outputs.api_image }}
-          WEB_IMAGE: ${{ needs.build-and-publish.outputs.web_image }}
         run: |
           ssh -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" "bash -se" << EOF
             set -euo pipefail
             cd /opt/tournament-manager
 
-            # Record previous SHA for rollback
-            PREV_SHA=\$(grep '^IMAGE_TAG=' .env 2>/dev/null | cut -d'=' -f2- || true)
-            echo "PREV_IMAGE_TAG=\${PREV_SHA}" > .deploy_state
+            # Record previous API image tag for rollback
+            PREV_API_SHA=\$(grep '^API_IMAGE_TAG=' .env 2>/dev/null | cut -d'=' -f2- || grep '^IMAGE_TAG=' .env 2>/dev/null | cut -d'=' -f2- || true)
+            echo "PREV_API_IMAGE_TAG=\${PREV_API_SHA}" > .deploy_state_api
 
-            # Set new image configuration
+            # Set new API image configuration
             sed -i.bak '/^API_IMAGE=/d' .env || true
-            sed -i.bak '/^WEB_IMAGE=/d' .env || true
-            sed -i.bak '/^IMAGE_TAG=/d' .env || true
+            sed -i.bak '/^API_IMAGE_TAG=/d' .env || true
             rm -f .env.bak
 
             echo "API_IMAGE=$API_IMAGE" >> .env
-            echo "WEB_IMAGE=$WEB_IMAGE" >> .env
-            echo "IMAGE_TAG=$RELEASE_SHA" >> .env
+            echo "API_IMAGE_TAG=$RELEASE_SHA" >> .env
 
-            # Pull images and run database migration
-            docker compose -f compose.prod.yml pull
+            # Pull new API image and ensure db is ready
+            docker compose -f compose.prod.yml pull api
             docker compose -f compose.prod.yml up -d db
             echo "Waiting for db to be healthy..."
             until [ "\$(docker inspect --format='{{.State.Health.Status}}' \$(docker compose -f compose.prod.yml ps -q db 2>/dev/null) 2>/dev/null)" = "healthy" ]; do
@@ -150,21 +174,12 @@ jobs:
 
             echo "Applying Prisma migrations from new API image..."
             docker compose -f compose.prod.yml run --rm api npm run --workspace=api prisma:deploy
+
+            echo "Starting updated API service..."
+            docker compose -f compose.prod.yml up -d --no-deps api
           EOF
 
-      - name: Start production services
-        env:
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_USER: ${{ secrets.SSH_USER }}
-          SSH_PORT: ${{ secrets.SSH_PORT || 22 }}
-        run: |
-          ssh -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" 'bash -se' << 'EOF'
-            set -euo pipefail
-            cd /opt/tournament-manager
-            docker compose -f compose.prod.yml up -d --remove-orphans
-          EOF
-
-      - name: Verify production health
+      - name: Verify API health
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_USER: ${{ secrets.SSH_USER }}
@@ -174,13 +189,12 @@ jobs:
             set -euo pipefail
             cd /opt/tournament-manager
 
-            echo "Verifying health checks..."
+            echo "Verifying API health..."
             SUCCESS=0
             for i in $(seq 1 30); do
               API_HEALTH=$(docker inspect --format='{{.State.Health.Status}}' $(docker compose -f compose.prod.yml ps -q api 2>/dev/null) 2>/dev/null || echo "unhealthy")
-              WEB_HEALTH=$(docker inspect --format='{{.State.Health.Status}}' $(docker compose -f compose.prod.yml ps -q web 2>/dev/null) 2>/dev/null || echo "unhealthy")
-              if [ "$API_HEALTH" = "healthy" ] && [ "$WEB_HEALTH" = "healthy" ]; then
-                echo "Services healthy: api=$API_HEALTH, web=$WEB_HEALTH"
+              if [ "$API_HEALTH" = "healthy" ]; then
+                echo "API service healthy: $API_HEALTH"
                 SUCCESS=1
                 break
               fi
@@ -188,18 +202,18 @@ jobs:
             done
 
             if [ "$SUCCESS" -ne 1 ]; then
-              echo "Health checks failed! Rolling back to previous release..."
-              if [ -f .deploy_state ]; then
-                source .deploy_state
-                if [ -n "${PREV_IMAGE_TAG:-}" ]; then
-                  sed -i.bak '/^IMAGE_TAG=/d' .env || true
-                  echo "IMAGE_TAG=$PREV_IMAGE_TAG" >> .env
+              echo "API health check failed! Rolling back API to previous release..."
+              if [ -f .deploy_state_api ]; then
+                source .deploy_state_api
+                if [ -n "${PREV_API_IMAGE_TAG:-}" ]; then
+                  sed -i.bak '/^API_IMAGE_TAG=/d' .env || true
+                  echo "API_IMAGE_TAG=$PREV_API_IMAGE_TAG" >> .env
                   rm -f .env.bak
-                  docker compose -f compose.prod.yml up -d --remove-orphans
-                  echo "Rollback to $PREV_IMAGE_TAG complete."
+                  docker compose -f compose.prod.yml up -d --no-deps api
+                  echo "Rollback to $PREV_API_IMAGE_TAG complete."
                 fi
               fi
               exit 1
             fi
-            echo "Production deployment successful."
+            echo "API deployment successful."
           EOF
