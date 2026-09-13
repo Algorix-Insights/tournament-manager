@@ -4,7 +4,7 @@
   "private": true,
   "main": "dist/server.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && tsc-alias",
     "dev": "tsx src/server.ts",
     "start": "npm run build && node dist/server.js",
     "seed": "npx tsx prisma/seed.ts",
@@ -27,6 +27,7 @@
     "jest": "^30.5.1",
     "prisma": "^7.10.0",
     "ts-jest": "^29.4.12",
+    "tsc-alias": "^1.9.5",
     "tsx": "^4.23.13",
     "typescript": "^6.0.3"
   },
@@ -34,7 +35,8 @@
     "preset": "ts-jest",
     "testEnvironment": "node",
     "moduleNameMapper": {
-      "^@/(.*)$": "<rootDir>/src/$1"
+      "^@/(.*)$": "<rootDir>/src/$1",
+      "^(\\.{1,2}/.*)\\.js$": "$1"
     }
   }
 }
