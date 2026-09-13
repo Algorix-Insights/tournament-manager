@@ -3,6 +3,7 @@ import { CreateScoreDTO, RankingFilterDTO, ScoreFilterDTO } from './score.types'
 import { buildDateFilter } from '../../core/utils/date-filter.util';
 import { parseOrderBy } from '../../core/utils/order-by.util';
 import { parsePaginationParams, formatPaginatedResponse } from '../../core/utils/pagination.util';
+import { IScoreService, ScoreStats } from './interfaces/score.service.interface';
 
 function buildScoreWhere(filters?: ScoreFilterDTO) {
   const where: any = {};
@@ -61,8 +62,8 @@ const scoreFieldMapping = {
   videojuego: { game: 'name' },
 };
 
-export class ScoreService {
-  static async getAll(filters?: ScoreFilterDTO) {
+export class ScoreService implements IScoreService {
+  async getAll(filters?: ScoreFilterDTO) {
     const where = buildScoreWhere(filters);
     const order = filters?.order ?? filters?.orden;
     const orderBy = parseOrderBy(order, scoreFieldMapping, { createdAt: 'desc' });
@@ -97,7 +98,7 @@ export class ScoreService {
     return formatPaginatedResponse(data, totalRecords);
   }
 
-  static async create(data: CreateScoreDTO) {
+  async create(data: CreateScoreDTO) {
     if (data.score < 0) {
       throw new Error('Score cannot be negative');
     }
@@ -119,7 +120,7 @@ export class ScoreService {
     });
   }
 
-  static async getRanking(filters?: RankingFilterDTO) {
+  async getRanking(filters?: RankingFilterDTO) {
     const where = buildScoreWhere(filters);
     const order = filters?.order ?? filters?.orden;
     const orderBy = parseOrderBy(order, scoreFieldMapping, { score: 'desc' });
@@ -167,7 +168,7 @@ export class ScoreService {
     return formatPaginatedResponse(formattedRanking, totalRecords);
   }
 
-  static async getStats() {
+  async getStats(): Promise<ScoreStats> {
     const totalPlayers = await prisma.player.count();
     const totalGames = await prisma.game.count();
     const totalScores = await prisma.score.count();
@@ -194,7 +195,7 @@ export class ScoreService {
     };
   }
 
-  static async delete(id: number) {
+  async delete(id: number) {
     return prisma.score.delete({
       where: { id },
     });

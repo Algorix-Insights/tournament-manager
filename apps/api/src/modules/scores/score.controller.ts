@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import { ScoreService } from './score.service';
+import { IScoreController } from './interfaces/score.controller.interface';
+import { IScoreService } from './interfaces/score.service.interface';
 
 function parseScoreFilters(query: any) {
   const {
@@ -89,18 +90,20 @@ function parseScoreFilters(query: any) {
   return filters;
 }
 
-export class ScoreController {
-  static async getAll(req: Request, res: Response): Promise<void> {
+export class ScoreController implements IScoreController {
+  constructor(private readonly scoreService: IScoreService) {}
+
+  async getAll(req: Request, res: Response): Promise<void> {
     try {
       const filters = parseScoreFilters(req.query);
-      const scores = await ScoreService.getAll(filters);
+      const scores = await this.scoreService.getAll(filters);
       res.json(scores);
     } catch (error) {
       res.status(500).json({ error: 'Error fetching scores' });
     }
   }
 
-  static async create(req: Request, res: Response): Promise<void> {
+  async create(req: Request, res: Response): Promise<void> {
     try {
       const rawPlayerId = req.body.playerId ?? req.body.jugadorId;
       const rawGameId = req.body.gameId ?? req.body.videojuegoId;
@@ -117,7 +120,7 @@ export class ScoreController {
         return;
       }
 
-      const score = await ScoreService.create({
+      const score = await this.scoreService.create({
         playerId: Number(rawPlayerId),
         gameId: Number(rawGameId),
         score: parsedScore,
@@ -133,26 +136,26 @@ export class ScoreController {
     }
   }
 
-  static async getRanking(req: Request, res: Response): Promise<void> {
+  async getRanking(req: Request, res: Response): Promise<void> {
     try {
       const filters = parseScoreFilters(req.query);
-      const ranking = await ScoreService.getRanking(filters);
+      const ranking = await this.scoreService.getRanking(filters);
       res.json(ranking);
     } catch (error) {
       res.status(500).json({ error: 'Error generating ranking table' });
     }
   }
 
-  static async getStats(_req: Request, res: Response): Promise<void> {
+  async getStats(_req: Request, res: Response): Promise<void> {
     try {
-      const stats = await ScoreService.getStats();
+      const stats = await this.scoreService.getStats();
       res.json(stats);
     } catch (error) {
       res.status(500).json({ error: 'Error calculating tournament statistics' });
     }
   }
 
-  static async delete(req: Request, res: Response): Promise<void> {
+  async delete(req: Request, res: Response): Promise<void> {
     try {
       const paramId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
       const id = parseInt(paramId, 10);
@@ -160,7 +163,7 @@ export class ScoreController {
         res.status(400).json({ error: 'Invalid score ID' });
         return;
       }
-      await ScoreService.delete(id);
+      await this.scoreService.delete(id);
       res.json({ message: 'Score deleted successfully' });
     } catch (error: any) {
       if (error.code === 'P2025') {
