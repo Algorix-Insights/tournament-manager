@@ -3,11 +3,14 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router'
 import './index.css'
 import AppRoutes from '@/routes/App.routes'
+import QueryProvider from '@/core/providers/QueryProvider'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
-      <AppRoutes />
-    </BrowserRouter>
+    <QueryProvider>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </QueryProvider>
   </StrictMode>,
 )
