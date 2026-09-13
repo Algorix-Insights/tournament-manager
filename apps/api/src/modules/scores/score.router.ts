@@ -1,12 +1,14 @@
 import { Router } from 'express';
 import { ScoreController } from './score.controller';
+import { ScoreService } from './score.service';
 
 const router = Router();
+const controller = new ScoreController(new ScoreService());
 
-router.get('/', ScoreController.getAll);
-router.get('/ranking', ScoreController.getRanking);
-router.get('/stats', ScoreController.getStats);
-router.post('/', ScoreController.create);
-router.delete('/:id', ScoreController.delete);
+router.get('/', controller.getAll.bind(controller));
+router.get('/ranking', controller.getRanking.bind(controller));
+router.get('/stats', controller.getStats.bind(controller));
+router.post('/', controller.create.bind(controller));
+router.delete('/:id', controller.delete.bind(controller));
 
 export default router;

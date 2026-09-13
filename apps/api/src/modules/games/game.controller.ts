@@ -1,8 +1,11 @@
 import { Request, Response } from 'express';
-import { GameService } from './game.service';
+import { IGameController } from './interfaces/game.controller.interface';
+import { IGameService } from './interfaces/game.service.interface';
 
-export class GameController {
-  static async getAll(req: Request, res: Response): Promise<void> {
+export class GameController implements IGameController {
+  constructor(private readonly gameService: IGameService) {}
+
+  async getAll(req: Request, res: Response): Promise<void> {
     try {
       const {
         name,
@@ -60,14 +63,14 @@ export class GameController {
         }
       }
 
-      const games = await GameService.getAll(filters);
+      const games = await this.gameService.getAll(filters);
       res.json(games);
     } catch (error) {
       res.status(500).json({ error: 'Error fetching games' });
     }
   }
 
-  static async getById(req: Request, res: Response): Promise<void> {
+  async getById(req: Request, res: Response): Promise<void> {
     try {
       const paramId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
       const id = parseInt(paramId, 10);
@@ -75,7 +78,7 @@ export class GameController {
         res.status(400).json({ error: 'Invalid game ID' });
         return;
       }
-      const game = await GameService.getById(id);
+      const game = await this.gameService.getById(id);
       if (!game) {
         res.status(404).json({ error: 'Game not found' });
         return;
@@ -86,7 +89,7 @@ export class GameController {
     }
   }
 
-  static async create(req: Request, res: Response): Promise<void> {
+  async create(req: Request, res: Response): Promise<void> {
     try {
       const name = req.body.name ?? req.body.nombre;
       const genreId = req.body.genreId ?? req.body.generoId;
@@ -97,7 +100,7 @@ export class GameController {
         return;
       }
 
-      const game = await GameService.create({ name, genreId: parsedGenreId });
+      const game = await this.gameService.create({ name, genreId: parsedGenreId });
       res.status(201).json(game);
     } catch (error: any) {
       if (error.code === 'P2002') {
@@ -112,7 +115,7 @@ export class GameController {
     }
   }
 
-  static async update(req: Request, res: Response): Promise<void> {
+  async update(req: Request, res: Response): Promise<void> {
     try {
       const paramId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
       const id = parseInt(paramId, 10);
@@ -142,7 +145,7 @@ export class GameController {
         updateData.genreId = parsedGenreId;
       }
 
-      const updated = await GameService.update(id, updateData);
+      const updated = await this.gameService.update(id, updateData);
       res.json(updated);
     } catch (error: any) {
       if (error.code === 'P2025') {
@@ -161,7 +164,7 @@ export class GameController {
     }
   }
 
-  static async delete(req: Request, res: Response): Promise<void> {
+  async delete(req: Request, res: Response): Promise<void> {
     try {
       const paramId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
       const id = parseInt(paramId, 10);
@@ -169,7 +172,7 @@ export class GameController {
         res.status(400).json({ error: 'Invalid game ID' });
         return;
       }
-      await GameService.delete(id);
+      await this.gameService.delete(id);
       res.json({ message: 'Game deleted successfully' });
     } catch (error: any) {
       if (error.code === 'P2025') {
