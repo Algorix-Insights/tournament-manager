@@ -4,6 +4,8 @@
 
 Validar el comportamiento de los módulos del API, sus middlewares principales y el flujo HTTP de las rutas versionadas bajo `/api/v1`.
 
+Para conocer el funcionamiento interno del código de testing, consulta [api-testing-code.md](./api-testing-code.md).
+
 Las pruebas verifican:
 
 - respuestas HTTP y cuerpos JSON;
