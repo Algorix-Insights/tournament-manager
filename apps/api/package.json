@@ -15,10 +15,13 @@
   "dependencies": {
     "@prisma/adapter-mariadb": "^7.10.0",
     "@prisma/client": "^7.10.0",
+    "@scalar/express-api-reference": "^0.10.18",
+    "@types/swagger-jsdoc": "^6.0.4",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "mariadb": "^3.4.5",
+    "swagger-jsdoc": "^6.3.0",
     "zod": "^4.6.4"
   },
   "devDependencies": {
@@ -42,6 +45,9 @@
     "modulePathIgnorePatterns": [
       "/node_modules/",
       "/dist/"
+    ],
+    "setupFiles": [
+      "<rootDir>/src/test-utils/scalar.mock.ts"
     ],
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/src/$1",

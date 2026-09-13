@@ -1,6 +1,8 @@
 import express from 'express';
 // import cors from 'cors';
+import { apiReference } from '@scalar/express-api-reference';
 import { apiErrorHandler } from '@/core/middlewares/error-handler.middleware';
+import { openApiDocument } from '@/core/openapi';
 import playerRouter from '@/modules/players/player.router';
 import gameRouter from '@/modules/games/game.router';
 import scoreRouter from '@/modules/scores/score.router';
@@ -18,6 +20,12 @@ app.use('/api/v1/players', playerRouter);
 app.use('/api/v1/games', gameRouter);
 app.use('/api/v1/scores', scoreRouter);
 app.use('/api/v1/genres', genreRouter);
+
+app.get('/openapi.json', (_req, res) => {
+  res.json(openApiDocument);
+});
+
+app.use('/docs', apiReference({ url: '/openapi.json' }));
 
 app.get('/', (_req, res) => {
   res.json({
