@@ -1,4 +1,4 @@
-import app from '@/server';
+import app from '../src/server';
 import { expect, test } from '@jest/globals';
 
 test('GET / returns API welcome info', async () => {
