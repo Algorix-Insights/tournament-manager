@@ -24,11 +24,11 @@ export function parsePaginationParams(
   const rawPage = query?.page;
   const rawLimit = query?.limit;
 
-  const pageNum = parseInt(rawPage, 10);
-  const limitNum = parseInt(rawLimit, 10);
+  const pageNum = Number.parseInt(rawPage, 10);
+  const limitNum = Number.parseInt(rawLimit, 10);
 
-  const page = !isNaN(pageNum) && pageNum > 0 ? pageNum : 1;
-  const limit = !isNaN(limitNum) && limitNum > 0 ? limitNum : defaultLimit;
+  const page = !Number.isNaN(pageNum) && pageNum > 0 ? pageNum : 1;
+  const limit = !Number.isNaN(limitNum) && limitNum > 0 ? limitNum : defaultLimit;
 
   const skip = (page - 1) * limit;
   const take = limit;
