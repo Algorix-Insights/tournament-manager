@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { IGenreController } from './interfaces/genre.controller.interface';
-import { IGenreService } from './interfaces/genre.service.interface';
+import { IGenreController } from '@/modules/genres/interfaces/genre.controller.interface';
+import { IGenreService } from '@/modules/genres/interfaces/genre.service.interface';
 
 export class GenreController implements IGenreController {
   constructor(private readonly genreService: IGenreService) {}

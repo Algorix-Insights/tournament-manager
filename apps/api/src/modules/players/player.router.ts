@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { PlayerController } from './player.controller';
-import { PlayerService } from './player.service';
+import { PlayerController } from '@/modules/players/player.controller';
+import { PlayerService } from '@/modules/players/player.service';
 
 const router = Router();
 const controller = new PlayerController(new PlayerService());

@@ -1,9 +1,9 @@
-import { prisma } from '../../core/prisma';
-import { CreateScoreDTO, RankingFilterDTO, ScoreFilterDTO } from './score.types';
-import { buildDateFilter } from '../../core/utils/date-filter.util';
-import { parseOrderBy } from '../../core/utils/order-by.util';
-import { parsePaginationParams, formatPaginatedResponse } from '../../core/utils/pagination.util';
-import { IScoreService, ScoreStats } from './interfaces/score.service.interface';
+import { prisma } from '@/core/prisma';
+import { CreateScoreDTO, RankingFilterDTO, ScoreFilterDTO } from '@/modules/scores/score.types';
+import { buildDateFilter } from '@/core/utils/date-filter.util';
+import { parseOrderBy } from '@/core/utils/order-by.util';
+import { parsePaginationParams, formatPaginatedResponse } from '@/core/utils/pagination.util';
+import { IScoreService, ScoreStats } from '@/modules/scores/interfaces/score.service.interface';
 
 function buildScoreWhere(filters?: ScoreFilterDTO) {
   const where: any = {};

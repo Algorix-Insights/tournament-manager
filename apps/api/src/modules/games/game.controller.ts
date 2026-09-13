@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { IGameController } from './interfaces/game.controller.interface';
-import { IGameService } from './interfaces/game.service.interface';
+import { IGameController } from '@/modules/games/interfaces/game.controller.interface';
+import { IGameService } from '@/modules/games/interfaces/game.service.interface';
 
 export class GameController implements IGameController {
   constructor(private readonly gameService: IGameService) {}

@@ -1,5 +1,5 @@
-import type { PaginatedResponse } from '../../../core/utils/pagination.util';
-import type { CreateGameDTO, GameFilterDTO, UpdateGameDTO } from '../game.types';
+import type { PaginatedResponse } from '@/core/utils/pagination.util';
+import type { CreateGameDTO, GameFilterDTO, UpdateGameDTO } from '@/modules/games/game.types';
 
 export interface IGameService {
   getAll(filters?: GameFilterDTO): Promise<PaginatedResponse<unknown>>;

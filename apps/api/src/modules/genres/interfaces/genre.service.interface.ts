@@ -1,5 +1,5 @@
-import type { PaginatedResponse } from '../../../core/utils/pagination.util';
-import type { CreateGenreDTO, GenreFilterDTO, UpdateGenreDTO } from '../genre.types';
+import type { PaginatedResponse } from '@/core/utils/pagination.util';
+import type { CreateGenreDTO, GenreFilterDTO, UpdateGenreDTO } from '@/modules/genres/genre.types';
 
 export interface IGenreService {
   getAll(filters?: GenreFilterDTO): Promise<PaginatedResponse<unknown>>;

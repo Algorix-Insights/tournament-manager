@@ -1,5 +1,5 @@
-import type { PaginatedResponse } from '../../../core/utils/pagination.util';
-import type { CreateScoreDTO, RankingFilterDTO, ScoreFilterDTO } from '../score.types';
+import type { PaginatedResponse } from '@/core/utils/pagination.util';
+import type { CreateScoreDTO, RankingFilterDTO, ScoreFilterDTO } from '@/modules/scores/score.types';
 
 export interface ScoreStats {
   totalPlayers: number;

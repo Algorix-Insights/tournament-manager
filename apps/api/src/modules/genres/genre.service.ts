@@ -1,8 +1,8 @@
-import { prisma } from '../../core/prisma';
-import { CreateGenreDTO, GenreFilterDTO, UpdateGenreDTO } from './genre.types';
-import { parseOrderBy } from '../../core/utils/order-by.util';
-import { parsePaginationParams, formatPaginatedResponse } from '../../core/utils/pagination.util';
-import { IGenreService } from './interfaces/genre.service.interface';
+import { prisma } from '@/core/prisma';
+import { CreateGenreDTO, GenreFilterDTO, UpdateGenreDTO } from '@/modules/genres/genre.types';
+import { parseOrderBy } from '@/core/utils/order-by.util';
+import { parsePaginationParams, formatPaginatedResponse } from '@/core/utils/pagination.util';
+import { IGenreService } from '@/modules/genres/interfaces/genre.service.interface';
 
 export class GenreService implements IGenreService {
   async getAll(filters?: GenreFilterDTO) {

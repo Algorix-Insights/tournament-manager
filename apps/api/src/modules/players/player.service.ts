@@ -1,9 +1,9 @@
-import { prisma } from '../../core/prisma';
-import { CreatePlayerDTO, PlayerFilterDTO, UpdatePlayerDTO } from './player.types';
-import { buildDateFilter } from '../../core/utils/date-filter.util';
-import { parseOrderBy } from '../../core/utils/order-by.util';
-import { parsePaginationParams, formatPaginatedResponse } from '../../core/utils/pagination.util';
-import { IPlayerService } from './interfaces/player.service.interface';
+import { prisma } from '@/core/prisma';
+import { CreatePlayerDTO, PlayerFilterDTO, UpdatePlayerDTO } from '@/modules/players/player.types';
+import { buildDateFilter } from '@/core/utils/date-filter.util';
+import { parseOrderBy } from '@/core/utils/order-by.util';
+import { parsePaginationParams, formatPaginatedResponse } from '@/core/utils/pagination.util';
+import { IPlayerService } from '@/modules/players/interfaces/player.service.interface';
 
 export class PlayerService implements IPlayerService {
   async getAll(filters?: PlayerFilterDTO) {

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { IPlayerController } from './interfaces/player.controller.interface';
-import { IPlayerService } from './interfaces/player.service.interface';
+import { IPlayerController } from '@/modules/players/interfaces/player.controller.interface';
+import { IPlayerService } from '@/modules/players/interfaces/player.service.interface';
 
 export class PlayerController implements IPlayerController {
   constructor(private readonly playerService: IPlayerService) {}

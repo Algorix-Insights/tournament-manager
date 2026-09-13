@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { ScoreController } from './score.controller';
-import { ScoreService } from './score.service';
+import { ScoreController } from '@/modules/scores/score.controller';
+import { ScoreService } from '@/modules/scores/score.service';
 
 const router = Router();
 const controller = new ScoreController(new ScoreService());

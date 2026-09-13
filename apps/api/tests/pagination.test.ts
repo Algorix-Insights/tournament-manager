@@ -1,4 +1,4 @@
-import { parsePaginationParams, formatPaginatedResponse } from '../src/core/utils/pagination.util';
+import { parsePaginationParams, formatPaginatedResponse } from '@/core/utils/pagination.util';
 import { expect, test, describe } from '@jest/globals';
 
 describe('Pagination Utility Tests', () => {

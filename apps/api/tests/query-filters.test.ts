@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { expect, test } from '@jest/globals';
-import { queryFilters } from '../src/core/middlewares/query-filters.middleware';
+import { queryFilters } from '@/core/middlewares/query-filters.middleware';
 
 test('normalizes query filters for the request pipeline', () => {
   const req = {

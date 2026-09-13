@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { IScoreController } from './interfaces/score.controller.interface';
-import { IScoreService } from './interfaces/score.service.interface';
+import { IScoreController } from '@/modules/scores/interfaces/score.controller.interface';
+import { IScoreService } from '@/modules/scores/interfaces/score.service.interface';
 
 export class ScoreController implements IScoreController {
   constructor(private readonly scoreService: IScoreService) {}

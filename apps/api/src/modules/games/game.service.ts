@@ -1,8 +1,8 @@
-import { prisma } from '../../core/prisma';
-import { CreateGameDTO, GameFilterDTO, UpdateGameDTO } from './game.types';
-import { parseOrderBy } from '../../core/utils/order-by.util';
-import { parsePaginationParams, formatPaginatedResponse } from '../../core/utils/pagination.util';
-import { IGameService } from './interfaces/game.service.interface';
+import { prisma } from '@/core/prisma';
+import { CreateGameDTO, GameFilterDTO, UpdateGameDTO } from '@/modules/games/game.types';
+import { parseOrderBy } from '@/core/utils/order-by.util';
+import { parsePaginationParams, formatPaginatedResponse } from '@/core/utils/pagination.util';
+import { IGameService } from '@/modules/games/interfaces/game.service.interface';
 
 export class GameService implements IGameService {
   async getAll(filters?: GameFilterDTO) {

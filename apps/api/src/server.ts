@@ -1,10 +1,10 @@
 import express from 'express';
 // import cors from 'cors';
-import playerRouter from './modules/players/player.router';
-import gameRouter from './modules/games/game.router';
-import scoreRouter from './modules/scores/score.router';
-import genreRouter from './modules/genres/genre.router';
-import { queryFilters } from './core/middlewares/query-filters.middleware';
+import playerRouter from '@/modules/players/player.router';
+import gameRouter from '@/modules/games/game.router';
+import scoreRouter from '@/modules/scores/score.router';
+import genreRouter from '@/modules/genres/genre.router';
+import { queryFilters } from '@/core/middlewares/query-filters.middleware';
 
 const app = express();
 
