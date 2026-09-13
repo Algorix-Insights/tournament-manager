@@ -1,6 +1,8 @@
 import express from 'express';
 // import cors from 'cors';
+import { apiReference } from '@scalar/express-api-reference';
 import { apiErrorHandler } from '@/core/middlewares/error-handler.middleware';
+import { openApiDocument } from '@/core/openapi';
 import playerRouter from '@/modules/players/player.router';
 import gameRouter from '@/modules/games/game.router';
 import scoreRouter from '@/modules/scores/score.router';
@@ -14,21 +16,27 @@ registerCoreMiddlewares(app);
 app.disable('x-powered-by');
 
 // Base API Endpoints
-app.use('/api/players', playerRouter);
-app.use('/api/games', gameRouter);
-app.use('/api/scores', scoreRouter);
-app.use('/api/genres', genreRouter);
+app.use('/api/v1/players', playerRouter);
+app.use('/api/v1/games', gameRouter);
+app.use('/api/v1/scores', scoreRouter);
+app.use('/api/v1/genres', genreRouter);
+
+app.get('/openapi.json', (_req, res) => {
+  res.json(openApiDocument);
+});
+
+app.use('/docs', apiReference({ url: '/openapi.json' }));
 
 app.get('/', (_req, res) => {
   res.json({
     message: 'Tournament Manager API ready',
     endpoints: {
-      players: '/api/players',
-      games: '/api/games',
-      scores: '/api/scores',
-      genres: '/api/genres',
-      ranking: '/api/scores/ranking',
-      stats: '/api/scores/stats',
+      players: '/api/v1/players',
+      games: '/api/v1/games',
+      scores: '/api/v1/scores',
+      genres: '/api/v1/genres',
+      ranking: '/api/v1/scores/ranking',
+      stats: '/api/v1/scores/stats',
     },
   });
 });

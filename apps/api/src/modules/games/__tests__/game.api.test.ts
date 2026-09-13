@@ -12,7 +12,7 @@ describe('RF02 - Register games', () => {
     const game = { id: 6, name: 'Tekken 8', genreId: 4 };
     database.game.create.mockResolvedValue(game);
 
-    const response = await api.request('/api/games', 'POST', game);
+    const response = await api.request('/api/v1/games', 'POST', game);
 
     expect(response.status).toBe(201);
     expect(await readJson(response)).toEqual(game);
@@ -22,7 +22,7 @@ describe('RF02 - Register games', () => {
     ['CP-RF02-04', { genreId: 4 }, 'name'],
     ['CP-RF02-05', { name: 'Street Fighter' }, 'genreId'],
   ])('%s rejects a game without %s', async (_id, body, field) => {
-    const response = await api.request('/api/games', 'POST', body);
+    const response = await api.request('/api/v1/games', 'POST', body);
     const result = await readJson(response);
 
     expect(response.status).toBe(400);
@@ -36,7 +36,7 @@ describe('RF02 - Register games', () => {
   test('CP-RF02-06 rejects a duplicated game name', async () => {
     database.game.create.mockRejectedValue({ code: 'P2002' });
 
-    const response = await api.request('/api/games', 'POST', { name: 'Tekken 8', genreId: 4 });
+    const response = await api.request('/api/v1/games', 'POST', { name: 'Tekken 8', genreId: 4 });
 
     expect(response.status).toBe(400);
     expect((await readJson(response)).error).toBe('Ya existe un registro con los datos proporcionados');
@@ -45,7 +45,7 @@ describe('RF02 - Register games', () => {
   test('CP-RF02-07 rejects a game with a nonexistent genre', async () => {
     database.game.create.mockRejectedValue({ code: 'P2003' });
 
-    const response = await api.request('/api/games', 'POST', { name: 'Mortal Kombat', genreId: 9999 });
+    const response = await api.request('/api/v1/games', 'POST', { name: 'Mortal Kombat', genreId: 9999 });
 
     expect(response.status).toBe(400);
     expect((await readJson(response)).error).toBe('La referencia especificada no existe o no es válida');

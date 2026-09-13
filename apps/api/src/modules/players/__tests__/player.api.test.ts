@@ -12,7 +12,7 @@ describe('RF01 - Register players', () => {
     const player = { id: 8, name: 'Carlos Mendoza', gamertag: 'ShadowQA', email: 'carlos@test.com' };
     database.player.create.mockResolvedValue(player);
 
-    const response = await api.request('/api/players', 'POST', player);
+    const response = await api.request('/api/v1/players', 'POST', player);
 
     expect(response.status).toBe(201);
     expect(await readJson(response)).toEqual(player);
@@ -23,7 +23,7 @@ describe('RF01 - Register players', () => {
     ['CP-RF01-03', { name: 'Carlos', email: 'nogamer@test.com' }, 'gamertag'],
     ['CP-RF01-04', { name: 'Carlos', gamertag: 'NoMail' }, 'email'],
   ])('%s rejects a player without %s', async (_id, body, field) => {
-    const response = await api.request('/api/players', 'POST', body);
+    const response = await api.request('/api/v1/players', 'POST', body);
     const result = await readJson(response);
 
     expect(response.status).toBe(400);
@@ -37,7 +37,7 @@ describe('RF01 - Register players', () => {
   test('CP-RF01-05 rejects a duplicated gamertag', async () => {
     database.player.create.mockRejectedValue({ code: 'P2002' });
 
-    const response = await api.request('/api/players', 'POST', {
+    const response = await api.request('/api/v1/players', 'POST', {
       name: 'Dhayan',
       gamertag: 'ShadowQA',
       email: 'otro@test.com',
@@ -54,7 +54,7 @@ describe('RF04 - Query players', () => {
     database.player.findMany.mockResolvedValue(players);
     database.player.count.mockResolvedValue(6);
 
-    const response = await api.request('/api/players');
+    const response = await api.request('/api/v1/players');
     const result = await readJson(response);
 
     expect(response.status).toBe(200);
@@ -66,14 +66,14 @@ describe('RF04 - Query players', () => {
     const player = { id: 8, name: 'Carlos Mendoza', scores: [] };
     database.player.findUnique.mockResolvedValue(player);
 
-    const response = await api.request('/api/players/8');
+    const response = await api.request('/api/v1/players/8');
 
     expect(response.status).toBe(200);
     expect(await readJson(response)).toEqual(player);
   });
 
   test('CP-RF04-03 returns 404 for an unknown player', async () => {
-    const response = await api.request('/api/players/9999');
+    const response = await api.request('/api/v1/players/9999');
 
     expect(response.status).toBe(404);
     expect((await readJson(response)).error).toBe('Jugador no encontrado');
@@ -85,7 +85,7 @@ describe('RF07 - Search players', () => {
     database.player.findMany.mockResolvedValue([{ id: 8, name: 'Carlos Mendoza' }]);
     database.player.count.mockResolvedValue(1);
 
-    const response = await api.request('/api/players?name=Carlos');
+    const response = await api.request('/api/v1/players?name=Carlos');
     const result = await readJson(response);
 
     expect(response.status).toBe(200);
@@ -99,7 +99,7 @@ describe('RF07 - Search players', () => {
     database.player.findMany.mockResolvedValue([{ id: 8, gamertag: 'ShadowQA' }]);
     database.player.count.mockResolvedValue(1);
 
-    const response = await api.request('/api/players?gamertag=ShadowQA');
+    const response = await api.request('/api/v1/players?gamertag=ShadowQA');
 
     expect(response.status).toBe(200);
     expect(database.player.findMany).toHaveBeenCalledWith(
@@ -108,7 +108,7 @@ describe('RF07 - Search players', () => {
   });
 
   test('CP-RF07-03 returns an empty list when there are no matches', async () => {
-    const response = await api.request('/api/players?name=InexistenteXYZ');
+    const response = await api.request('/api/v1/players?name=InexistenteXYZ');
     const result = await readJson(response);
 
     expect(response.status).toBe(200);

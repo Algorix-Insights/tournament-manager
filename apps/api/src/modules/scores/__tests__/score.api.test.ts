@@ -12,7 +12,7 @@ describe('RF03 - Register scores', () => {
     const score = { id: 8, playerId: 8, gameId: 6, score: 950 };
     database.score.create.mockResolvedValue(score);
 
-    const response = await api.request('/api/scores', 'POST', score);
+    const response = await api.request('/api/v1/scores', 'POST', score);
 
     expect(response.status).toBe(201);
     expect(await readJson(response)).toEqual(score);
@@ -23,8 +23,8 @@ describe('RF03 - Register scores', () => {
       .mockResolvedValueOnce({ id: 8, playerId: 8, gameId: 6, score: 950 })
       .mockResolvedValueOnce({ id: 9, playerId: 8, gameId: 7, score: 820 });
 
-    const first = await api.request('/api/scores', 'POST', { playerId: 8, gameId: 6, score: 950 });
-    const second = await api.request('/api/scores', 'POST', { playerId: 8, gameId: 7, score: 820 });
+    const first = await api.request('/api/v1/scores', 'POST', { playerId: 8, gameId: 6, score: 950 });
+    const second = await api.request('/api/v1/scores', 'POST', { playerId: 8, gameId: 7, score: 820 });
 
     expect(first.status).toBe(201);
     expect(second.status).toBe(201);
@@ -32,7 +32,7 @@ describe('RF03 - Register scores', () => {
   });
 
   test('CP-RF03-03 rejects a negative score', async () => {
-    const response = await api.request('/api/scores', 'POST', { playerId: 8, gameId: 6, score: -50 });
+    const response = await api.request('/api/v1/scores', 'POST', { playerId: 8, gameId: 6, score: -50 });
     const result = await readJson(response);
 
     expect(response.status).toBe(400);
@@ -50,14 +50,14 @@ describe('RF03 - Register scores', () => {
   ])('%s rejects a score with a nonexistent relation', async (_id, body) => {
     database.score.create.mockRejectedValue({ code: 'P2003' });
 
-    const response = await api.request('/api/scores', 'POST', body);
+    const response = await api.request('/api/v1/scores', 'POST', body);
 
     expect(response.status).toBe(400);
     expect((await readJson(response)).error).toBe('La referencia especificada no existe o no es válida');
   });
 
   test('CP-RF03-06 rejects a score without required data', async () => {
-    const response = await api.request('/api/scores', 'POST', {});
+    const response = await api.request('/api/v1/scores', 'POST', {});
     const result = await readJson(response);
 
     expect(response.status).toBe(400);
@@ -92,7 +92,7 @@ describe('RF06 - Score ranking', () => {
     ]);
     database.score.count.mockResolvedValue(2);
 
-    const response = await api.request('/api/scores/ranking');
+    const response = await api.request('/api/v1/scores/ranking');
     const result = await readJson(response);
 
     expect(response.status).toBe(200);
@@ -106,7 +106,7 @@ describe('RF06 - Score ranking', () => {
   test('CP-RF06-02 filters ranking by gameId', async () => {
     database.score.count.mockResolvedValue(1);
 
-    const response = await api.request('/api/scores/ranking?gameId=6');
+    const response = await api.request('/api/v1/scores/ranking?gameId=6');
 
     expect(response.status).toBe(200);
     expect(database.score.findMany).toHaveBeenCalledWith(
@@ -122,7 +122,7 @@ describe('RF08 - Statistics', () => {
     database.score.count.mockResolvedValue(7);
     database.score.aggregate.mockResolvedValue({ _avg: { score: 854.2857 } });
 
-    const response = await api.request('/api/scores/stats');
+    const response = await api.request('/api/v1/scores/stats');
 
     expect(response.status).toBe(200);
     expect(await readJson(response)).toEqual({
