@@ -14,6 +14,11 @@ export class PlayerService implements IPlayerService {
       where.name = { contains: name.trim() };
     }
 
+    const search = filters?.search;
+    if (search && !name && !filters?.gamertag) {
+      where.name = { contains: search.trim() };
+    }
+
     if (filters?.gamertag) {
       where.gamertag = { contains: filters.gamertag.trim() };
     }
