@@ -10,8 +10,7 @@ export function EmptyState({
   action?: ReactNode;
 }>) {
   return (
-    <div
-      role="region"
+    <section
       aria-label={title}
       className="rounded-lg border border-dashed border-slate-800 p-8 text-center"
     >
@@ -21,7 +20,7 @@ export function EmptyState({
       <h3 className="text-base font-semibold text-slate-200">{title}</h3>
       <p className="mt-1 text-sm text-slate-400 max-w-sm mx-auto">{message}</p>
       {action && <div className="mt-4 flex justify-center">{action}</div>}
-    </div>
+    </section>
   );
 }
 
