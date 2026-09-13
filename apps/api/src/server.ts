@@ -4,30 +4,12 @@ import playerRouter from '@/modules/players/player.router';
 import gameRouter from '@/modules/games/game.router';
 import scoreRouter from '@/modules/scores/score.router';
 import genreRouter from '@/modules/genres/genre.router';
-import { queryFilters } from '@/core/middlewares/query-filters.middleware';
+import { registerCoreMiddlewares } from '@/core/middlewares/register-core-middlewares';
 
 const app = express();
 
 // app.use(cors());
-app.use(express.json());
-app.use(
-  queryFilters([
-    'playerId',
-    'jugadorId',
-    'gameId',
-    'videojuegoId',
-    'genreId',
-    'generoId',
-    'minScore',
-    'maxScore',
-    'period',
-    'periodo',
-    'page',
-    'pagina',
-    'limit',
-    'cantidadRegistros',
-  ]),
-);
+registerCoreMiddlewares(app);
 app.disable('x-powered-by');
 
 // Base API Endpoints
