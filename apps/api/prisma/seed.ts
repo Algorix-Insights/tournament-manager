@@ -1,6 +1,11 @@
-import { PrismaClient } from '@prisma/client';
+import 'dotenv/config';
+import { PrismaClient } from '../src/generated/prisma/client';
+import { PrismaMariaDb } from '@prisma/adapter-mariadb';
 
-const prisma = new PrismaClient();
+const adapter = new PrismaMariaDb(
+  process.env.DATABASE_URL!
+);
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log('🌱 Starting database seeding in MySQL...');
