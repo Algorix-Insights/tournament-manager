@@ -5,6 +5,13 @@ export interface PaginationParams {
   take: number;
 }
 
+export const DEFAULT_PAGINATION: PaginationParams = {
+  page: 1,
+  limit: 20,
+  skip: 0,
+  take: 20,
+};
+
 export interface PaginatedResponse<T> {
   data: T[];
   ROW_COUNT: number;

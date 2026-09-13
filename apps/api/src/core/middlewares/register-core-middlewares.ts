@@ -1,5 +1,6 @@
 import express from 'express';
 import type { Express } from 'express';
+import { paginationMiddleware } from '@/core/middlewares/pagination.middleware';
 import { queryFilters } from '@/core/middlewares/query-filters.middleware';
 
 const allowedQueryKeys = [
@@ -35,4 +36,5 @@ const numericQueryKeys = [
 export function registerCoreMiddlewares(app: Express): void {
   app.use(express.json());
   app.use(queryFilters({ numericKeys: numericQueryKeys, allowedKeys: allowedQueryKeys }));
+  app.use(paginationMiddleware);
 }
