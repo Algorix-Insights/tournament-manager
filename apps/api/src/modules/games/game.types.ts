@@ -15,12 +15,4 @@ export interface GameFilterDTO {
   order?: string;
   page?: number;
   limit?: number;
-
-  // Legacy compatibility
-  nombre?: string;
-  generoId?: number;
-  generoNombre?: string;
-  orden?: string;
-  pagina?: number;
-  cantidadRegistros?: number;
 }

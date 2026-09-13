@@ -35,9 +35,9 @@ export class PlayerController implements IPlayerController {
 
   async create(req: Request, res: Response): Promise<void> {
     try {
-      const name = req.body.name ?? req.body.nombre;
+      const name = req.body.name;
       const gamertag = req.body.gamertag;
-      const email = req.body.email ?? req.body.correo;
+      const email = req.body.email;
 
       if (!name || !gamertag || !email) {
         res.status(400).json({ error: 'Name, Gamertag, and Email are required' });
@@ -65,7 +65,7 @@ export class PlayerController implements IPlayerController {
       }
 
       const updateData: any = {};
-      const name = req.body.name ?? req.body.nombre;
+      const name = req.body.name;
       if (name !== undefined) {
         if (typeof name !== 'string' || !name.trim()) {
           res.status(400).json({ error: 'Invalid player name' });
@@ -82,7 +82,7 @@ export class PlayerController implements IPlayerController {
         updateData.gamertag = req.body.gamertag;
       }
 
-      const email = req.body.email ?? req.body.correo;
+      const email = req.body.email;
       if (email !== undefined) {
         if (typeof email !== 'string' || !email.trim()) {
           res.status(400).json({ error: 'Invalid email address' });

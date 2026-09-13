@@ -11,10 +11,4 @@ export interface GenreFilterDTO {
   order?: string;
   page?: number;
   limit?: number;
-
-  // Legacy compatibility
-  nombre?: string;
-  orden?: string;
-  pagina?: number;
-  cantidadRegistros?: number;
 }

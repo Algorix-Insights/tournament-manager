@@ -21,14 +21,4 @@ export interface PlayerFilterDTO {
   order?: string;
   page?: number;
   limit?: number;
-
-  // Legacy compatibility
-  nombre?: string;
-  correo?: string;
-  periodo?: number;
-  fechaInicio?: string;
-  fechaFin?: string;
-  orden?: string;
-  pagina?: number;
-  cantidadRegistros?: number;
 }

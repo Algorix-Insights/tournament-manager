@@ -16,9 +16,9 @@ export class ScoreController implements IScoreController {
 
   async create(req: Request, res: Response): Promise<void> {
     try {
-      const rawPlayerId = req.body.playerId ?? req.body.jugadorId;
-      const rawGameId = req.body.gameId ?? req.body.videojuegoId;
-      const rawScore = req.body.score ?? req.body.puntuacion;
+      const rawPlayerId = req.body.playerId;
+      const rawGameId = req.body.gameId;
+      const rawScore = req.body.score;
 
       if (rawPlayerId === undefined || rawGameId === undefined || rawScore === undefined) {
         res.status(400).json({ error: 'Player, Game, and Score are required' });

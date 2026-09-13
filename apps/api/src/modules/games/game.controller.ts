@@ -35,8 +35,8 @@ export class GameController implements IGameController {
 
   async create(req: Request, res: Response): Promise<void> {
     try {
-      const name = req.body.name ?? req.body.nombre;
-      const genreId = req.body.genreId ?? req.body.generoId;
+      const name = req.body.name;
+      const genreId = req.body.genreId;
       const parsedGenreId = parseInt(genreId, 10);
 
       if (!name || typeof name !== 'string' || !name.trim() || isNaN(parsedGenreId)) {
@@ -68,8 +68,8 @@ export class GameController implements IGameController {
         return;
       }
 
-      const name = req.body.name ?? req.body.nombre;
-      const genreId = req.body.genreId ?? req.body.generoId;
+      const name = req.body.name;
+      const genreId = req.body.genreId;
       const updateData: { name?: string; genreId?: number } = {};
 
       if (name !== undefined) {

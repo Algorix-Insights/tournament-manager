@@ -8,18 +8,17 @@ export class GenreService implements IGenreService {
   async getAll(filters?: GenreFilterDTO) {
     const where: any = {};
 
-    const name = filters?.name ?? filters?.nombre;
+    const name = filters?.name;
     if (name) {
       where.name = { contains: name.trim() };
     }
 
-    const order = filters?.order ?? filters?.orden;
+    const order = filters?.order;
     const orderBy = parseOrderBy(
       order,
       {
         id: 'id',
         name: 'name',
-        nombre: 'name',
       },
       { name: 'asc' }
     );

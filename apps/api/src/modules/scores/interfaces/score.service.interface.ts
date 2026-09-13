@@ -6,10 +6,6 @@ export interface ScoreStats {
   totalGames: number;
   totalScores: number;
   averageScore: number;
-  totalJugadores: number;
-  totalVideojuegos: number;
-  totalPuntuaciones: number;
-  puntuacionPromedio: number;
 }
 
 export interface IScoreService {

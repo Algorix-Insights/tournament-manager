@@ -35,7 +35,7 @@ export class GenreController implements IGenreController {
 
   async create(req: Request, res: Response): Promise<void> {
     try {
-      const name = req.body.name ?? req.body.nombre;
+      const name = req.body.name;
 
       if (!name || typeof name !== 'string' || !name.trim()) {
         res.status(400).json({ error: 'Genre name is required' });
@@ -62,7 +62,7 @@ export class GenreController implements IGenreController {
         return;
       }
 
-      const name = req.body.name ?? req.body.nombre;
+      const name = req.body.name;
       if (name !== undefined && (typeof name !== 'string' || !name.trim())) {
         res.status(400).json({ error: 'Invalid genre name' });
         return;
