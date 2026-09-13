@@ -58,6 +58,8 @@ test('serves the OpenAPI contract and Scalar documentation', async () => {
     expect(openApi.info.title).toBe('Tournament Manager API');
     expect(openApi.paths['/api/v1/players']).toBeDefined();
     expect(openApi.paths['/api/v1/scores/ranking']).toBeDefined();
+    expect(openApi.components.schemas.PaginatedPlayers.properties.ROW_COUNT).toBeUndefined();
+    expect(openApi.components.schemas.PaginatedPlayers.properties.totalRecords).toBeDefined();
 
     const docsResponse = await fetch(`${baseUrl}/docs`);
     expect(docsResponse.status).toBe(200);

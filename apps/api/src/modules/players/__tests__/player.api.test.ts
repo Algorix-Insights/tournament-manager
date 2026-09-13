@@ -58,7 +58,7 @@ describe('RF04 - Query players', () => {
     const result = await readJson(response);
 
     expect(response.status).toBe(200);
-    expect(result.ROW_COUNT).toBe(6);
+    expect(result.totalRecords).toBe(6);
     expect(result.data).toEqual(players);
   });
 
@@ -113,6 +113,6 @@ describe('RF07 - Search players', () => {
 
     expect(response.status).toBe(200);
     expect(result.data).toEqual([]);
-    expect(result.ROW_COUNT).toBe(0);
+    expect(result.totalRecords).toBe(0);
   });
 });

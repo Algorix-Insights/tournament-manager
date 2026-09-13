@@ -102,7 +102,7 @@ Archivo: `src/modules/scores/__tests__/score.api.test.ts`
 
 | Caso | Endpoint | Resultado validado |
 |---|---|---|
-| CP-RF04-01 | `GET /api/v1/players` | Lista paginada, `data` y `ROW_COUNT`. |
+| CP-RF04-01 | `GET /api/v1/players` | Lista paginada, `data` y `totalRecords`. |
 | CP-RF04-02 | `GET /api/v1/players/{id}` | Detalle del jugador existente con sus puntuaciones. |
 | CP-RF04-03 | `GET /api/v1/players/{id}` | Jugador inexistente produce `404` y `Jugador no encontrado`. |
 
@@ -123,7 +123,7 @@ Archivo: `src/modules/players/__tests__/player.api.test.ts`
 |---|---|---|
 | CP-RF07-01 | `GET /api/v1/players?name=Carlos` | Filtra por nombre usando búsqueda parcial. |
 | CP-RF07-02 | `GET /api/v1/players?gamertag=ShadowQA` | Filtra por gamertag usando búsqueda parcial. |
-| CP-RF07-03 | `GET /api/v1/players?name=InexistenteXYZ` | Devuelve `200` con lista vacía y `ROW_COUNT: 0`. |
+| CP-RF07-03 | `GET /api/v1/players?name=InexistenteXYZ` | Devuelve `200` con lista vacía y `totalRecords: 0`. |
 
 ### RF08 — Estadísticas
 

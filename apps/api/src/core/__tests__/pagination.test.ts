@@ -34,13 +34,12 @@ describe('Pagination Utility Tests', () => {
     expect(params.take).toBe(15);
   });
 
-  test('formatPaginatedResponse should return data and ROW_COUNT', () => {
+  test('formatPaginatedResponse should return data and totalRecords', () => {
     const sampleData = [{ id: 1, name: 'Test' }];
     const response = formatPaginatedResponse(sampleData, 42);
 
     expect(response).toEqual({
       data: sampleData,
-      ROW_COUNT: 42,
       totalRecords: 42,
     });
   });
