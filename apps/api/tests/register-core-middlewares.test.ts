@@ -18,7 +18,7 @@ test('registers core middlewares before the application routes', async () => {
     if (!address || typeof address === 'string') throw new Error('Server did not bind to TCP');
 
     const response = await fetch(
-      `http://127.0.0.1:${address.port}/filters?genreId=7&name=%20Zelda%20`,
+      `http://127.0.0.1:${address.port}/filters?genreId=7&name=%20Zelda%20&nombre=Legacy`,
     );
 
     expect(response.status).toBe(200);

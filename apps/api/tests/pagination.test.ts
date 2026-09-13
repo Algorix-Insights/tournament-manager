@@ -18,12 +18,12 @@ describe('Pagination Utility Tests', () => {
     expect(params.take).toBe(25);
   });
 
-  test('should support legacy pagina and cantidadRegistros parameters', () => {
+  test('should ignore legacy Spanish pagination parameters', () => {
     const params = parsePaginationParams({ pagina: '2', cantidadRegistros: '10' });
-    expect(params.page).toBe(2);
-    expect(params.limit).toBe(10);
-    expect(params.skip).toBe(10);
-    expect(params.take).toBe(10);
+    expect(params.page).toBe(1);
+    expect(params.limit).toBe(20);
+    expect(params.skip).toBe(0);
+    expect(params.take).toBe(20);
   });
 
   test('should handle invalid or negative values by falling back to defaults', () => {

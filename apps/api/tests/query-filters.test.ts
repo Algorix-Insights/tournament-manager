@@ -10,12 +10,16 @@ test('normalizes query filters for the request pipeline', () => {
       limit: '20',
       invalidId: 'abc',
       empty: '   ',
+      nombre: 'Legacy',
     },
   } as unknown as Request;
   const res = { locals: {} } as Response;
   let nextCalled = false;
 
-  queryFilters(['genreId', 'limit', 'invalidId'])(req, res, () => {
+  queryFilters({
+    numericKeys: ['genreId', 'limit', 'invalidId'],
+    allowedKeys: ['name', 'genreId', 'limit', 'invalidId'],
+  })(req, res, () => {
     nextCalled = true;
   });
 
