@@ -1,5 +1,5 @@
 import { prisma } from '@/core/prisma';
-import { CreateGenreDTO, GenreFilterDTO, UpdateGenreDTO } from '@/modules/genres/genre.types';
+import type { CreateGenreDTO, GenreFilterDTO, UpdateGenreDTO } from '@/modules/genres/dtos/genre.dto';
 import { parseOrderBy } from '@/core/utils/order-by.util';
 import { DEFAULT_PAGINATION, formatPaginatedResponse, PaginationParams } from '@/core/utils/pagination.util';
 import { IGenreService } from '@/modules/genres/interfaces/genre.service.interface';

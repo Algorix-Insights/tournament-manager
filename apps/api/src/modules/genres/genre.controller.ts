@@ -16,12 +16,7 @@ export class GenreController implements IGenreController {
 
   async getById(req: Request, res: Response): Promise<void> {
     try {
-      const paramId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-      const id = parseInt(paramId, 10);
-      if (isNaN(id)) {
-        res.status(400).json({ error: 'Invalid genre ID' });
-        return;
-      }
+      const id = Number(req.params.id);
       const genre = await this.genreService.getById(id);
       if (!genre) {
         res.status(404).json({ error: 'Genre not found' });
@@ -35,14 +30,7 @@ export class GenreController implements IGenreController {
 
   async create(req: Request, res: Response): Promise<void> {
     try {
-      const name = req.body.name;
-
-      if (!name || typeof name !== 'string' || !name.trim()) {
-        res.status(400).json({ error: 'Genre name is required' });
-        return;
-      }
-
-      const genre = await this.genreService.create({ name });
+      const genre = await this.genreService.create(req.body);
       res.status(201).json(genre);
     } catch (error: any) {
       if (error.code === 'P2002') {
@@ -55,20 +43,7 @@ export class GenreController implements IGenreController {
 
   async update(req: Request, res: Response): Promise<void> {
     try {
-      const paramId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-      const id = parseInt(paramId, 10);
-      if (isNaN(id)) {
-        res.status(400).json({ error: 'Invalid genre ID' });
-        return;
-      }
-
-      const name = req.body.name;
-      if (name !== undefined && (typeof name !== 'string' || !name.trim())) {
-        res.status(400).json({ error: 'Invalid genre name' });
-        return;
-      }
-
-      const updated = await this.genreService.update(id, { name });
+      const updated = await this.genreService.update(Number(req.params.id), req.body);
       res.json(updated);
     } catch (error: any) {
       if (error.code === 'P2025') {
@@ -85,12 +60,7 @@ export class GenreController implements IGenreController {
 
   async delete(req: Request, res: Response): Promise<void> {
     try {
-      const paramId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-      const id = parseInt(paramId, 10);
-      if (isNaN(id)) {
-        res.status(400).json({ error: 'Invalid genre ID' });
-        return;
-      }
+      const id = Number(req.params.id);
       await this.genreService.delete(id);
       res.json({ message: 'Genre deleted successfully' });
     } catch (error: any) {
