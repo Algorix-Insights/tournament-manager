@@ -1,2 +1,36 @@
 @import "tailwindcss";
 @import "@heroui/styles";
+@import "./themes/tournament.css" layer(theme);
+
+@font-face {
+  font-family: 'Manrope-Light';
+  src: url('/fonts/Manrope-Light.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Manrope-Regular';
+  src: url('/fonts/Manrope-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Manrope-Medium';
+  src: url('/fonts/Manrope-Medium.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Manrope-SemiBold';
+  src: url('/fonts/Manrope-SemiBold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Manrope-Bold';
+  src: url('/fonts/Manrope-Bold.ttf') format('truetype');
+}
+
+@theme {
+  --font-manrope-light: 'Manrope-Light', sans-serif;
+  --font-manrope-regular: 'Manrope-Regular', sans-serif;
+  --font-manrope-medium: 'Manrope-Medium', sans-serif;
+  --font-manrope-semibold: 'Manrope-SemiBold', sans-serif;
+  --font-manrope-bold: 'Manrope-Bold', sans-serif;
+}

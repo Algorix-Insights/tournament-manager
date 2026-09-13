@@ -1,5 +1,7 @@
 # Stage 1: Build web application
-FROM node:24-alpine AS builder
+FROM node:22-alpine AS builder
+
+RUN apk update && apk upgrade --no-cache
 
 WORKDIR /app
 
@@ -8,6 +10,7 @@ COPY package.json package-lock.json ./
 COPY apps/web/package.json ./apps/web/
 COPY apps/api/package.json ./apps/api/
 COPY apps/api/prisma/schema.prisma ./apps/api/prisma/schema.prisma
+COPY apps/api/prisma.config.ts ./apps/api/prisma.config.ts
 
 # Install workspace dependencies
 RUN npm ci

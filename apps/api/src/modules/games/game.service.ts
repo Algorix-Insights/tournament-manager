@@ -2,9 +2,10 @@ import { prisma } from '../../core/prisma';
 import { CreateGameDTO, GameFilterDTO, UpdateGameDTO } from './game.types';
 import { parseOrderBy } from '../../core/utils/order-by.util';
 import { parsePaginationParams, formatPaginatedResponse } from '../../core/utils/pagination.util';
+import { IGameService } from './interfaces/game.service.interface';
 
-export class GameService {
-  static async getAll(filters?: GameFilterDTO) {
+export class GameService implements IGameService {
+  async getAll(filters?: GameFilterDTO) {
     const where: any = {};
 
     const name = filters?.name ?? filters?.nombre;
@@ -57,7 +58,7 @@ export class GameService {
     return formatPaginatedResponse(data, totalRecords);
   }
 
-  static async getById(id: number) {
+  async getById(id: number) {
     return prisma.game.findUnique({
       where: { id },
       include: {
@@ -71,7 +72,7 @@ export class GameService {
     });
   }
 
-  static async create(data: CreateGameDTO) {
+  async create(data: CreateGameDTO) {
     return prisma.game.create({
       data: {
         name: data.name.trim(),
@@ -83,7 +84,7 @@ export class GameService {
     });
   }
 
-  static async update(id: number, data: UpdateGameDTO) {
+  async update(id: number, data: UpdateGameDTO) {
     return prisma.game.update({
       where: { id },
       data: {
@@ -96,7 +97,7 @@ export class GameService {
     });
   }
 
-  static async delete(id: number) {
+  async delete(id: number) {
     return prisma.game.delete({
       where: { id },
     });

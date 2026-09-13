@@ -10,6 +10,7 @@ COPY package.json package-lock.json ./
 COPY apps/api/package.json ./apps/api/
 COPY apps/web/package.json ./apps/web/
 COPY apps/api/prisma/schema.prisma ./apps/api/prisma/schema.prisma
+COPY apps/api/prisma.config.ts ./apps/api/prisma.config.ts
 
 # Install all dependencies and run postinstall (prisma generate)
 RUN npm ci

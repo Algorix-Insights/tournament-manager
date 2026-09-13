@@ -1,8 +1,11 @@
 import { Request, Response } from 'express';
-import { PlayerService } from './player.service';
+import { IPlayerController } from './interfaces/player.controller.interface';
+import { IPlayerService } from './interfaces/player.service.interface';
 
-export class PlayerController {
-  static async getAll(req: Request, res: Response): Promise<void> {
+export class PlayerController implements IPlayerController {
+  constructor(private readonly playerService: IPlayerService) {}
+
+  async getAll(req: Request, res: Response): Promise<void> {
     try {
       const {
         name,
@@ -85,14 +88,14 @@ export class PlayerController {
         }
       }
 
-      const players = await PlayerService.getAll(filters);
+      const players = await this.playerService.getAll(filters);
       res.json(players);
     } catch (error) {
       res.status(500).json({ error: 'Error fetching players' });
     }
   }
 
-  static async getById(req: Request, res: Response): Promise<void> {
+  async getById(req: Request, res: Response): Promise<void> {
     try {
       const paramId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
       const id = parseInt(paramId, 10);
@@ -100,7 +103,7 @@ export class PlayerController {
         res.status(400).json({ error: 'Invalid player ID' });
         return;
       }
-      const player = await PlayerService.getById(id);
+      const player = await this.playerService.getById(id);
       if (!player) {
         res.status(404).json({ error: 'Player not found' });
         return;
@@ -111,7 +114,7 @@ export class PlayerController {
     }
   }
 
-  static async create(req: Request, res: Response): Promise<void> {
+  async create(req: Request, res: Response): Promise<void> {
     try {
       const name = req.body.name ?? req.body.nombre;
       const gamertag = req.body.gamertag;
@@ -122,7 +125,7 @@ export class PlayerController {
         return;
       }
 
-      const player = await PlayerService.create({ name, gamertag, email });
+      const player = await this.playerService.create({ name, gamertag, email });
       res.status(201).json(player);
     } catch (error: any) {
       if (error.code === 'P2002') {
@@ -133,7 +136,7 @@ export class PlayerController {
     }
   }
 
-  static async update(req: Request, res: Response): Promise<void> {
+  async update(req: Request, res: Response): Promise<void> {
     try {
       const paramId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
       const id = parseInt(paramId, 10);
@@ -169,7 +172,7 @@ export class PlayerController {
         updateData.email = email;
       }
 
-      const updated = await PlayerService.update(id, updateData);
+      const updated = await this.playerService.update(id, updateData);
       res.json(updated);
     } catch (error: any) {
       if (error.code === 'P2025') {
@@ -184,7 +187,7 @@ export class PlayerController {
     }
   }
 
-  static async delete(req: Request, res: Response): Promise<void> {
+  async delete(req: Request, res: Response): Promise<void> {
     try {
       const paramId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
       const id = parseInt(paramId, 10);
@@ -192,7 +195,7 @@ export class PlayerController {
         res.status(400).json({ error: 'Invalid player ID' });
         return;
       }
-      await PlayerService.delete(id);
+      await this.playerService.delete(id);
       res.json({ message: 'Player deleted successfully' });
     } catch (error: any) {
       if (error.code === 'P2025') {

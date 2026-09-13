@@ -3,9 +3,10 @@ import { CreatePlayerDTO, PlayerFilterDTO, UpdatePlayerDTO } from './player.type
 import { buildDateFilter } from '../../core/utils/date-filter.util';
 import { parseOrderBy } from '../../core/utils/order-by.util';
 import { parsePaginationParams, formatPaginatedResponse } from '../../core/utils/pagination.util';
+import { IPlayerService } from './interfaces/player.service.interface';
 
-export class PlayerService {
-  static async getAll(filters?: PlayerFilterDTO) {
+export class PlayerService implements IPlayerService {
+  async getAll(filters?: PlayerFilterDTO) {
     const where: any = {};
 
     const name = filters?.name ?? filters?.nombre;
@@ -71,7 +72,7 @@ export class PlayerService {
     return formatPaginatedResponse(data, totalRecords);
   }
 
-  static async getById(id: number) {
+  async getById(id: number) {
     return prisma.player.findUnique({
       where: { id },
       include: {
@@ -88,7 +89,7 @@ export class PlayerService {
     });
   }
 
-  static async create(data: CreatePlayerDTO) {
+  async create(data: CreatePlayerDTO) {
     return prisma.player.create({
       data: {
         name: data.name.trim(),
@@ -98,7 +99,7 @@ export class PlayerService {
     });
   }
 
-  static async update(id: number, data: UpdatePlayerDTO) {
+  async update(id: number, data: UpdatePlayerDTO) {
     return prisma.player.update({
       where: { id },
       data: {
@@ -109,7 +110,7 @@ export class PlayerService {
     });
   }
 
-  static async delete(id: number) {
+  async delete(id: number) {
     return prisma.player.delete({
       where: { id },
     });
