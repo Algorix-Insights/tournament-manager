@@ -1,5 +1,6 @@
 import express from 'express';
 // import cors from 'cors';
+import { apiErrorHandler } from '@/core/middlewares/error-handler.middleware';
 import playerRouter from '@/modules/players/player.router';
 import gameRouter from '@/modules/games/game.router';
 import scoreRouter from '@/modules/scores/score.router';
@@ -31,6 +32,8 @@ app.get('/', (_req, res) => {
     },
   });
 });
+
+app.use(apiErrorHandler);
 
 const PORT = process.env.PORT || 3000;
 
