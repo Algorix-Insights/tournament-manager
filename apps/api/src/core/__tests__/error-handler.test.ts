@@ -12,7 +12,7 @@ test('convierte una excepción desconocida en un error HTTP en español', () => 
   const next = jest.fn() as unknown as NextFunction;
   const log = jest.spyOn(console, 'error').mockImplementation(() => undefined);
 
-  apiErrorHandler(error, {} as Request, res, next);
+  apiErrorHandler(error, {} as unknown as Request, res, next);
 
   expect(res.status).toHaveBeenCalledWith(500);
   expect(res.json).toHaveBeenCalledWith({ error: 'Error interno del servidor' });

@@ -13,7 +13,7 @@ test('normalizes query filters for the request pipeline', () => {
       nombre: 'Legacy',
     },
   } as unknown as Request;
-  const res = { locals: {} } as Response;
+  const res = { locals: {} } as unknown as Response;
   let nextCalled = false;
 
   queryFilters({

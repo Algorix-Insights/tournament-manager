@@ -4,7 +4,7 @@ import { validate } from '@/core/middlewares/validation.middleware';
 import { createGameSchema } from '@/modules/games/dtos/game.dto';
 
 test('rechaza datos inválidos con mensajes en español', () => {
-  const req = { body: { name: '', genreId: 'no-numérico' } } as Request;
+  const req = { body: { name: '', genreId: 'no-numérico' } } as unknown as Request;
   const res = {
     status: jest.fn().mockReturnThis(),
     json: jest.fn(),
