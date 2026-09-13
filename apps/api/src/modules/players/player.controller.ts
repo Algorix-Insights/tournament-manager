@@ -7,7 +7,7 @@ export class PlayerController implements IPlayerController {
 
   async getAll(_req: Request, res: Response): Promise<void> {
     try {
-      const players = await this.playerService.getAll(res.locals.filters);
+      const players = await this.playerService.getAll(res.locals.filters, res.locals.pagination);
       res.json(players);
     } catch (error) {
       res.status(500).json({ error: 'Error fetching players' });

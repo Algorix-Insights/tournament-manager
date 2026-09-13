@@ -2,7 +2,7 @@ import { prisma } from '@/core/prisma';
 import { CreateScoreDTO, RankingFilterDTO, ScoreFilterDTO } from '@/modules/scores/score.types';
 import { buildDateFilter } from '@/core/utils/date-filter.util';
 import { parseOrderBy } from '@/core/utils/order-by.util';
-import { parsePaginationParams, formatPaginatedResponse } from '@/core/utils/pagination.util';
+import { DEFAULT_PAGINATION, formatPaginatedResponse, PaginationParams } from '@/core/utils/pagination.util';
 import { IScoreService, ScoreStats } from '@/modules/scores/interfaces/score.service.interface';
 
 function buildScoreWhere(filters?: ScoreFilterDTO) {
@@ -58,11 +58,11 @@ const scoreFieldMapping = {
 };
 
 export class ScoreService implements IScoreService {
-  async getAll(filters?: ScoreFilterDTO) {
+  async getAll(filters?: ScoreFilterDTO, pagination?: PaginationParams) {
     const where = buildScoreWhere(filters);
     const order = filters?.order;
     const orderBy = parseOrderBy(order, scoreFieldMapping, { createdAt: 'desc' });
-    const { skip, take } = parsePaginationParams(filters);
+    const { skip, take } = pagination ?? DEFAULT_PAGINATION;
 
     const [data, totalRecords] = await Promise.all([
       prisma.score.findMany({
@@ -115,11 +115,11 @@ export class ScoreService implements IScoreService {
     });
   }
 
-  async getRanking(filters?: RankingFilterDTO) {
+  async getRanking(filters?: RankingFilterDTO, pagination?: PaginationParams) {
     const where = buildScoreWhere(filters);
     const order = filters?.order;
     const orderBy = parseOrderBy(order, scoreFieldMapping, { score: 'desc' });
-    const { skip, take } = parsePaginationParams(filters);
+    const { skip, take } = pagination ?? DEFAULT_PAGINATION;
 
     const [scores, totalRecords] = await Promise.all([
       prisma.score.findMany({

@@ -1,11 +1,11 @@
 import { prisma } from '@/core/prisma';
 import { CreateGenreDTO, GenreFilterDTO, UpdateGenreDTO } from '@/modules/genres/genre.types';
 import { parseOrderBy } from '@/core/utils/order-by.util';
-import { parsePaginationParams, formatPaginatedResponse } from '@/core/utils/pagination.util';
+import { DEFAULT_PAGINATION, formatPaginatedResponse, PaginationParams } from '@/core/utils/pagination.util';
 import { IGenreService } from '@/modules/genres/interfaces/genre.service.interface';
 
 export class GenreService implements IGenreService {
-  async getAll(filters?: GenreFilterDTO) {
+  async getAll(filters?: GenreFilterDTO, pagination?: PaginationParams) {
     const where: any = {};
 
     const name = filters?.name;
@@ -23,7 +23,7 @@ export class GenreService implements IGenreService {
       { name: 'asc' }
     );
 
-    const { skip, take } = parsePaginationParams(filters);
+    const { skip, take } = pagination ?? DEFAULT_PAGINATION;
 
     const [data, totalRecords] = await Promise.all([
       prisma.genre.findMany({

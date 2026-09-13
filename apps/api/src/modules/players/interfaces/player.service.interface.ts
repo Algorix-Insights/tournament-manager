@@ -1,8 +1,8 @@
-import type { PaginatedResponse } from '@/core/utils/pagination.util';
+import type { PaginatedResponse, PaginationParams } from '@/core/utils/pagination.util';
 import type { CreatePlayerDTO, PlayerFilterDTO, UpdatePlayerDTO } from '@/modules/players/player.types';
 
 export interface IPlayerService {
-  getAll(filters?: PlayerFilterDTO): Promise<PaginatedResponse<unknown>>;
+  getAll(filters?: PlayerFilterDTO, pagination?: PaginationParams): Promise<PaginatedResponse<unknown>>;
   getById(id: number): Promise<unknown | null>;
   create(data: CreatePlayerDTO): Promise<unknown>;
   update(id: number, data: UpdatePlayerDTO): Promise<unknown>;

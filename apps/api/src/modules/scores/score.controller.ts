@@ -7,7 +7,7 @@ export class ScoreController implements IScoreController {
 
   async getAll(_req: Request, res: Response): Promise<void> {
     try {
-      const scores = await this.scoreService.getAll(res.locals.filters);
+      const scores = await this.scoreService.getAll(res.locals.filters, res.locals.pagination);
       res.json(scores);
     } catch (error) {
       res.status(500).json({ error: 'Error fetching scores' });
@@ -49,7 +49,7 @@ export class ScoreController implements IScoreController {
 
   async getRanking(_req: Request, res: Response): Promise<void> {
     try {
-      const ranking = await this.scoreService.getRanking(res.locals.filters);
+      const ranking = await this.scoreService.getRanking(res.locals.filters, res.locals.pagination);
       res.json(ranking);
     } catch (error) {
       res.status(500).json({ error: 'Error generating ranking table' });

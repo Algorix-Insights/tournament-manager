@@ -7,7 +7,7 @@ export class GameController implements IGameController {
 
   async getAll(_req: Request, res: Response): Promise<void> {
     try {
-      const games = await this.gameService.getAll(res.locals.filters);
+      const games = await this.gameService.getAll(res.locals.filters, res.locals.pagination);
       res.json(games);
     } catch (error) {
       res.status(500).json({ error: 'Error fetching games' });

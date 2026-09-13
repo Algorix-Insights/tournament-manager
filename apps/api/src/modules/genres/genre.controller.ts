@@ -7,7 +7,7 @@ export class GenreController implements IGenreController {
 
   async getAll(_req: Request, res: Response): Promise<void> {
     try {
-      const genres = await this.genreService.getAll(res.locals.filters);
+      const genres = await this.genreService.getAll(res.locals.filters, res.locals.pagination);
       res.json(genres);
     } catch (error) {
       res.status(500).json({ error: 'Error fetching genres' });

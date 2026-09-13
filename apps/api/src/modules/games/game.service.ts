@@ -1,11 +1,11 @@
 import { prisma } from '@/core/prisma';
 import { CreateGameDTO, GameFilterDTO, UpdateGameDTO } from '@/modules/games/game.types';
 import { parseOrderBy } from '@/core/utils/order-by.util';
-import { parsePaginationParams, formatPaginatedResponse } from '@/core/utils/pagination.util';
+import { DEFAULT_PAGINATION, formatPaginatedResponse, PaginationParams } from '@/core/utils/pagination.util';
 import { IGameService } from '@/modules/games/interfaces/game.service.interface';
 
 export class GameService implements IGameService {
-  async getAll(filters?: GameFilterDTO) {
+  async getAll(filters?: GameFilterDTO, pagination?: PaginationParams) {
     const where: any = {};
 
     const name = filters?.name;
@@ -37,7 +37,7 @@ export class GameService implements IGameService {
       { name: 'asc' }
     );
 
-    const { skip, take } = parsePaginationParams(filters);
+    const { skip, take } = pagination ?? DEFAULT_PAGINATION;
 
     const [data, totalRecords] = await Promise.all([
       prisma.game.findMany({
