@@ -43,9 +43,13 @@ async function main() {
   const genreNames = [
     ...new Map(publicGames.map((game) => [game.genre.toLowerCase(), game.genre])).values(),
   ];
-  const genres = await prisma.$transaction(
-    genreNames.map((name) => prisma.genre.create({ data: { name } })),
-  );
+  await prisma.genre.createMany({
+    data: genreNames.map((name) => ({ name })),
+  });
+  const genres = await prisma.genre.findMany({
+    where: { name: { in: genreNames } },
+    select: { id: true, name: true },
+  });
   const genreIds = new Map(genres.map((genre) => [genre.name.toLowerCase(), genre.id]));
   console.log('✅ Genres created.');
 
@@ -93,16 +97,18 @@ async function main() {
   console.log('✅ Players created.');
 
   // 4. Create games from the public catalog
-  const games = await prisma.$transaction(
-    publicGames.map((game) =>
-      prisma.game.create({
-        data: {
-          name: game.title,
-          genreId: genreIds.get(game.genre.toLowerCase())!,
-        },
-      }),
-    ),
-  );
+  await prisma.game.createMany({
+    data: publicGames.map((game) => ({
+      name: game.title,
+      genreId: genreIds.get(game.genre.toLowerCase())!,
+    })),
+  });
+  const createdGames = await prisma.game.findMany({
+    where: { name: { in: publicGames.map((game) => game.title) } },
+    select: { id: true, name: true },
+  });
+  const gameIds = new Map(createdGames.map((game) => [game.name, game.id]));
+  const games = publicGames.map((game) => ({ id: gameIds.get(game.title)! }));
 
   console.log(`✅ ${games.length} games created.`);
 
