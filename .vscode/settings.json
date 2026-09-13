@@ -1,0 +1,15 @@
+{
+  "jest.useJest30": true,
+  "jest.virtualFolders": [
+    {
+      "name": "api",
+      "rootPath": "apps/api",
+      "jestCommandLine": "npm test --"
+    },
+    {
+      "name": "web",
+      "rootPath": "apps/web",
+      "jestCommandLine": "npm test --"
+    }
+  ]
+}
