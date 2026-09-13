@@ -561,7 +561,6 @@ const options = {
           type: 'object',
           properties: {
             data: { type: 'array', items: { $ref: '#/components/schemas/Player' } },
-            ROW_COUNT: { type: 'integer' },
             totalRecords: { type: 'integer' },
           },
         },
@@ -569,7 +568,6 @@ const options = {
           type: 'object',
           properties: {
             data: { type: 'array', items: { $ref: '#/components/schemas/Genre' } },
-            ROW_COUNT: { type: 'integer' },
             totalRecords: { type: 'integer' },
           },
         },
@@ -577,7 +575,6 @@ const options = {
           type: 'object',
           properties: {
             data: { type: 'array', items: { $ref: '#/components/schemas/Game' } },
-            ROW_COUNT: { type: 'integer' },
             totalRecords: { type: 'integer' },
           },
         },
@@ -585,7 +582,6 @@ const options = {
           type: 'object',
           properties: {
             data: { type: 'array', items: { $ref: '#/components/schemas/ScoreDetail' } },
-            ROW_COUNT: { type: 'integer' },
             totalRecords: { type: 'integer' },
           },
         },
@@ -593,7 +589,6 @@ const options = {
           type: 'object',
           properties: {
             data: { type: 'array', items: { $ref: '#/components/schemas/RankingEntry' } },
-            ROW_COUNT: { type: 'integer' },
             totalRecords: { type: 'integer' },
           },
         },

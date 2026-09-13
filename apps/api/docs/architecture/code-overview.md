@@ -150,7 +150,6 @@ Los services envían `skip` y `take` a Prisma y devuelven las colecciones con es
 ```json
 {
   "data": [],
-  "ROW_COUNT": 0,
   "totalRecords": 0
 }
 ```

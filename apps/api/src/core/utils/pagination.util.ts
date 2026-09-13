@@ -14,8 +14,7 @@ export const DEFAULT_PAGINATION: PaginationParams = {
 
 export interface PaginatedResponse<T> {
   data: T[];
-  ROW_COUNT: number;
-  totalRecords?: number;
+  totalRecords: number;
 }
 
 /**
@@ -49,7 +48,7 @@ export function parsePaginationParams(
 }
 
 /**
- * Formats data and row count into the expected response structure.
+ * Formats data and total record count into the expected response structure.
  */
 export function formatPaginatedResponse<T>(
   data: T[],
@@ -57,7 +56,6 @@ export function formatPaginatedResponse<T>(
 ): PaginatedResponse<T> {
   return {
     data,
-    ROW_COUNT: totalRecords,
     totalRecords,
   };
 }
