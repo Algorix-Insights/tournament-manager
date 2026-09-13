@@ -1,5 +1,5 @@
 import { prisma } from '@/core/prisma';
-import { CreateGameDTO, GameFilterDTO, UpdateGameDTO } from '@/modules/games/game.types';
+import type { CreateGameDTO, GameFilterDTO, UpdateGameDTO } from '@/modules/games/dtos/game.dto';
 import { parseOrderBy } from '@/core/utils/order-by.util';
 import { DEFAULT_PAGINATION, formatPaginatedResponse, PaginationParams } from '@/core/utils/pagination.util';
 import { IGameService } from '@/modules/games/interfaces/game.service.interface';

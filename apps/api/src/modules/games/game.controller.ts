@@ -16,12 +16,7 @@ export class GameController implements IGameController {
 
   async getById(req: Request, res: Response): Promise<void> {
     try {
-      const paramId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-      const id = parseInt(paramId, 10);
-      if (isNaN(id)) {
-        res.status(400).json({ error: 'Invalid game ID' });
-        return;
-      }
+      const id = Number(req.params.id);
       const game = await this.gameService.getById(id);
       if (!game) {
         res.status(404).json({ error: 'Game not found' });
@@ -35,16 +30,7 @@ export class GameController implements IGameController {
 
   async create(req: Request, res: Response): Promise<void> {
     try {
-      const name = req.body.name;
-      const genreId = req.body.genreId;
-      const parsedGenreId = parseInt(genreId, 10);
-
-      if (!name || typeof name !== 'string' || !name.trim() || isNaN(parsedGenreId)) {
-        res.status(400).json({ error: 'Name and a valid genreId are required' });
-        return;
-      }
-
-      const game = await this.gameService.create({ name, genreId: parsedGenreId });
+      const game = await this.gameService.create(req.body);
       res.status(201).json(game);
     } catch (error: any) {
       if (error.code === 'P2002') {
@@ -61,35 +47,7 @@ export class GameController implements IGameController {
 
   async update(req: Request, res: Response): Promise<void> {
     try {
-      const paramId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-      const id = parseInt(paramId, 10);
-      if (isNaN(id)) {
-        res.status(400).json({ error: 'Invalid game ID' });
-        return;
-      }
-
-      const name = req.body.name;
-      const genreId = req.body.genreId;
-      const updateData: { name?: string; genreId?: number } = {};
-
-      if (name !== undefined) {
-        if (typeof name !== 'string' || !name.trim()) {
-          res.status(400).json({ error: 'Invalid game name' });
-          return;
-        }
-        updateData.name = name;
-      }
-
-      if (genreId !== undefined) {
-        const parsedGenreId = parseInt(genreId, 10);
-        if (isNaN(parsedGenreId)) {
-          res.status(400).json({ error: 'Invalid genre ID' });
-          return;
-        }
-        updateData.genreId = parsedGenreId;
-      }
-
-      const updated = await this.gameService.update(id, updateData);
+      const updated = await this.gameService.update(Number(req.params.id), req.body);
       res.json(updated);
     } catch (error: any) {
       if (error.code === 'P2025') {
@@ -110,12 +68,7 @@ export class GameController implements IGameController {
 
   async delete(req: Request, res: Response): Promise<void> {
     try {
-      const paramId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-      const id = parseInt(paramId, 10);
-      if (isNaN(id)) {
-        res.status(400).json({ error: 'Invalid game ID' });
-        return;
-      }
+      const id = Number(req.params.id);
       await this.gameService.delete(id);
       res.json({ message: 'Game deleted successfully' });
     } catch (error: any) {
