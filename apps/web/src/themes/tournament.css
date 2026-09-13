@@ -1,0 +1,49 @@
+[data-theme="tournament"] {
+  color-scheme: light;
+
+  --tm-navy-900: #111827;
+  --tm-neutral-50: #f4f4f4;
+  --tm-primary-500: #684bf3;
+  --tm-navy-42: rgba(17, 24, 39, 0.42);
+  --tm-black: #000000;
+  --tm-black-5: rgba(0, 0, 0, 0.05);
+  --tm-black-4: rgba(0, 0, 0, 0.04);
+  --tm-black-3: rgba(0, 0, 0, 0.03);
+  --tm-black-2: rgba(0, 0, 0, 0.02);
+  --tm-gray-500: #90939c;
+  --tm-gray-400: #a3a3a3;
+
+  --accent: var(--tm-primary-500);
+  --accent-foreground: #ffffff;
+  --black: var(--tm-black);
+  --background: var(--tm-neutral-50);
+  --foreground: var(--tm-navy-900);
+  --surface: var(--tm-black-5);
+  --surface-foreground: var(--tm-navy-900);
+  --surface-secondary: var(--tm-black-3);
+  --surface-secondary-foreground: var(--tm-navy-900);
+  --surface-tertiary: var(--tm-black-2);
+  --surface-tertiary-foreground: var(--tm-navy-900);
+  --overlay: var(--tm-neutral-50);
+  --overlay-foreground: var(--tm-navy-900);
+  --muted: var(--tm-gray-500);
+  --default: var(--tm-black-3);
+  --default-foreground: var(--tm-navy-900);
+  --field-background: var(--tm-black-2);
+  --field-foreground: var(--tm-navy-900);
+  --field-placeholder: var(--tm-gray-400);
+  --field-border: var(--tm-black-5);
+  --field-border-width: 1px;
+  --field-hover: var(--tm-black-4);
+  --field-border-hover: var(--tm-black-5);
+  --field-border-focus: var(--tm-primary-500);
+  --border: var(--tm-black-5);
+  --separator: var(--tm-black-5);
+  --focus: var(--tm-primary-500);
+  --link: var(--tm-primary-500);
+  --backdrop: var(--tm-navy-42);
+  --surface-hover: var(--tm-black-4);
+  --background-secondary: var(--tm-black-3);
+  --background-tertiary: var(--tm-black-2);
+  --disabled-opacity: 0.42;
+}
