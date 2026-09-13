@@ -10,7 +10,7 @@ export class GenreController implements IGenreController {
       const genres = await this.genreService.getAll(res.locals.filters, res.locals.pagination);
       res.json(genres);
     } catch (error) {
-      res.status(500).json({ error: 'Error fetching genres' });
+      res.status(500).json({ error: 'Error al obtener los géneros' });
     }
   }
 
@@ -19,12 +19,12 @@ export class GenreController implements IGenreController {
       const id = Number(req.params.id);
       const genre = await this.genreService.getById(id);
       if (!genre) {
-        res.status(404).json({ error: 'Genre not found' });
+        res.status(404).json({ error: 'Género no encontrado' });
         return;
       }
       res.json(genre);
     } catch (error) {
-      res.status(500).json({ error: 'Error fetching genre' });
+      res.status(500).json({ error: 'Error al obtener el género' });
     }
   }
 
@@ -34,10 +34,10 @@ export class GenreController implements IGenreController {
       res.status(201).json(genre);
     } catch (error: any) {
       if (error.code === 'P2002') {
-        res.status(400).json({ error: 'A genre with that name already exists' });
+        res.status(400).json({ error: 'Ya existe un género con ese nombre' });
         return;
       }
-      res.status(500).json({ error: 'Error registering genre' });
+      res.status(500).json({ error: 'Error al registrar el género' });
     }
   }
 
@@ -47,14 +47,14 @@ export class GenreController implements IGenreController {
       res.json(updated);
     } catch (error: any) {
       if (error.code === 'P2025') {
-        res.status(404).json({ error: 'Genre not found' });
+        res.status(404).json({ error: 'Género no encontrado' });
         return;
       }
       if (error.code === 'P2002') {
-        res.status(400).json({ error: 'A genre with that name already exists' });
+        res.status(400).json({ error: 'Ya existe un género con ese nombre' });
         return;
       }
-      res.status(500).json({ error: 'Error updating genre' });
+      res.status(500).json({ error: 'Error al actualizar el género' });
     }
   }
 
@@ -65,14 +65,14 @@ export class GenreController implements IGenreController {
       res.json({ message: 'Genre deleted successfully' });
     } catch (error: any) {
       if (error.code === 'P2025') {
-        res.status(404).json({ error: 'Genre not found' });
+        res.status(404).json({ error: 'Género no encontrado' });
         return;
       }
       if (error.code === 'P2003') {
-        res.status(400).json({ error: 'Cannot delete genre because it has associated games' });
+        res.status(400).json({ error: 'No se puede eliminar el género porque tiene juegos asociados' });
         return;
       }
-      res.status(500).json({ error: 'Error deleting genre' });
+      res.status(500).json({ error: 'Error al eliminar el género' });
     }
   }
 }

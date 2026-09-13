@@ -10,7 +10,7 @@ export class ScoreController implements IScoreController {
       const scores = await this.scoreService.getAll(res.locals.filters, res.locals.pagination);
       res.json(scores);
     } catch (error) {
-      res.status(500).json({ error: 'Error fetching scores' });
+      res.status(500).json({ error: 'Error al obtener los puntajes' });
     }
   }
 
@@ -21,10 +21,10 @@ export class ScoreController implements IScoreController {
       res.status(201).json(score);
     } catch (error: any) {
       if (error.code === 'P2003') {
-        res.status(400).json({ error: 'The specified player or game does not exist' });
+        res.status(400).json({ error: 'El jugador o juego especificado no existe' });
         return;
       }
-      res.status(500).json({ error: error.message || 'Error registering score' });
+      res.status(500).json({ error: 'Error al registrar el puntaje' });
     }
   }
 
@@ -33,7 +33,7 @@ export class ScoreController implements IScoreController {
       const ranking = await this.scoreService.getRanking(res.locals.filters, res.locals.pagination);
       res.json(ranking);
     } catch (error) {
-      res.status(500).json({ error: 'Error generating ranking table' });
+      res.status(500).json({ error: 'Error al generar la tabla de posiciones' });
     }
   }
 
@@ -42,7 +42,7 @@ export class ScoreController implements IScoreController {
       const stats = await this.scoreService.getStats();
       res.json(stats);
     } catch (error) {
-      res.status(500).json({ error: 'Error calculating tournament statistics' });
+      res.status(500).json({ error: 'Error al calcular las estadísticas del torneo' });
     }
   }
 
@@ -53,10 +53,10 @@ export class ScoreController implements IScoreController {
       res.json({ message: 'Score deleted successfully' });
     } catch (error: any) {
       if (error.code === 'P2025') {
-        res.status(404).json({ error: 'Score not found' });
+        res.status(404).json({ error: 'Puntaje no encontrado' });
         return;
       }
-      res.status(500).json({ error: 'Error deleting score' });
+      res.status(500).json({ error: 'Error al eliminar el puntaje' });
     }
   }
 }

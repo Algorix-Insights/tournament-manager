@@ -10,7 +10,7 @@ export class GameController implements IGameController {
       const games = await this.gameService.getAll(res.locals.filters, res.locals.pagination);
       res.json(games);
     } catch (error) {
-      res.status(500).json({ error: 'Error fetching games' });
+      res.status(500).json({ error: 'Error al obtener los juegos' });
     }
   }
 
@@ -19,12 +19,12 @@ export class GameController implements IGameController {
       const id = Number(req.params.id);
       const game = await this.gameService.getById(id);
       if (!game) {
-        res.status(404).json({ error: 'Game not found' });
+        res.status(404).json({ error: 'Juego no encontrado' });
         return;
       }
       res.json(game);
     } catch (error) {
-      res.status(500).json({ error: 'Error fetching game' });
+      res.status(500).json({ error: 'Error al obtener el juego' });
     }
   }
 
@@ -34,14 +34,14 @@ export class GameController implements IGameController {
       res.status(201).json(game);
     } catch (error: any) {
       if (error.code === 'P2002') {
-        res.status(400).json({ error: 'A game with that name already exists' });
+        res.status(400).json({ error: 'Ya existe un juego con ese nombre' });
         return;
       }
       if (error.code === 'P2003') {
-        res.status(400).json({ error: 'The specified genreId does not exist' });
+        res.status(400).json({ error: 'El genreId especificado no existe' });
         return;
       }
-      res.status(500).json({ error: 'Error registering game' });
+      res.status(500).json({ error: 'Error al registrar el juego' });
     }
   }
 
@@ -51,18 +51,18 @@ export class GameController implements IGameController {
       res.json(updated);
     } catch (error: any) {
       if (error.code === 'P2025') {
-        res.status(404).json({ error: 'Game not found' });
+        res.status(404).json({ error: 'Juego no encontrado' });
         return;
       }
       if (error.code === 'P2002') {
-        res.status(400).json({ error: 'A game with that name already exists' });
+        res.status(400).json({ error: 'Ya existe un juego con ese nombre' });
         return;
       }
       if (error.code === 'P2003') {
-        res.status(400).json({ error: 'The specified genreId does not exist' });
+        res.status(400).json({ error: 'El genreId especificado no existe' });
         return;
       }
-      res.status(500).json({ error: 'Error updating game' });
+      res.status(500).json({ error: 'Error al actualizar el juego' });
     }
   }
 
@@ -73,10 +73,10 @@ export class GameController implements IGameController {
       res.json({ message: 'Game deleted successfully' });
     } catch (error: any) {
       if (error.code === 'P2025') {
-        res.status(404).json({ error: 'Game not found' });
+        res.status(404).json({ error: 'Juego no encontrado' });
         return;
       }
-      res.status(500).json({ error: 'Error deleting game' });
+      res.status(500).json({ error: 'Error al eliminar el juego' });
     }
   }
 }

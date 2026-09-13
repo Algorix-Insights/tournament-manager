@@ -10,7 +10,7 @@ export class PlayerController implements IPlayerController {
       const players = await this.playerService.getAll(res.locals.filters, res.locals.pagination);
       res.json(players);
     } catch (error) {
-      res.status(500).json({ error: 'Error fetching players' });
+      res.status(500).json({ error: 'Error al obtener los jugadores' });
     }
   }
 
@@ -19,12 +19,12 @@ export class PlayerController implements IPlayerController {
       const id = Number(req.params.id);
       const player = await this.playerService.getById(id);
       if (!player) {
-        res.status(404).json({ error: 'Player not found' });
+        res.status(404).json({ error: 'Jugador no encontrado' });
         return;
       }
       res.json(player);
     } catch (error) {
-      res.status(500).json({ error: 'Error fetching player' });
+      res.status(500).json({ error: 'Error al obtener el jugador' });
     }
   }
 
@@ -34,10 +34,10 @@ export class PlayerController implements IPlayerController {
       res.status(201).json(player);
     } catch (error: any) {
       if (error.code === 'P2002') {
-        res.status(400).json({ error: 'Gamertag or Email is already registered' });
+        res.status(400).json({ error: 'El gamertag o el correo electrónico ya están registrados' });
         return;
       }
-      res.status(500).json({ error: 'Error registering player' });
+      res.status(500).json({ error: 'Error al registrar el jugador' });
     }
   }
 
@@ -47,14 +47,14 @@ export class PlayerController implements IPlayerController {
       res.json(updated);
     } catch (error: any) {
       if (error.code === 'P2025') {
-        res.status(404).json({ error: 'Player not found' });
+        res.status(404).json({ error: 'Jugador no encontrado' });
         return;
       }
       if (error.code === 'P2002') {
-        res.status(400).json({ error: 'Gamertag or Email is already registered' });
+        res.status(400).json({ error: 'El gamertag o el correo electrónico ya están registrados' });
         return;
       }
-      res.status(500).json({ error: 'Error updating player' });
+      res.status(500).json({ error: 'Error al actualizar el jugador' });
     }
   }
 
@@ -65,10 +65,10 @@ export class PlayerController implements IPlayerController {
       res.json({ message: 'Player deleted successfully' });
     } catch (error: any) {
       if (error.code === 'P2025') {
-        res.status(404).json({ error: 'Player not found' });
+        res.status(404).json({ error: 'Jugador no encontrado' });
         return;
       }
-      res.status(500).json({ error: 'Error deleting player' });
+      res.status(500).json({ error: 'Error al eliminar el jugador' });
     }
   }
 }
