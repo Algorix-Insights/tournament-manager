@@ -1,30 +1,29 @@
-import { prisma } from '../../core/prisma';
-import { CreateGenreDTO, GenreFilterDTO, UpdateGenreDTO } from './genre.types';
-import { parseOrderBy } from '../../core/utils/order-by.util';
-import { parsePaginationParams, formatPaginatedResponse } from '../../core/utils/pagination.util';
-import { IGenreService } from './interfaces/genre.service.interface';
+import { prisma } from '@/core/prisma';
+import type { CreateGenreDTO, GenreFilterDTO, UpdateGenreDTO } from '@/modules/genres/dtos/genre.dto';
+import { parseOrderBy } from '@/core/utils/order-by.util';
+import { DEFAULT_PAGINATION, formatPaginatedResponse, PaginationParams } from '@/core/utils/pagination.util';
+import { IGenreService } from '@/modules/genres/interfaces/genre.service.interface';
 
 export class GenreService implements IGenreService {
-  async getAll(filters?: GenreFilterDTO) {
+  async getAll(filters?: GenreFilterDTO, pagination?: PaginationParams) {
     const where: any = {};
 
-    const name = filters?.name ?? filters?.nombre;
+    const name = filters?.name;
     if (name) {
       where.name = { contains: name.trim() };
     }
 
-    const order = filters?.order ?? filters?.orden;
+    const order = filters?.order;
     const orderBy = parseOrderBy(
       order,
       {
         id: 'id',
         name: 'name',
-        nombre: 'name',
       },
       { name: 'asc' }
     );
 
-    const { skip, take } = parsePaginationParams(filters);
+    const { skip, take } = pagination ?? DEFAULT_PAGINATION;
 
     const [data, totalRecords] = await Promise.all([
       prisma.genre.findMany({

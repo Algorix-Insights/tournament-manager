@@ -1,24 +1,24 @@
-import { prisma } from '../../core/prisma';
-import { CreateScoreDTO, RankingFilterDTO, ScoreFilterDTO } from './score.types';
-import { buildDateFilter } from '../../core/utils/date-filter.util';
-import { parseOrderBy } from '../../core/utils/order-by.util';
-import { parsePaginationParams, formatPaginatedResponse } from '../../core/utils/pagination.util';
-import { IScoreService, ScoreStats } from './interfaces/score.service.interface';
+import { prisma } from '@/core/prisma';
+import type { CreateScoreDTO, RankingFilterDTO, ScoreFilterDTO } from '@/modules/scores/dtos/score.dto';
+import { buildDateFilter } from '@/core/utils/date-filter.util';
+import { parseOrderBy } from '@/core/utils/order-by.util';
+import { DEFAULT_PAGINATION, formatPaginatedResponse, PaginationParams } from '@/core/utils/pagination.util';
+import { IScoreService, ScoreStats } from '@/modules/scores/interfaces/score.service.interface';
 
 function buildScoreWhere(filters?: ScoreFilterDTO) {
   const where: any = {};
 
-  const playerId = filters?.playerId ?? filters?.jugadorId;
+  const playerId = filters?.playerId;
   if (playerId !== undefined) {
     where.playerId = playerId;
   }
 
-  const gameId = filters?.gameId ?? filters?.videojuegoId;
+  const gameId = filters?.gameId;
   if (gameId !== undefined) {
     where.gameId = gameId;
   }
 
-  const genreId = filters?.genreId ?? filters?.generoId;
+  const genreId = filters?.genreId;
   if (genreId !== undefined) {
     where.game = {
       genreId,
@@ -35,9 +35,9 @@ function buildScoreWhere(filters?: ScoreFilterDTO) {
     }
   }
 
-  const period = filters?.period ?? filters?.periodo;
-  const startDate = filters?.startDate ?? filters?.fechaInicio;
-  const endDate = filters?.endDate ?? filters?.fechaFin;
+  const period = filters?.period;
+  const startDate = filters?.startDate;
+  const endDate = filters?.endDate;
 
   const dateRange = buildDateFilter(period, startDate, endDate);
   if (dateRange) {
@@ -50,24 +50,19 @@ function buildScoreWhere(filters?: ScoreFilterDTO) {
 const scoreFieldMapping = {
   id: 'id',
   score: 'score',
-  puntuacion: 'score',
   createdAt: 'createdAt',
   date: 'createdAt',
-  fecha: 'createdAt',
   player: { player: 'gamertag' },
-  jugador: { player: 'gamertag' },
   playerName: { player: 'name' },
-  jugadorNombre: { player: 'name' },
   game: { game: 'name' },
-  videojuego: { game: 'name' },
 };
 
 export class ScoreService implements IScoreService {
-  async getAll(filters?: ScoreFilterDTO) {
+  async getAll(filters?: ScoreFilterDTO, pagination?: PaginationParams) {
     const where = buildScoreWhere(filters);
-    const order = filters?.order ?? filters?.orden;
+    const order = filters?.order;
     const orderBy = parseOrderBy(order, scoreFieldMapping, { createdAt: 'desc' });
-    const { skip, take } = parsePaginationParams(filters);
+    const { skip, take } = pagination ?? DEFAULT_PAGINATION;
 
     const [data, totalRecords] = await Promise.all([
       prisma.score.findMany({
@@ -120,11 +115,11 @@ export class ScoreService implements IScoreService {
     });
   }
 
-  async getRanking(filters?: RankingFilterDTO) {
+  async getRanking(filters?: RankingFilterDTO, pagination?: PaginationParams) {
     const where = buildScoreWhere(filters);
-    const order = filters?.order ?? filters?.orden;
+    const order = filters?.order;
     const orderBy = parseOrderBy(order, scoreFieldMapping, { score: 'desc' });
-    const { skip, take } = parsePaginationParams(filters);
+    const { skip, take } = pagination ?? DEFAULT_PAGINATION;
 
     const [scores, totalRecords] = await Promise.all([
       prisma.score.findMany({
@@ -154,7 +149,6 @@ export class ScoreService implements IScoreService {
 
     const formattedRanking = scores.map((item, index) => ({
       position: skip + index + 1,
-      posicion: skip + index + 1,
       playerId: item.player.id,
       player: item.player.gamertag,
       playerName: item.player.name,
@@ -187,11 +181,6 @@ export class ScoreService implements IScoreService {
       totalGames,
       totalScores,
       averageScore,
-      // Legacy compatibility
-      totalJugadores: totalPlayers,
-      totalVideojuegos: totalGames,
-      totalPuntuaciones: totalScores,
-      puntuacionPromedio: averageScore,
     };
   }
 

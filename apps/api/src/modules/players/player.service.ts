@@ -1,56 +1,57 @@
-import { prisma } from '../../core/prisma';
-import { CreatePlayerDTO, PlayerFilterDTO, UpdatePlayerDTO } from './player.types';
-import { buildDateFilter } from '../../core/utils/date-filter.util';
-import { parseOrderBy } from '../../core/utils/order-by.util';
-import { parsePaginationParams, formatPaginatedResponse } from '../../core/utils/pagination.util';
-import { IPlayerService } from './interfaces/player.service.interface';
+import { prisma } from '@/core/prisma';
+import type { CreatePlayerDTO, PlayerFilterDTO, UpdatePlayerDTO } from '@/modules/players/dtos/player.dto';
+import { buildDateFilter } from '@/core/utils/date-filter.util';
+import { parseOrderBy } from '@/core/utils/order-by.util';
+import { DEFAULT_PAGINATION, formatPaginatedResponse, PaginationParams } from '@/core/utils/pagination.util';
+import { IPlayerService } from '@/modules/players/interfaces/player.service.interface';
 
 export class PlayerService implements IPlayerService {
-  async getAll(filters?: PlayerFilterDTO) {
+  async getAll(filters?: PlayerFilterDTO, pagination?: PaginationParams) {
     const where: any = {};
 
-    const name = filters?.name ?? filters?.nombre;
+    const name = filters?.name;
     if (name) {
       where.name = { contains: name.trim() };
+    }
+
+    const search = filters?.search;
+    if (search && !name && !filters?.gamertag) {
+      where.name = { contains: search.trim() };
     }
 
     if (filters?.gamertag) {
       where.gamertag = { contains: filters.gamertag.trim() };
     }
 
-    const email = filters?.email ?? filters?.correo;
+    const email = filters?.email;
     if (email) {
       where.email = { contains: email.trim() };
     }
 
-    const period = filters?.period ?? filters?.periodo;
-    const startDate = filters?.startDate ?? filters?.fechaInicio;
-    const endDate = filters?.endDate ?? filters?.fechaFin;
+    const period = filters?.period;
+    const startDate = filters?.startDate;
+    const endDate = filters?.endDate;
 
     const dateRange = buildDateFilter(period, startDate, endDate);
     if (dateRange) {
       where.createdAt = dateRange;
     }
 
-    const order = filters?.order ?? filters?.orden;
+    const order = filters?.order;
     const orderBy = parseOrderBy(
       order,
       {
         id: 'id',
         name: 'name',
-        nombre: 'name',
         gamertag: 'gamertag',
         email: 'email',
-        correo: 'email',
         createdAt: 'createdAt',
-        fechaRegistro: 'createdAt',
         date: 'createdAt',
-        fecha: 'createdAt',
       },
       { createdAt: 'desc' }
     );
 
-    const { skip, take } = parsePaginationParams(filters);
+    const { skip, take } = pagination ?? DEFAULT_PAGINATION;
 
     const [data, totalRecords] = await Promise.all([
       prisma.player.findMany({
