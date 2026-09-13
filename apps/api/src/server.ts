@@ -1,14 +1,33 @@
 import express from 'express';
-import cors from 'cors';
+// import cors from 'cors';
 import playerRouter from './modules/players/player.router';
 import gameRouter from './modules/games/game.router';
 import scoreRouter from './modules/scores/score.router';
 import genreRouter from './modules/genres/genre.router';
+import { queryFilters } from './core/middlewares/query-filters.middleware';
 
 const app = express();
 
-app.use(cors());
+// app.use(cors());
 app.use(express.json());
+app.use(
+  queryFilters([
+    'playerId',
+    'jugadorId',
+    'gameId',
+    'videojuegoId',
+    'genreId',
+    'generoId',
+    'minScore',
+    'maxScore',
+    'period',
+    'periodo',
+    'page',
+    'pagina',
+    'limit',
+    'cantidadRegistros',
+  ]),
+);
 app.disable('x-powered-by');
 
 // Base API Endpoints
