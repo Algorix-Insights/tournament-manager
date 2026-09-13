@@ -16,26 +16,7 @@ export class ScoreController implements IScoreController {
 
   async create(req: Request, res: Response): Promise<void> {
     try {
-      const rawPlayerId = req.body.playerId;
-      const rawGameId = req.body.gameId;
-      const rawScore = req.body.score;
-
-      if (rawPlayerId === undefined || rawGameId === undefined || rawScore === undefined) {
-        res.status(400).json({ error: 'Player, Game, and Score are required' });
-        return;
-      }
-
-      const parsedScore = Number(rawScore);
-      if (isNaN(parsedScore) || parsedScore < 0) {
-        res.status(400).json({ error: 'Score cannot be negative' });
-        return;
-      }
-
-      const score = await this.scoreService.create({
-        playerId: Number(rawPlayerId),
-        gameId: Number(rawGameId),
-        score: parsedScore,
-      });
+      const score = await this.scoreService.create(req.body);
 
       res.status(201).json(score);
     } catch (error: any) {
@@ -67,12 +48,7 @@ export class ScoreController implements IScoreController {
 
   async delete(req: Request, res: Response): Promise<void> {
     try {
-      const paramId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-      const id = parseInt(paramId, 10);
-      if (isNaN(id)) {
-        res.status(400).json({ error: 'Invalid score ID' });
-        return;
-      }
+      const id = Number(req.params.id);
       await this.scoreService.delete(id);
       res.json({ message: 'Score deleted successfully' });
     } catch (error: any) {

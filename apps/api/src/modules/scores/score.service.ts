@@ -1,5 +1,5 @@
 import { prisma } from '@/core/prisma';
-import { CreateScoreDTO, RankingFilterDTO, ScoreFilterDTO } from '@/modules/scores/score.types';
+import type { CreateScoreDTO, RankingFilterDTO, ScoreFilterDTO } from '@/modules/scores/dtos/score.dto';
 import { buildDateFilter } from '@/core/utils/date-filter.util';
 import { parseOrderBy } from '@/core/utils/order-by.util';
 import { DEFAULT_PAGINATION, formatPaginatedResponse, PaginationParams } from '@/core/utils/pagination.util';
