@@ -3,8 +3,6 @@ export interface PaginationParams {
   limit: number;
   skip: number;
   take: number;
-  pagina?: number;
-  cantidadRegistros?: number;
 }
 
 export interface PaginatedResponse<T> {
@@ -15,7 +13,7 @@ export interface PaginatedResponse<T> {
 
 /**
  * Parses and validates pagination parameters from req.query.
- * Supports English 'page' and 'limit' as primary parameters, with legacy fallback.
+ * Supports English 'page' and 'limit' parameters.
  * @param query Express req.query object
  * @param defaultLimit Default page limit (default 20)
  */
@@ -23,8 +21,8 @@ export function parsePaginationParams(
   query: any,
   defaultLimit: number = 20
 ): PaginationParams {
-  const rawPage = query?.page ?? query?.pagina;
-  const rawLimit = query?.limit ?? query?.cantidadRegistros;
+  const rawPage = query?.page;
+  const rawLimit = query?.limit;
 
   const pageNum = parseInt(rawPage, 10);
   const limitNum = parseInt(rawLimit, 10);
@@ -40,8 +38,6 @@ export function parsePaginationParams(
     limit,
     skip,
     take,
-    pagina: page,
-    cantidadRegistros: limit,
   };
 }
 

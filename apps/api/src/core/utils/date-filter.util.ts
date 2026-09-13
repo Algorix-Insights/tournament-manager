@@ -10,8 +10,6 @@ export enum PeriodEnum {
   CUSTOM = 9,
 }
 
-export const PeriodoEnum = PeriodEnum;
-
 export interface DateFilterRange {
   gte?: Date;
   lte?: Date;
