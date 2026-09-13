@@ -1,5 +1,5 @@
 import { prisma } from '@/core/prisma';
-import { CreatePlayerDTO, PlayerFilterDTO, UpdatePlayerDTO } from '@/modules/players/player.types';
+import type { CreatePlayerDTO, PlayerFilterDTO, UpdatePlayerDTO } from '@/modules/players/dtos/player.dto';
 import { buildDateFilter } from '@/core/utils/date-filter.util';
 import { parseOrderBy } from '@/core/utils/order-by.util';
 import { DEFAULT_PAGINATION, formatPaginatedResponse, PaginationParams } from '@/core/utils/pagination.util';

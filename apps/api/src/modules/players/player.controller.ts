@@ -16,12 +16,7 @@ export class PlayerController implements IPlayerController {
 
   async getById(req: Request, res: Response): Promise<void> {
     try {
-      const paramId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-      const id = parseInt(paramId, 10);
-      if (isNaN(id)) {
-        res.status(400).json({ error: 'Invalid player ID' });
-        return;
-      }
+      const id = Number(req.params.id);
       const player = await this.playerService.getById(id);
       if (!player) {
         res.status(404).json({ error: 'Player not found' });
@@ -35,16 +30,7 @@ export class PlayerController implements IPlayerController {
 
   async create(req: Request, res: Response): Promise<void> {
     try {
-      const name = req.body.name;
-      const gamertag = req.body.gamertag;
-      const email = req.body.email;
-
-      if (!name || !gamertag || !email) {
-        res.status(400).json({ error: 'Name, Gamertag, and Email are required' });
-        return;
-      }
-
-      const player = await this.playerService.create({ name, gamertag, email });
+      const player = await this.playerService.create(req.body);
       res.status(201).json(player);
     } catch (error: any) {
       if (error.code === 'P2002') {
@@ -57,41 +43,7 @@ export class PlayerController implements IPlayerController {
 
   async update(req: Request, res: Response): Promise<void> {
     try {
-      const paramId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-      const id = parseInt(paramId, 10);
-      if (isNaN(id)) {
-        res.status(400).json({ error: 'Invalid player ID' });
-        return;
-      }
-
-      const updateData: any = {};
-      const name = req.body.name;
-      if (name !== undefined) {
-        if (typeof name !== 'string' || !name.trim()) {
-          res.status(400).json({ error: 'Invalid player name' });
-          return;
-        }
-        updateData.name = name;
-      }
-
-      if (req.body.gamertag !== undefined) {
-        if (typeof req.body.gamertag !== 'string' || !req.body.gamertag.trim()) {
-          res.status(400).json({ error: 'Invalid gamertag' });
-          return;
-        }
-        updateData.gamertag = req.body.gamertag;
-      }
-
-      const email = req.body.email;
-      if (email !== undefined) {
-        if (typeof email !== 'string' || !email.trim()) {
-          res.status(400).json({ error: 'Invalid email address' });
-          return;
-        }
-        updateData.email = email;
-      }
-
-      const updated = await this.playerService.update(id, updateData);
+      const updated = await this.playerService.update(Number(req.params.id), req.body);
       res.json(updated);
     } catch (error: any) {
       if (error.code === 'P2025') {
@@ -108,12 +60,7 @@ export class PlayerController implements IPlayerController {
 
   async delete(req: Request, res: Response): Promise<void> {
     try {
-      const paramId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-      const id = parseInt(paramId, 10);
-      if (isNaN(id)) {
-        res.status(400).json({ error: 'Invalid player ID' });
-        return;
-      }
+      const id = Number(req.params.id);
       await this.playerService.delete(id);
       res.json({ message: 'Player deleted successfully' });
     } catch (error: any) {
