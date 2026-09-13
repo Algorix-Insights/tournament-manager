@@ -2,9 +2,10 @@ import { prisma } from '../../core/prisma';
 import { CreateGenreDTO, GenreFilterDTO, UpdateGenreDTO } from './genre.types';
 import { parseOrderBy } from '../../core/utils/order-by.util';
 import { parsePaginationParams, formatPaginatedResponse } from '../../core/utils/pagination.util';
+import { IGenreService } from './interfaces/genre.service.interface';
 
-export class GenreService {
-  static async getAll(filters?: GenreFilterDTO) {
+export class GenreService implements IGenreService {
+  async getAll(filters?: GenreFilterDTO) {
     const where: any = {};
 
     const name = filters?.name ?? filters?.nombre;
@@ -43,7 +44,7 @@ export class GenreService {
     return formatPaginatedResponse(data, totalRecords);
   }
 
-  static async getById(id: number) {
+  async getById(id: number) {
     return prisma.genre.findUnique({
       where: { id },
       include: {
@@ -52,7 +53,7 @@ export class GenreService {
     });
   }
 
-  static async create(data: CreateGenreDTO) {
+  async create(data: CreateGenreDTO) {
     return prisma.genre.create({
       data: {
         name: data.name.trim(),
@@ -60,7 +61,7 @@ export class GenreService {
     });
   }
 
-  static async update(id: number, data: UpdateGenreDTO) {
+  async update(id: number, data: UpdateGenreDTO) {
     return prisma.genre.update({
       where: { id },
       data: {
@@ -69,7 +70,7 @@ export class GenreService {
     });
   }
 
-  static async delete(id: number) {
+  async delete(id: number) {
     return prisma.genre.delete({
       where: { id },
     });

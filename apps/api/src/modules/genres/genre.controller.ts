@@ -1,8 +1,11 @@
 import { Request, Response } from 'express';
-import { GenreService } from './genre.service';
+import { IGenreController } from './interfaces/genre.controller.interface';
+import { IGenreService } from './interfaces/genre.service.interface';
 
-export class GenreController {
-  static async getAll(req: Request, res: Response): Promise<void> {
+export class GenreController implements IGenreController {
+  constructor(private readonly genreService: IGenreService) {}
+
+  async getAll(req: Request, res: Response): Promise<void> {
     try {
       const { name, nombre, order, orden, page, pagina, limit, cantidadRegistros } = req.query;
       const filters: any = {};
@@ -33,14 +36,14 @@ export class GenreController {
         }
       }
 
-      const genres = await GenreService.getAll(filters);
+      const genres = await this.genreService.getAll(filters);
       res.json(genres);
     } catch (error) {
       res.status(500).json({ error: 'Error fetching genres' });
     }
   }
 
-  static async getById(req: Request, res: Response): Promise<void> {
+  async getById(req: Request, res: Response): Promise<void> {
     try {
       const paramId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
       const id = parseInt(paramId, 10);
@@ -48,7 +51,7 @@ export class GenreController {
         res.status(400).json({ error: 'Invalid genre ID' });
         return;
       }
-      const genre = await GenreService.getById(id);
+      const genre = await this.genreService.getById(id);
       if (!genre) {
         res.status(404).json({ error: 'Genre not found' });
         return;
@@ -59,7 +62,7 @@ export class GenreController {
     }
   }
 
-  static async create(req: Request, res: Response): Promise<void> {
+  async create(req: Request, res: Response): Promise<void> {
     try {
       const name = req.body.name ?? req.body.nombre;
 
@@ -68,7 +71,7 @@ export class GenreController {
         return;
       }
 
-      const genre = await GenreService.create({ name });
+      const genre = await this.genreService.create({ name });
       res.status(201).json(genre);
     } catch (error: any) {
       if (error.code === 'P2002') {
@@ -79,7 +82,7 @@ export class GenreController {
     }
   }
 
-  static async update(req: Request, res: Response): Promise<void> {
+  async update(req: Request, res: Response): Promise<void> {
     try {
       const paramId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
       const id = parseInt(paramId, 10);
@@ -94,7 +97,7 @@ export class GenreController {
         return;
       }
 
-      const updated = await GenreService.update(id, { name });
+      const updated = await this.genreService.update(id, { name });
       res.json(updated);
     } catch (error: any) {
       if (error.code === 'P2025') {
@@ -109,7 +112,7 @@ export class GenreController {
     }
   }
 
-  static async delete(req: Request, res: Response): Promise<void> {
+  async delete(req: Request, res: Response): Promise<void> {
     try {
       const paramId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
       const id = parseInt(paramId, 10);
@@ -117,7 +120,7 @@ export class GenreController {
         res.status(400).json({ error: 'Invalid genre ID' });
         return;
       }
-      await GenreService.delete(id);
+      await this.genreService.delete(id);
       res.json({ message: 'Genre deleted successfully' });
     } catch (error: any) {
       if (error.code === 'P2025') {
