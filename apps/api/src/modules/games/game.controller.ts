@@ -5,65 +5,9 @@ import { IGameService } from './interfaces/game.service.interface';
 export class GameController implements IGameController {
   constructor(private readonly gameService: IGameService) {}
 
-  async getAll(req: Request, res: Response): Promise<void> {
+  async getAll(_req: Request, res: Response): Promise<void> {
     try {
-      const {
-        name,
-        nombre,
-        genreId,
-        generoId,
-        genreName,
-        generoNombre,
-        order,
-        orden,
-        page,
-        pagina,
-        limit,
-        cantidadRegistros,
-      } = req.query;
-
-      const filters: any = {};
-
-      const rawName = (name ?? nombre) as string;
-      if (typeof rawName === 'string' && rawName.trim()) {
-        filters.name = rawName.trim();
-      }
-
-      const rawGenreId = genreId ?? generoId;
-      if (rawGenreId !== undefined) {
-        const parsedId = parseInt(rawGenreId as string, 10);
-        if (!isNaN(parsedId)) {
-          filters.genreId = parsedId;
-        }
-      }
-
-      const rawGenreName = (genreName ?? generoNombre) as string;
-      if (typeof rawGenreName === 'string' && rawGenreName.trim()) {
-        filters.genreName = rawGenreName.trim();
-      }
-
-      const rawOrder = (order ?? orden) as string;
-      if (typeof rawOrder === 'string' && rawOrder.trim()) {
-        filters.order = rawOrder.trim();
-      }
-
-      const rawPage = page ?? pagina;
-      if (rawPage !== undefined) {
-        const parsedPage = parseInt(rawPage as string, 10);
-        if (!isNaN(parsedPage)) {
-          filters.page = parsedPage;
-        }
-      }
-
-      const rawLimit = limit ?? cantidadRegistros;
-      if (rawLimit !== undefined) {
-        const parsedLimit = parseInt(rawLimit as string, 10);
-        if (!isNaN(parsedLimit)) {
-          filters.limit = parsedLimit;
-        }
-      }
-
-      const games = await this.gameService.getAll(filters);
+      const games = await this.gameService.getAll(res.locals.filters);
       res.json(games);
     } catch (error) {
       res.status(500).json({ error: 'Error fetching games' });

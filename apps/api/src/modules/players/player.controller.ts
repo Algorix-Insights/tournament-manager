@@ -5,90 +5,9 @@ import { IPlayerService } from './interfaces/player.service.interface';
 export class PlayerController implements IPlayerController {
   constructor(private readonly playerService: IPlayerService) {}
 
-  async getAll(req: Request, res: Response): Promise<void> {
+  async getAll(_req: Request, res: Response): Promise<void> {
     try {
-      const {
-        name,
-        nombre,
-        gamertag,
-        email,
-        correo,
-        period,
-        periodo,
-        startDate,
-        fechaInicio,
-        endDate,
-        fechaFin,
-        order,
-        orden,
-        search,
-        page,
-        pagina,
-        limit,
-        cantidadRegistros,
-      } = req.query;
-
-      const filters: any = {};
-
-      const rawName = (name ?? nombre) as string;
-      if (typeof rawName === 'string' && rawName.trim()) {
-        filters.name = rawName.trim();
-      }
-
-      if (typeof gamertag === 'string' && gamertag.trim()) {
-        filters.gamertag = gamertag.trim();
-      }
-
-      const rawEmail = (email ?? correo) as string;
-      if (typeof rawEmail === 'string' && rawEmail.trim()) {
-        filters.email = rawEmail.trim();
-      }
-
-      // If 'search' is provided without a specific name or gamertag, use it for name search
-      if (search && typeof search === 'string' && !filters.name && !filters.gamertag) {
-        filters.name = search.trim();
-      }
-
-      const rawPeriod = period ?? periodo;
-      if (rawPeriod !== undefined) {
-        const parsedPeriod = parseInt(rawPeriod as string, 10);
-        if (!isNaN(parsedPeriod)) {
-          filters.period = parsedPeriod;
-        }
-      }
-
-      const rawStartDate = (startDate ?? fechaInicio) as string;
-      if (typeof rawStartDate === 'string') {
-        filters.startDate = rawStartDate;
-      }
-
-      const rawEndDate = (endDate ?? fechaFin) as string;
-      if (typeof rawEndDate === 'string') {
-        filters.endDate = rawEndDate;
-      }
-
-      const rawOrder = (order ?? orden) as string;
-      if (typeof rawOrder === 'string' && rawOrder.trim()) {
-        filters.order = rawOrder.trim();
-      }
-
-      const rawPage = page ?? pagina;
-      if (rawPage !== undefined) {
-        const parsedPage = parseInt(rawPage as string, 10);
-        if (!isNaN(parsedPage)) {
-          filters.page = parsedPage;
-        }
-      }
-
-      const rawLimit = limit ?? cantidadRegistros;
-      if (rawLimit !== undefined) {
-        const parsedLimit = parseInt(rawLimit as string, 10);
-        if (!isNaN(parsedLimit)) {
-          filters.limit = parsedLimit;
-        }
-      }
-
-      const players = await this.playerService.getAll(filters);
+      const players = await this.playerService.getAll(res.locals.filters);
       res.json(players);
     } catch (error) {
       res.status(500).json({ error: 'Error fetching players' });

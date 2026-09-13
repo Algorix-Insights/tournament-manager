@@ -5,38 +5,9 @@ import { IGenreService } from './interfaces/genre.service.interface';
 export class GenreController implements IGenreController {
   constructor(private readonly genreService: IGenreService) {}
 
-  async getAll(req: Request, res: Response): Promise<void> {
+  async getAll(_req: Request, res: Response): Promise<void> {
     try {
-      const { name, nombre, order, orden, page, pagina, limit, cantidadRegistros } = req.query;
-      const filters: any = {};
-
-      const rawName = (name ?? nombre) as string;
-      if (typeof rawName === 'string' && rawName.trim()) {
-        filters.name = rawName.trim();
-      }
-
-      const rawOrder = (order ?? orden) as string;
-      if (typeof rawOrder === 'string' && rawOrder.trim()) {
-        filters.order = rawOrder.trim();
-      }
-
-      const rawPage = page ?? pagina;
-      if (rawPage !== undefined) {
-        const parsedPage = parseInt(rawPage as string, 10);
-        if (!isNaN(parsedPage)) {
-          filters.page = parsedPage;
-        }
-      }
-
-      const rawLimit = limit ?? cantidadRegistros;
-      if (rawLimit !== undefined) {
-        const parsedLimit = parseInt(rawLimit as string, 10);
-        if (!isNaN(parsedLimit)) {
-          filters.limit = parsedLimit;
-        }
-      }
-
-      const genres = await this.genreService.getAll(filters);
+      const genres = await this.genreService.getAll(res.locals.filters);
       res.json(genres);
     } catch (error) {
       res.status(500).json({ error: 'Error fetching genres' });
