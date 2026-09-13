@@ -1,14 +1,16 @@
 import express from 'express';
-import cors from 'cors';
-import playerRouter from './modules/players/player.router';
-import gameRouter from './modules/games/game.router';
-import scoreRouter from './modules/scores/score.router';
-import genreRouter from './modules/genres/genre.router';
+// import cors from 'cors';
+import { apiErrorHandler } from '@/core/middlewares/error-handler.middleware';
+import playerRouter from '@/modules/players/player.router';
+import gameRouter from '@/modules/games/game.router';
+import scoreRouter from '@/modules/scores/score.router';
+import genreRouter from '@/modules/genres/genre.router';
+import { registerCoreMiddlewares } from '@/core/middlewares/register-core-middlewares';
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
+// app.use(cors());
+registerCoreMiddlewares(app);
 app.disable('x-powered-by');
 
 // Base API Endpoints
@@ -30,6 +32,8 @@ app.get('/', (_req, res) => {
     },
   });
 });
+
+app.use(apiErrorHandler);
 
 const PORT = process.env.PORT || 3000;
 

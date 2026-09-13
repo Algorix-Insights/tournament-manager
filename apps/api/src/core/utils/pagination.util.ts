@@ -3,9 +3,14 @@ export interface PaginationParams {
   limit: number;
   skip: number;
   take: number;
-  pagina?: number;
-  cantidadRegistros?: number;
 }
+
+export const DEFAULT_PAGINATION: PaginationParams = {
+  page: 1,
+  limit: 20,
+  skip: 0,
+  take: 20,
+};
 
 export interface PaginatedResponse<T> {
   data: T[];
@@ -15,7 +20,7 @@ export interface PaginatedResponse<T> {
 
 /**
  * Parses and validates pagination parameters from req.query.
- * Supports English 'page' and 'limit' as primary parameters, with legacy fallback.
+ * Supports English 'page' and 'limit' parameters.
  * @param query Express req.query object
  * @param defaultLimit Default page limit (default 20)
  */
@@ -23,14 +28,14 @@ export function parsePaginationParams(
   query: any,
   defaultLimit: number = 20
 ): PaginationParams {
-  const rawPage = query?.page ?? query?.pagina;
-  const rawLimit = query?.limit ?? query?.cantidadRegistros;
+  const rawPage = query?.page;
+  const rawLimit = query?.limit;
 
-  const pageNum = parseInt(rawPage, 10);
-  const limitNum = parseInt(rawLimit, 10);
+  const pageNum = Number.parseInt(rawPage, 10);
+  const limitNum = Number.parseInt(rawLimit, 10);
 
-  const page = !isNaN(pageNum) && pageNum > 0 ? pageNum : 1;
-  const limit = !isNaN(limitNum) && limitNum > 0 ? limitNum : defaultLimit;
+  const page = !Number.isNaN(pageNum) && pageNum > 0 ? pageNum : 1;
+  const limit = !Number.isNaN(limitNum) && limitNum > 0 ? limitNum : defaultLimit;
 
   const skip = (page - 1) * limit;
   const take = limit;
@@ -40,8 +45,6 @@ export function parsePaginationParams(
     limit,
     skip,
     take,
-    pagina: page,
-    cantidadRegistros: limit,
   };
 }
 

@@ -1,8 +1,8 @@
-import type { PaginatedResponse } from '../../../core/utils/pagination.util';
-import type { CreateGenreDTO, GenreFilterDTO, UpdateGenreDTO } from '../genre.types';
+import type { PaginatedResponse, PaginationParams } from '@/core/utils/pagination.util';
+import type { CreateGenreDTO, GenreFilterDTO, UpdateGenreDTO } from '@/modules/genres/dtos/genre.dto';
 
 export interface IGenreService {
-  getAll(filters?: GenreFilterDTO): Promise<PaginatedResponse<unknown>>;
+  getAll(filters?: GenreFilterDTO, pagination?: PaginationParams): Promise<PaginatedResponse<unknown>>;
   getById(id: number): Promise<unknown | null>;
   create(data: CreateGenreDTO): Promise<unknown>;
   update(id: number, data: UpdateGenreDTO): Promise<unknown>;

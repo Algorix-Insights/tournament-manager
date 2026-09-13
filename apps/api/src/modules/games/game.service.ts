@@ -1,46 +1,43 @@
-import { prisma } from '../../core/prisma';
-import { CreateGameDTO, GameFilterDTO, UpdateGameDTO } from './game.types';
-import { parseOrderBy } from '../../core/utils/order-by.util';
-import { parsePaginationParams, formatPaginatedResponse } from '../../core/utils/pagination.util';
-import { IGameService } from './interfaces/game.service.interface';
+import { prisma } from '@/core/prisma';
+import type { CreateGameDTO, GameFilterDTO, UpdateGameDTO } from '@/modules/games/dtos/game.dto';
+import { parseOrderBy } from '@/core/utils/order-by.util';
+import { DEFAULT_PAGINATION, formatPaginatedResponse, PaginationParams } from '@/core/utils/pagination.util';
+import { IGameService } from '@/modules/games/interfaces/game.service.interface';
 
 export class GameService implements IGameService {
-  async getAll(filters?: GameFilterDTO) {
+  async getAll(filters?: GameFilterDTO, pagination?: PaginationParams) {
     const where: any = {};
 
-    const name = filters?.name ?? filters?.nombre;
+    const name = filters?.name;
     if (name) {
       where.name = { contains: name.trim() };
     }
 
-    const genreId = filters?.genreId ?? filters?.generoId;
+    const genreId = filters?.genreId;
     if (genreId !== undefined) {
       where.genreId = genreId;
     }
 
-    const genreName = filters?.genreName ?? filters?.generoNombre;
+    const genreName = filters?.genreName;
     if (genreName) {
       where.genre = {
         name: { contains: genreName.trim() },
       };
     }
 
-    const order = filters?.order ?? filters?.orden;
+    const order = filters?.order;
     const orderBy = parseOrderBy(
       order,
       {
         id: 'id',
         name: 'name',
-        nombre: 'name',
         genreId: 'genreId',
-        generoId: 'genreId',
         genre: { genre: 'name' },
-        genero: { genre: 'name' },
       },
       { name: 'asc' }
     );
 
-    const { skip, take } = parsePaginationParams(filters);
+    const { skip, take } = pagination ?? DEFAULT_PAGINATION;
 
     const [data, totalRecords] = await Promise.all([
       prisma.game.findMany({
