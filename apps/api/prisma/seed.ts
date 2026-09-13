@@ -1,14 +1,37 @@
 import 'dotenv/config';
-import { PrismaClient } from '@/generated/prisma/client';
+import { PrismaClient } from '../src/generated/prisma/client';
 import { PrismaMariaDb } from '@prisma/adapter-mariadb';
+import { normalizePublicGames, type PublicGame } from '../src/core/utils/public-games.util';
+
+const PUBLIC_GAMES_URL = 'https://www.freetogame.com/api/games';
 
 const adapter = new PrismaMariaDb(
   process.env.DATABASE_URL!
 );
 const prisma = new PrismaClient({ adapter });
 
+async function fetchPublicGames(): Promise<PublicGame[]> {
+  const response = await fetch(PUBLIC_GAMES_URL, {
+    signal: AbortSignal.timeout(10_000),
+  });
+
+  if (!response.ok) {
+    throw new Error(`FreeToGame API request failed with status ${response.status}`);
+  }
+
+  const games = normalizePublicGames(await response.json());
+  if (games.length === 0) {
+    throw new Error('FreeToGame API returned no valid games');
+  }
+
+  return games;
+}
+
 async function main() {
   console.log('🌱 Starting database seeding in MySQL...');
+
+  const publicGames = await fetchPublicGames();
+  console.log(`📚 ${publicGames.length} games fetched from ${PUBLIC_GAMES_URL}`);
 
   // 1. Clear existing data
   await prisma.score.deleteMany();
@@ -16,16 +39,14 @@ async function main() {
   await prisma.game.deleteMany();
   await prisma.genre.deleteMany();
 
-  // 2. Create Genres Catalog
-  const fighting = await prisma.genre.create({
-    data: { name: 'Fighting' },
-  });
-  const shooter = await prisma.genre.create({
-    data: { name: 'Shooter' },
-  });
-  const sports = await prisma.genre.create({
-    data: { name: 'Sports' },
-  });
+  // 2. Create the genres from the public catalog
+  const genreNames = [
+    ...new Map(publicGames.map((game) => [game.genre.toLowerCase(), game.genre])).values(),
+  ];
+  const genres = await prisma.$transaction(
+    genreNames.map((name) => prisma.genre.create({ data: { name } })),
+  );
+  const genreIds = new Map(genres.map((genre) => [genre.name.toLowerCase(), genre.id]));
   console.log('✅ Genres created.');
 
   // 3. Create Players
@@ -71,55 +92,28 @@ async function main() {
 
   console.log('✅ Players created.');
 
-  // 4. Create Games
-  const tekken = await prisma.game.create({
-    data: {
-      name: 'Tekken 8',
-      genreId: fighting.id,
-    },
-  });
+  // 4. Create games from the public catalog
+  const games = await prisma.$transaction(
+    publicGames.map((game) =>
+      prisma.game.create({
+        data: {
+          name: game.title,
+          genreId: genreIds.get(game.genre.toLowerCase())!,
+        },
+      }),
+    ),
+  );
 
-  const sf6 = await prisma.game.create({
-    data: {
-      name: 'Street Fighter 6',
-      genreId: fighting.id,
-    },
-  });
-
-  const smash = await prisma.game.create({
-    data: {
-      name: 'Super Smash Bros. Ultimate',
-      genreId: fighting.id,
-    },
-  });
-
-  const halo = await prisma.game.create({
-    data: {
-      name: 'Halo Infinite',
-      genreId: shooter.id,
-    },
-  });
-
-  await prisma.game.create({
-    data: {
-      name: 'FIFA 24',
-      genreId: sports.id,
-    },
-  });
-
-  console.log('✅ Games created.');
+  console.log(`✅ ${games.length} games created.`);
 
   // 5. Create Scores
+  const players = [shadow, nova, ghost, apex, titan];
   await prisma.score.createMany({
-    data: [
-      { playerId: shadow.id, gameId: smash.id, score: 990 },
-      { playerId: shadow.id, gameId: tekken.id, score: 950 },
-      { playerId: titan.id, gameId: halo.id, score: 910 },
-      { playerId: apex.id, gameId: sf6.id, score: 890 },
-      { playerId: nova.id, gameId: tekken.id, score: 820 },
-      { playerId: ghost.id, gameId: tekken.id, score: 760 },
-      { playerId: nova.id, gameId: sf6.id, score: 750 },
-    ],
+    data: games.slice(0, 7).map((game, index) => ({
+      playerId: players[index % players.length].id,
+      gameId: game.id,
+      score: 990 - index * 30,
+    })),
   });
 
   console.log('✅ Initial scores registered.');
