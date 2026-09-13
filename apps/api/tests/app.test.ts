@@ -23,10 +23,10 @@ test('GET / returns API welcome info', async () => {
 
     const data = await response.json();
     expect(data.message).toBe('Tournament Manager API ready');
-    expect(data.endpoints.players).toBe('/api/players');
-    expect(data.endpoints.games).toBe('/api/games');
-    expect(data.endpoints.scores).toBe('/api/scores');
-    expect(data.endpoints.genres).toBe('/api/genres');
+    expect(data.endpoints.players).toBe('/api/v1/players');
+    expect(data.endpoints.games).toBe('/api/v1/games');
+    expect(data.endpoints.scores).toBe('/api/v1/scores');
+    expect(data.endpoints.genres).toBe('/api/v1/genres');
   } finally {
     await new Promise<void>((resolve, reject) => {
       server.close((error) => (error ? reject(error) : resolve()));
