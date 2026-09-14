@@ -33,6 +33,6 @@ export class GameController implements IGameController {
   async delete(req: Request, res: Response): Promise<void> {
     const id = Number(req.params.id);
     await this.gameService.delete(id);
-    res.json({ message: 'Game deleted successfully' });
+    res.json({ message: 'Videojuego eliminado correctamente' });
   }
 }

@@ -133,3 +133,12 @@ describe('RF08 - Statistics', () => {
     });
   });
 });
+
+test('returns a Spanish success message when deleting a score', async () => {
+  database.score.delete.mockResolvedValue({ id: 8 });
+
+  const response = await api.request('/api/v1/scores/8', 'DELETE');
+
+  expect(response.status).toBe(200);
+  expect(await readJson(response)).toEqual({ message: 'Puntuación eliminada correctamente' });
+});
