@@ -70,3 +70,33 @@ test('serves the OpenAPI contract and Scalar documentation', async () => {
     });
   }
 });
+
+test('allows the configured frontend origin through CORS', async () => {
+  const server = app.listen(0, '127.0.0.1');
+
+  await new Promise<void>((resolve, reject) => {
+    server.once('listening', resolve);
+    server.once('error', reject);
+  });
+
+  try {
+    const address = server.address();
+
+    if (!address || typeof address === 'string') {
+      throw new Error('Server did not bind to TCP');
+    }
+
+    const response = await fetch(`http://127.0.0.1:${address.port}/`, {
+      headers: { Origin: 'http://localhost:5173' },
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get('access-control-allow-origin')).toBe(
+      'http://localhost:5173',
+    );
+  } finally {
+    await new Promise<void>((resolve, reject) => {
+      server.close((error) => (error ? reject(error) : resolve()));
+    });
+  }
+});
