@@ -1,6 +1,4 @@
 import type { ReactNode } from 'react';
-import { BackgroundSyncBadge } from '@/core/ui/BackgroundSyncBadge';
-import { StaleDataBadge } from '@/core/ui/StaleDataBadge';
 import { LoadingSkeleton } from '@/core/ui/LoadingSkeleton';
 import { ErrorAlert } from '@/core/ui/ErrorAlert';
 import { EmptyState } from '@/core/ui/EmptyState';
@@ -10,8 +8,6 @@ export interface QueryStateViewProps {
   isError?: boolean;
   error?: Error | null;
   isEmpty?: boolean;
-  isFetching?: boolean;
-  isStale?: boolean;
   onRetry?: () => void;
   loadingMessage?: string;
   emptyTitle?: string;
@@ -25,8 +21,6 @@ export function QueryStateView({
   isError,
   error,
   isEmpty,
-  isFetching,
-  isStale,
   onRetry,
   loadingMessage,
   emptyTitle,
@@ -43,30 +37,10 @@ export function QueryStateView({
   }
 
   if (isEmpty) {
-    return (
-      <div className="space-y-3">
-        {(isFetching || isStale) && (
-          <div className="flex items-center gap-2 justify-end">
-            <BackgroundSyncBadge isFetching={isFetching} />
-            <StaleDataBadge isStale={isStale} onRefresh={onRetry} />
-          </div>
-        )}
-        <EmptyState title={emptyTitle} message={emptyMessage} action={emptyAction} />
-      </div>
-    );
+    return <EmptyState title={emptyTitle} message={emptyMessage} action={emptyAction} />;
   }
 
-  return (
-    <div className="relative space-y-3">
-      {(isFetching || isStale) && (
-        <div className="flex items-center gap-2 justify-end mb-2">
-          <BackgroundSyncBadge isFetching={isFetching} />
-          <StaleDataBadge isStale={isStale} onRefresh={onRetry} />
-        </div>
-      )}
-      {children}
-    </div>
-  );
+  return <div className="relative space-y-3">{children}</div>;
 }
 
 export default QueryStateView;

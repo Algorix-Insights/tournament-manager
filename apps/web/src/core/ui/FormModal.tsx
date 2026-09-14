@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type SyntheticEvent } from "react";
 import { X } from "lucide-react";
 import FormSelect from "@/core/ui/FormSelect";
 
@@ -40,7 +40,7 @@ export default function FormModal({
   errorMessage,
   isSubmitting = false,
   submitLabel = "Registrar",
-}: FormModalProps) {
+}: Readonly<FormModalProps>) {
   const [values, setValues] = useState<Record<string, string>>({});
   const [isMounted, setIsMounted] = useState(isOpen);
   const isClosing = isMounted && !isOpen;
@@ -82,7 +82,7 @@ export default function FormModal({
 
   const animationState = isClosing ? "exit" : "enter";
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const hasInvalidNumber = fields.some((field) => {
@@ -98,7 +98,9 @@ export default function FormModal({
   return (
     <div
       className={`fixed inset-0 z-100 flex items-center justify-center bg-[#101827]/95 px-4 py-6 modal-backdrop-${animationState}`}
-      role="presentation"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="form-modal-title"
       onAnimationEnd={(event) => {
         if (event.target === event.currentTarget && isClosing) setIsMounted(false);
       }}
@@ -118,7 +120,7 @@ export default function FormModal({
         onSubmit={handleSubmit}
       >
         <img className="mx-auto -mt-1 mb-2 h-36 w-56 object-contain sm:h-40" src={image} alt="" />
-        <h2 className="text-center font-manrope-bold text-2xl leading-tight tracking-[-0.04em] sm:text-3xl">
+        <h2 id="form-modal-title" className="text-center font-manrope-bold text-2xl leading-tight tracking-[-0.04em] sm:text-3xl">
           {title}
           <span className="block text-[#684bf3]">{accentTitle}</span>
         </h2>

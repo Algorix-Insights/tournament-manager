@@ -16,6 +16,8 @@ test('animates the modal in and out before unmounting', () => {
 
   const form = container.querySelector('form') as HTMLFormElement;
   const overlay = form.parentElement as HTMLElement;
+  expect(overlay).toHaveAttribute('role', 'dialog');
+  expect(overlay).toHaveAttribute('aria-modal', 'true');
   expect(overlay).toHaveClass('modal-backdrop-enter');
   expect(form).toHaveClass('modal-panel-enter');
 

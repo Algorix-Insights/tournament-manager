@@ -26,8 +26,10 @@ export default function FormSelect({
   onChange,
 }: FormSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
   const selectedOption = options.find((option) => option.value === value);
+  const filteredOptions = options.filter((option) => option.label.toLowerCase().includes(searchTerm.toLowerCase()));
 
   useEffect(() => {
     const handlePointerDown = (event: PointerEvent) => {
@@ -40,6 +42,7 @@ export default function FormSelect({
 
   const selectOption = (option: FormSelectOption) => {
     onChange(option.value);
+    setSearchTerm("");
     setIsOpen(false);
   };
 
@@ -51,7 +54,10 @@ export default function FormSelect({
         aria-label={ariaLabel}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
-        onClick={() => setIsOpen((current) => !current)}
+        onClick={() => {
+          setSearchTerm("");
+          setIsOpen((current) => !current);
+        }}
         className={`flex h-11 w-full cursor-pointer items-center justify-between rounded-full border px-4 text-left text-xs font-manrope-regular transition-colors focus:outline-none focus:ring-2 focus:ring-[#d9cffb] ${isOpen ? "border-[#c9b7ff] bg-white" : "border-transparent bg-[#e9edf5]"}`}
       >
         <span className={selectedOption ? "text-[#5f6470]" : "text-[#9ca1aa]"}>
@@ -61,8 +67,19 @@ export default function FormSelect({
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 right-0 top-[calc(100%+6px)] z-20 overflow-hidden rounded-2xl border border-[#e5e1f0] bg-white p-1.5 shadow-[0_12px_28px_rgba(17,24,39,0.14)]" role="listbox" aria-label={name}>
-          {options.map((option) => {
+        <div className="absolute left-0 right-0 top-[calc(100%+6px)] z-20 max-h-60 overflow-y-auto overscroll-contain rounded-2xl border border-[#e5e1f0] bg-white p-1.5 shadow-[0_12px_28px_rgba(17,24,39,0.14)]">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
+            placeholder="Buscar..."
+            aria-label={`Buscar ${ariaLabel?.toLowerCase() ?? name}`}
+            autoComplete="off"
+            autoFocus
+            className="sticky top-0 z-10 mb-1 h-9 w-full rounded-xl border border-[#e5e1f0] bg-white px-3 text-xs font-manrope-regular text-[#5f6470] outline-none placeholder:text-[#9ca1aa] focus:border-[#c9b7ff] focus:ring-2 focus:ring-[#d9cffb]"
+          />
+          <div role="listbox" aria-label={name}>
+          {filteredOptions.length > 0 ? filteredOptions.map((option) => {
             const isSelected = option.value === value;
             return (
               <button
@@ -77,7 +94,8 @@ export default function FormSelect({
                 {isSelected && <Check className="size-3.5" aria-hidden="true" />}
               </button>
             );
-          })}
+          }) : <p className="px-3 py-2.5 text-xs font-manrope-regular text-[#9ca1aa]">No se encontraron opciones.</p>}
+          </div>
         </div>
       )}
     </div>

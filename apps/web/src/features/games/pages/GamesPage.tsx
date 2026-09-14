@@ -20,7 +20,7 @@ export default function GamesPage() {
   const [editingGame, setEditingGame] = useState<Game | null>(null);
   const [search, setSearch] = useState("");
   const [actionError, setActionError] = useState<string | null>(null);
-  const { data, error, isError, isFetching, isLoading, isStale, refetch } = useGames(search);
+  const { data, error, isError, isLoading, refetch } = useGames(search);
   const genresQuery = useGenres();
   const createGameMutation = useCreateGame();
   const updateGameMutation = useUpdateGame();
@@ -115,8 +115,6 @@ export default function GamesPage() {
           isError={isError}
           error={error}
           isEmpty={games.length === 0}
-          isFetching={isFetching}
-          isStale={isStale}
           onRetry={refetch}
           loadingMessage="Cargando videojuegos..."
           emptyTitle="No hay videojuegos registrados"
