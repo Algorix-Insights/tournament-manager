@@ -174,7 +174,7 @@ Convierte errores conocidos de Prisma en respuestas HTTP:
 
 | Código Prisma | HTTP | Mensaje |
 |---|---:|---|
-| `P2002` | 400 | Ya existe un registro con los datos proporcionados |
+| `P2002` | 400 | Mensaje específico según el campo duplicado, con fallback genérico |
 | `P2003` | 400 | La referencia especificada no existe o no es válida |
 | `P2025` | 404 | Registro no encontrado |
 | desconocido | 500 | Error interno del servidor |

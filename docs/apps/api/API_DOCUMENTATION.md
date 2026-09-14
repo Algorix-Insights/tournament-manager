@@ -66,7 +66,9 @@ Registers a new player in the system.
   ```
   - `name` *(String, required, min 1, max 100 chars)*.
   - `gamertag` *(String, required, unique, min 1, max 50 chars)*.
-  - `email` *(String, required, min 5, max 100 chars)*.
+  - `email` *(String, required, unique, min 5, max 100 chars)*.
+
+If the `gamertag` or `email` is already registered, the endpoint responds with HTTP `400` and a specific message in the `error` property.
 
 #### `PUT /api/players/:id`
 Updates an existing player's details.
