@@ -13,6 +13,7 @@ import { useCreateGame, useDeleteGame, useGames, useUpdateGame } from "@/feature
 import { useGenres } from "@/features/games/hooks/useGenres";
 import type { Game } from "@/features/games/games.types";
 import { useCallback, useState } from "react";
+import { useStats } from "@/features/dashboard/hooks/useStats";
 
 const GAME_CARD_COLORS = ["bg-[#F6EAF3]", "bg-[#E4DEF5]"];
 const GAMES_PER_PAGE = 20;
@@ -26,6 +27,7 @@ export default function GamesPage() {
   const [page, setPage] = useState(1);
   const [actionError, setActionError] = useState<string | null>(null);
   const { data, error, isError, isLoading, refetch } = useGames(search, page, GAMES_PER_PAGE);
+  const { data: stats, isLoading: isStatsLoading } = useStats();
   const genresQuery = useGenres();
   const createGameMutation = useCreateGame();
   const updateGameMutation = useUpdateGame();
@@ -91,14 +93,15 @@ export default function GamesPage() {
           metrics={[
             {
               icon: <UsersRound className="size-5" />,
-              value: 128,
+              value: stats?.totalPlayers ?? "",
               label: "Jugadores Registrados",
+              isLoading: isStatsLoading,
             },
             {
               icon: <Gamepad2 className="size-5" />,
-              value: data?.totalRecords ?? "",
+              value: stats?.totalGames ?? "",
               label: "Videojuegos Registrados",
-              isLoading,
+              isLoading: isStatsLoading,
             },
           ]}
         />
