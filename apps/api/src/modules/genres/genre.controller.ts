@@ -33,6 +33,6 @@ export class GenreController implements IGenreController {
   async delete(req: Request, res: Response): Promise<void> {
     const id = Number(req.params.id);
     await this.genreService.delete(id);
-    res.json({ message: 'Genre deleted successfully' });
+    res.json({ message: 'Género eliminado correctamente' });
   }
 }

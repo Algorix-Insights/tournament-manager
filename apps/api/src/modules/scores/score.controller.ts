@@ -28,6 +28,6 @@ export class ScoreController implements IScoreController {
   async delete(req: Request, res: Response): Promise<void> {
     const id = Number(req.params.id);
     await this.scoreService.delete(id);
-    res.json({ message: 'Score deleted successfully' });
+    res.json({ message: 'Puntuación eliminada correctamente' });
   }
 }

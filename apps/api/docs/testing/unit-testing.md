@@ -42,13 +42,13 @@ src/test-utils/api-test-utils.ts                      # servidor temporal y mock
 
 | Suite | Archivo | Casos | Cobertura |
 |---|---|---:|---|
-| Aplicación | `tests/app.test.ts` | 2 | Health check, versionamiento, OpenAPI y Scalar |
-| Core | `src/core/__tests__/*.test.ts` | 26 | Fechas, filtros, paginación, validación, errores, seeder y middlewares |
-| Players | `src/modules/players/__tests__/player.api.test.ts` | 11 | Registro, duplicados, consultas y búsqueda |
-| Genres | `src/modules/genres/__tests__/genre.api.test.ts` | 2 | Registro válido y duplicados |
-| Games | `src/modules/games/__tests__/game.api.test.ts` | 5 | Registro, campos obligatorios, duplicados y referencias |
-| Scores | `src/modules/scores/__tests__/score.api.test.ts` | 9 | Registro, relaciones, ranking y estadísticas |
-| **Total** |  | **54** | 13 suites |
+| Aplicación | `tests/app.test.ts` | 3 | Health check, versionamiento, OpenAPI, Scalar y CORS |
+| Core | `src/core/__tests__/*.test.ts` | 25 | Fechas, filtros, paginación, validación, errores, seeder y middlewares |
+| Players | `src/modules/players/__tests__/player.api.test.ts` | 12 | Registro, duplicados, consultas, búsqueda y eliminación |
+| Genres | `src/modules/genres/__tests__/genre.api.test.ts` | 3 | Registro, duplicados y eliminación |
+| Games | `src/modules/games/__tests__/game.api.test.ts` | 6 | Registro, campos obligatorios, duplicados, referencias y eliminación |
+| Scores | `src/modules/scores/__tests__/score.api.test.ts` | 10 | Registro, relaciones, ranking, estadísticas y eliminación |
+| **Total** |  | **59** | 13 suites |
 
 ## Casos funcionales
 
@@ -155,6 +155,7 @@ Archivo: `src/modules/scores/__tests__/score.api.test.ts`
 - `GET /openapi.json` responde `200` con OpenAPI `3.0.3`.
 - El contrato contiene las rutas versionadas de players y ranking.
 - `GET /docs` responde `200` con HTML de Scalar.
+- El API permite el origen configurado del frontend mediante CORS.
 
 ## Ejecución
 
@@ -189,7 +190,7 @@ npm test -- --watch
 
 ```text
 Test Suites: 13 passed, 13 total
-Tests:       54 passed, 54 total
+Tests:       59 passed, 59 total
 ```
 
 ## Alcance y limitaciones
