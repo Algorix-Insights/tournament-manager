@@ -22,8 +22,6 @@
   },
   "devDependencies": {
     "@jest/globals": "^30.5.1",
-    "@rolldown/binding-win32-x64-msvc": "^1.2.8",
-    "@tailwindcss/oxide-win32-x64-msvc": "^4.3.3",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@types/node": "^24.13.3",
@@ -32,7 +30,6 @@
     "@vitejs/plugin-react": "^6.1.1",
     "jest": "^30.5.1",
     "jest-environment-jsdom": "^30.5.1",
-    "lightningcss-win32-x64-msvc": "^1.33.0",
     "oxlint": "^1.81.0",
     "ts-jest": "^29.4.12",
     "typescript": "~6.0.2",
