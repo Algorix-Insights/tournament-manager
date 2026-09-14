@@ -30,3 +30,16 @@ test('animates the modal in and out before unmounting', () => {
   fireEvent.animationEnd(overlay);
   expect(container.querySelector('form')).not.toBeInTheDocument();
 });
+
+test('locks page scroll and keeps overflow inside the modal', () => {
+  document.body.style.overflow = '';
+  const { container, unmount } = render(
+    <FormModal isOpen onClose={jest.fn()} title="Registrar" accentTitle="Videojuego" image="test-image" fields={fields} />,
+  );
+
+  expect(document.body.style.overflow).toBe('hidden');
+  expect(container.querySelector('form')).toHaveClass('overflow-y-auto', 'overscroll-contain');
+
+  unmount();
+  expect(document.body.style.overflow).toBe('');
+});

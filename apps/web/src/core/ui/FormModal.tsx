@@ -57,6 +57,16 @@ export default function FormModal({
   }, [isClosing]);
 
   useEffect(() => {
+    if (!isMounted) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isMounted]);
+
+  useEffect(() => {
     if (!isOpen) return;
 
     setValues(Object.fromEntries(fields.map((field) => [field.name, initialValues?.[field.name] ?? ""])));
@@ -104,7 +114,7 @@ export default function FormModal({
       </button>
 
       <form
-        className={`w-full max-w-120 rounded-4xl bg-[#f2f5fb] px-6 pb-7 pt-5 text-[#111827] shadow-2xl sm:px-8 modal-panel-${animationState}`}
+        className={`max-h-[calc(100vh-3rem)] w-full max-w-120 overflow-y-auto overscroll-contain rounded-4xl bg-[#f2f5fb] px-6 pb-7 pt-5 text-[#111827] shadow-2xl sm:px-8 modal-panel-${animationState}`}
         onSubmit={handleSubmit}
       >
         <img className="mx-auto -mt-1 mb-2 h-36 w-56 object-contain sm:h-40" src={image} alt="" />
