@@ -1,8 +1,8 @@
 import { Avatar as HeroAvatar } from '@heroui/react'
 import type { ComponentProps } from 'react'
-import Root from './Root'
-import Image from './Image'
-import Fallback from './Fallback'
+import Root from '@/core/ui/Avatar/Root'
+import Image from '@/core/ui/Avatar/Image'
+import Fallback from '@/core/ui/Avatar/Fallback'
 
 function LocalAvatar(props: Readonly<ComponentProps<typeof HeroAvatar>>) {
   return <HeroAvatar {...props} />

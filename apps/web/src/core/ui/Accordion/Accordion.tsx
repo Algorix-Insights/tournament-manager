@@ -1,12 +1,12 @@
 import { Accordion as HeroAccordion } from '@heroui/react'
 import type { ComponentProps } from 'react'
-import Root from './Root'
-import Item from './Item'
-import Heading from './Heading'
-import Trigger from './Trigger'
-import Panel from './Panel'
-import Indicator from './Indicator'
-import Body from './Body'
+import Root from '@/core/ui/Accordion/Root'
+import Item from '@/core/ui/Accordion/Item'
+import Heading from '@/core/ui/Accordion/Heading'
+import Trigger from '@/core/ui/Accordion/Trigger'
+import Panel from '@/core/ui/Accordion/Panel'
+import Indicator from '@/core/ui/Accordion/Indicator'
+import Body from '@/core/ui/Accordion/Body'
 
 function LocalAccordion(props: Readonly<ComponentProps<typeof HeroAccordion>>) {
   return <HeroAccordion {...props} />

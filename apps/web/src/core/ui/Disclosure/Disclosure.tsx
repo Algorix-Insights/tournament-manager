@@ -1,11 +1,11 @@
 import { Disclosure as HeroDisclosure } from '@heroui/react'
 import type { ComponentProps } from 'react'
-import Root from './Root'
-import Heading from './Heading'
-import Trigger from './Trigger'
-import Content from './Content'
-import Body from './Body'
-import Indicator from './Indicator'
+import Root from '@/core/ui/Disclosure/Root'
+import Heading from '@/core/ui/Disclosure/Heading'
+import Trigger from '@/core/ui/Disclosure/Trigger'
+import Content from '@/core/ui/Disclosure/Content'
+import Body from '@/core/ui/Disclosure/Body'
+import Indicator from '@/core/ui/Disclosure/Indicator'
 
 function LocalDisclosure(props: Readonly<ComponentProps<typeof HeroDisclosure>>) {
   return <HeroDisclosure {...props} />

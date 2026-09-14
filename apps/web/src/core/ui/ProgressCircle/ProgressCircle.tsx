@@ -1,9 +1,9 @@
 import { ProgressCircle as HeroProgressCircle } from '@heroui/react'
 import type { ComponentProps } from 'react'
-import Root from './Root'
-import Track from './Track'
-import TrackCircle from './TrackCircle'
-import FillCircle from './FillCircle'
+import Root from '@/core/ui/ProgressCircle/Root'
+import Track from '@/core/ui/ProgressCircle/Track'
+import TrackCircle from '@/core/ui/ProgressCircle/TrackCircle'
+import FillCircle from '@/core/ui/ProgressCircle/FillCircle'
 
 function LocalProgressCircle(props: Readonly<ComponentProps<typeof HeroProgressCircle>>) {
   return <HeroProgressCircle {...props} />

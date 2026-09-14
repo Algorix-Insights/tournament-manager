@@ -1,9 +1,9 @@
 import { ColorSwatchPicker as HeroColorSwatchPicker } from '@heroui/react'
 import type { ComponentProps } from 'react'
-import Root from './Root'
-import Item from './Item'
-import Swatch from './Swatch'
-import Indicator from './Indicator'
+import Root from '@/core/ui/ColorSwatchPicker/Root'
+import Item from '@/core/ui/ColorSwatchPicker/Item'
+import Swatch from '@/core/ui/ColorSwatchPicker/Swatch'
+import Indicator from '@/core/ui/ColorSwatchPicker/Indicator'
 
 function LocalColorSwatchPicker(props: Readonly<ComponentProps<typeof HeroColorSwatchPicker>>) {
   return <HeroColorSwatchPicker {...props} />

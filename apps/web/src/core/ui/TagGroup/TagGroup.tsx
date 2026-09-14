@@ -1,7 +1,7 @@
 import { TagGroup as HeroTagGroup } from '@heroui/react'
 import type { ComponentProps } from 'react'
-import Root from './Root'
-import List from './List'
+import Root from '@/core/ui/TagGroup/Root'
+import List from '@/core/ui/TagGroup/List'
 
 function LocalTagGroup(props: Readonly<ComponentProps<typeof HeroTagGroup>>) {
   return <HeroTagGroup {...props} />

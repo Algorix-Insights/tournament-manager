@@ -1,7 +1,7 @@
 import { Chip as HeroChip } from '@heroui/react'
 import type { ComponentProps } from 'react'
-import Root from './Root'
-import Label from './Label'
+import Root from '@/core/ui/Chip/Root'
+import Label from '@/core/ui/Chip/Label'
 
 function LocalChip(props: Readonly<ComponentProps<typeof HeroChip>>) {
   return <HeroChip {...props} />
