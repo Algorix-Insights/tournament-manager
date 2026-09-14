@@ -2,6 +2,8 @@ import { useEffect, useState, type FormEvent } from "react";
 import { X } from "lucide-react";
 import FormSelect from "@/core/ui/FormSelect";
 
+const MODAL_ANIMATION_DURATION_MS = 220;
+
 export interface FormModalField {
   name: string;
   label: string;
@@ -40,6 +42,19 @@ export default function FormModal({
   submitLabel = "Registrar",
 }: FormModalProps) {
   const [values, setValues] = useState<Record<string, string>>({});
+  const [isMounted, setIsMounted] = useState(isOpen);
+  const isClosing = isMounted && !isOpen;
+
+  useEffect(() => {
+    if (isOpen) setIsMounted(true);
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isClosing) return;
+
+    const timeoutId = window.setTimeout(() => setIsMounted(false), MODAL_ANIMATION_DURATION_MS);
+    return () => window.clearTimeout(timeoutId);
+  }, [isClosing]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -53,7 +68,9 @@ export default function FormModal({
     return () => document.removeEventListener("keydown", handleEscape);
   }, [fields, initialValues, isOpen, onClose]);
 
-  if (!isOpen) return null;
+  if (!isMounted) return null;
+
+  const animationState = isClosing ? "exit" : "enter";
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -70,8 +87,11 @@ export default function FormModal({
 
   return (
     <div
-      className="fixed inset-0 z-100 flex items-center justify-center bg-[#101827]/95 px-4 py-6"
+      className={`fixed inset-0 z-100 flex items-center justify-center bg-[#101827]/95 px-4 py-6 modal-backdrop-${animationState}`}
       role="presentation"
+      onAnimationEnd={(event) => {
+        if (event.target === event.currentTarget && isClosing) setIsMounted(false);
+      }}
       onMouseDown={(event) => event.target === event.currentTarget && onClose()}
     >
       <button
@@ -84,7 +104,7 @@ export default function FormModal({
       </button>
 
       <form
-        className="w-full max-w-120 rounded-4xl bg-[#f2f5fb] px-6 pb-7 pt-5 text-[#111827] shadow-2xl sm:px-8"
+        className={`w-full max-w-120 rounded-4xl bg-[#f2f5fb] px-6 pb-7 pt-5 text-[#111827] shadow-2xl sm:px-8 modal-panel-${animationState}`}
         onSubmit={handleSubmit}
       >
         <img className="mx-auto -mt-1 mb-2 h-36 w-56 object-contain sm:h-40" src={image} alt="" />

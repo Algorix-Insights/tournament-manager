@@ -72,6 +72,7 @@ describe('GamesPage', () => {
 
     await waitFor(() => {
       expect(mockedPost).toHaveBeenCalledWith('/games', { name: 'Tekken 8', genreId: 4 });
+      expect(document.querySelector('.modal-panel-exit')).toBeInTheDocument();
     });
   });
 
