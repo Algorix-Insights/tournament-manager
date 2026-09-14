@@ -11,9 +11,9 @@ import Pagination from "@/core/ui/Pagination/Pagination";
 import { getApiErrorMessage } from "@/features/games/api/games";
 import { useCreateGame, useDeleteGame, useGames, useUpdateGame } from "@/features/games/hooks/useGames";
 import { useGenres } from "@/features/games/hooks/useGenres";
-import { usePlayers } from "@/features/players/hooks/usePlayers";
 import type { Game } from "@/features/games/games.types";
 import { useCallback, useState } from "react";
+import { useStats } from "@/features/dashboard/hooks/useStats";
 
 const GAME_CARD_COLORS = ["bg-[#F6EAF3]", "bg-[#E4DEF5]"];
 const GAMES_PER_PAGE = 20;
@@ -27,8 +27,8 @@ export default function GamesPage() {
   const [page, setPage] = useState(1);
   const [actionError, setActionError] = useState<string | null>(null);
   const { data, error, isError, isLoading, refetch } = useGames(search, page, GAMES_PER_PAGE);
+  const { data: stats, isLoading: isStatsLoading } = useStats();
   const genresQuery = useGenres();
-  const playersQuery = usePlayers();
   const createGameMutation = useCreateGame();
   const updateGameMutation = useUpdateGame();
   const deleteGameMutation = useDeleteGame();
@@ -93,15 +93,15 @@ export default function GamesPage() {
           metrics={[
             {
               icon: <UsersRound className="size-5" />,
-              value: playersQuery.data?.totalRecords ?? "",
+              value: stats?.totalPlayers ?? "",
               label: "Jugadores Registrados",
-              isLoading: playersQuery.isLoading,
+              isLoading: isStatsLoading,
             },
             {
               icon: <Gamepad2 className="size-5" />,
-              value: data?.totalRecords ?? "",
+              value: stats?.totalGames ?? "",
               label: "Videojuegos Registrados",
-              isLoading,
+              isLoading: isStatsLoading,
             },
           ]}
         />

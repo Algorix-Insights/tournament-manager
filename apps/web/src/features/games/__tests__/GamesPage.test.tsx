@@ -186,17 +186,16 @@ describe('GamesPage', () => {
     });
   });
 
-  test('shows the total number of players returned by the API', async () => {
+  test('shows the total number of players returned by the stats API', async () => {
     mockedGet.mockImplementation((url) => Promise.resolve({
-      data: url === '/players'
-        ? { data: [], totalRecords: 42 }
+      data: url === '/scores/stats'
+        ? { totalPlayers: 42, totalGames: 3, totalScores: 0, averageScore: 0 }
         : { data: [], totalRecords: 3 },
     }));
 
     renderWithQuery(<GamesPage />);
 
     expect(await screen.findByText('42')).toBeInTheDocument();
-    expect(mockedGet).toHaveBeenCalledWith('/players');
   });
 
 });

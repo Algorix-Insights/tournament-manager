@@ -166,8 +166,8 @@ describe('PlayersPage', () => {
 
   test('shows the total number of games returned by the API', async () => {
     mockedGet.mockImplementation((url) => Promise.resolve({
-      data: url === '/games'
-        ? { data: [], totalRecords: 42 }
+      data: url === '/scores/stats'
+        ? { totalPlayers: 3, totalGames: 42, totalScores: 0, averageScore: 0 }
         : { data: [], totalRecords: 3 },
     }));
 

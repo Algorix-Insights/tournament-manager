@@ -14,6 +14,7 @@ import { getApiErrorMessage } from "@/features/games/api/games";
 import { useGames } from "@/features/games/hooks/useGames";
 import { useCreatePlayer, usePlayers } from "@/features/players/hooks/usePlayers";
 import { useCreateScore } from "@/features/scores/hooks/useScores";
+import { useStats } from "@/features/dashboard/hooks/useStats";
 
 const PLAYERS_PER_PAGE = 20;
 
@@ -27,6 +28,7 @@ const formatDate = (date: string) => new Intl.DateTimeFormat("es-MX", {
 export default function PlayersPage() {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [isPointsModalOpen, setIsPointsModalOpen] = useState(false);
+  const { data: stats, isLoading: isStatsLoading } = useStats();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -85,15 +87,15 @@ export default function PlayersPage() {
           metrics={[
             {
               icon: <UsersRound className="size-5" />,
-              value: data?.totalRecords ?? "",
+              value: stats?.totalPlayers ?? "",
               label: "Jugadores Registrados",
-              isLoading,
+              isLoading: isStatsLoading,
             },
             {
               icon: <Gamepad2 className="size-5" />,
-              value: gamesQuery.data?.totalRecords ?? "",
+              value: stats?.totalGames ?? "",
               label: "Videojuegos Registrados",
-              isLoading: gamesQuery.isLoading,
+              isLoading: isStatsLoading,
             },
           ]}
         />
