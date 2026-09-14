@@ -47,8 +47,8 @@ src/test-utils/api-test-utils.ts                      # servidor temporal y mock
 | Players | `src/modules/players/__tests__/player.api.test.ts` | 12 | Registro, duplicados, consultas, búsqueda y eliminación |
 | Genres | `src/modules/genres/__tests__/genre.api.test.ts` | 3 | Registro, duplicados y eliminación |
 | Games | `src/modules/games/__tests__/game.api.test.ts` | 6 | Registro, campos obligatorios, duplicados, referencias y eliminación |
-| Scores | `src/modules/scores/__tests__/score.api.test.ts` y `score.service.test.ts` | 11 | Registro, relaciones, ranking, estadísticas, eliminación y regla de puntaje |
-| **Total** |  | **60** | 14 suites |
+| Scores | `src/modules/scores/__tests__/score.api.test.ts` y `score.service.test.ts` | 12 | Registro, relaciones, ranking, estadísticas, eliminación y validación de puntajes enteros |
+| **Total** |  | **61** | 14 suites |
 
 ## Casos funcionales
 
@@ -97,6 +97,7 @@ Archivo: `src/modules/scores/__tests__/score.api.test.ts`
 | CP-RF03-04 | `POST /api/v1/scores` | Jugador inexistente produce `400` por referencia inválida. |
 | CP-RF03-05 | `POST /api/v1/scores` | Videojuego inexistente produce `400` por referencia inválida. |
 | CP-RF03-06 | `POST /api/v1/scores` | Falta de `playerId`, `gameId` o `score` produce `400`. |
+| Validación de entero | `POST /api/v1/scores` | Un puntaje decimal produce `400` y no se envía a persistencia. |
 
 ### RF04 — Consulta de players
 
@@ -190,7 +191,7 @@ npm test -- --watch
 
 ```text
 Test Suites: 14 passed, 14 total
-Tests:       60 passed, 60 total
+Tests:       61 passed, 61 total
 ```
 
 ## Alcance y limitaciones

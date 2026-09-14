@@ -273,9 +273,9 @@ Esto mantiene un solo cuerpo de prueba para escenarios equivalentes.
 | Players | `src/modules/players/__tests__/player.api.test.ts` | Registro, campos obligatorios, duplicados, listado, detalle y búsquedas por nombre/gamertag. |
 | Genres | `src/modules/genres/__tests__/genre.api.test.ts` | Registro válido y género duplicado. |
 | Games | `src/modules/games/__tests__/game.api.test.ts` | Registro, campos obligatorios, nombre duplicado y género inexistente. |
-| Scores | `src/modules/scores/__tests__/score.api.test.ts` | Registro, múltiples puntuaciones, puntaje negativo, relaciones inválidas, ranking y estadísticas. |
+| Scores | `src/modules/scores/__tests__/score.api.test.ts` y `score.service.test.ts` | Registro, múltiples puntuaciones, puntajes negativos y decimales, relaciones inválidas, ranking, estadísticas y eliminación. |
 | Core | `src/core/__tests__/*.test.ts` | Filtros, paginación, fechas, validación, errores, middlewares y normalización del catálogo público. |
-| Aplicación | `tests/app.test.ts` | Health check, prefijo `/api/v1`, OpenAPI y respuesta HTML de Scalar. |
+| Aplicación | `tests/app.test.ts` | Health check, prefijo `/api/v1`, OpenAPI, respuesta HTML de Scalar y CORS. |
 
 ## 7. Pruebas unitarias del core
 
@@ -301,7 +301,8 @@ Cuando no hace falta Express, se invoca directamente la función bajo prueba. Cu
 - `X-Powered-By` no aparece en la respuesta;
 - `GET /openapi.json` devuelve OpenAPI `3.0.3`;
 - el contrato contiene rutas versionadas;
-- `GET /docs` devuelve HTML de la documentación.
+- `GET /docs` devuelve HTML de la documentación;
+- el origen configurado del frontend recibe el header de CORS.
 
 ## 9. Convenciones para agregar pruebas
 
@@ -352,8 +353,8 @@ npm test -- --runInBand --coverage
 La última ejecución completa registrada fue:
 
 ```text
-Test Suites: 13 passed, 13 total
-Tests:       60 passed, 60 total
+Test Suites: 14 passed, 14 total
+Tests:       61 passed, 61 total
 ```
 
 ## 12. Alcance
