@@ -115,6 +115,26 @@ describe('RF07 - Search players', () => {
     expect(result.data).toEqual([]);
     expect(result.totalRecords).toBe(0);
   });
+
+  test('searches players across name, gamertag and email', async () => {
+    database.player.findMany.mockResolvedValue([{ id: 8, name: 'Carlos Mendoza' }]);
+    database.player.count.mockResolvedValue(1);
+
+    const response = await api.request('/api/v1/players?search=Shadow');
+
+    expect(response.status).toBe(200);
+    expect(database.player.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          OR: [
+            { name: { contains: 'Shadow' } },
+            { gamertag: { contains: 'Shadow' } },
+            { email: { contains: 'Shadow' } },
+          ],
+        },
+      }),
+    );
+  });
 });
 
 test('returns a Spanish success message when deleting a player', async () => {
