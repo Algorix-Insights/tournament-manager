@@ -44,6 +44,23 @@ describe('RF03 - Register scores', () => {
     expect(database.score.create).not.toHaveBeenCalled();
   });
 
+  test('rejects a fractional score because the database stores integers', async () => {
+    const response = await api.request('/api/v1/scores', 'POST', {
+      playerId: 8,
+      gameId: 6,
+      score: 950.5,
+    });
+    const result = await readJson(response);
+
+    expect(response.status).toBe(400);
+    expect(result.details).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ field: 'score', message: 'El puntaje debe ser un número válido.' }),
+      ]),
+    );
+    expect(database.score.create).not.toHaveBeenCalled();
+  });
+
   test.each([
     ['CP-RF03-04', { playerId: 9999, gameId: 6, score: 500 }],
     ['CP-RF03-05', { playerId: 8, gameId: 9999, score: 500 }],
@@ -132,4 +149,13 @@ describe('RF08 - Statistics', () => {
       averageScore: 854.29,
     });
   });
+});
+
+test('returns a Spanish success message when deleting a score', async () => {
+  database.score.delete.mockResolvedValue({ id: 8 });
+
+  const response = await api.request('/api/v1/scores/8', 'DELETE');
+
+  expect(response.status).toBe(200);
+  expect(await readJson(response)).toEqual({ message: 'Puntuación eliminada correctamente' });
 });

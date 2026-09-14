@@ -321,8 +321,8 @@ const options = {
             { name: 'playerId', in: 'query', schema: { type: 'integer', minimum: 1 } },
             { name: 'gameId', in: 'query', schema: { type: 'integer', minimum: 1 } },
             { name: 'genreId', in: 'query', schema: { type: 'integer', minimum: 1 } },
-            { name: 'minScore', in: 'query', schema: { type: 'number', minimum: 0 } },
-            { name: 'maxScore', in: 'query', schema: { type: 'number', minimum: 0 } },
+            { name: 'minScore', in: 'query', schema: { type: 'integer', minimum: 0 } },
+            { name: 'maxScore', in: 'query', schema: { type: 'integer', minimum: 0 } },
             { name: 'period', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 9 } },
             { name: 'startDate', in: 'query', schema: { type: 'string', format: 'date-time' } },
             { name: 'endDate', in: 'query', schema: { type: 'string', format: 'date-time' } },
@@ -364,8 +364,8 @@ const options = {
             { name: 'playerId', in: 'query', schema: { type: 'integer', minimum: 1 } },
             { name: 'gameId', in: 'query', schema: { type: 'integer', minimum: 1 } },
             { name: 'genreId', in: 'query', schema: { type: 'integer', minimum: 1 } },
-            { name: 'minScore', in: 'query', schema: { type: 'number', minimum: 0 } },
-            { name: 'maxScore', in: 'query', schema: { type: 'number', minimum: 0 } },
+            { name: 'minScore', in: 'query', schema: { type: 'integer', minimum: 0 } },
+            { name: 'maxScore', in: 'query', schema: { type: 'integer', minimum: 0 } },
             { name: 'period', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 9 } },
             { name: 'startDate', in: 'query', schema: { type: 'string', format: 'date-time' } },
             { name: 'endDate', in: 'query', schema: { type: 'string', format: 'date-time' } },
@@ -516,7 +516,7 @@ const options = {
           properties: {
             playerId: { type: 'integer', minimum: 1, example: 8 },
             gameId: { type: 'integer', minimum: 1, example: 6 },
-            score: { type: 'number', minimum: 0, example: 950 },
+            score: { type: 'integer', minimum: 0, example: 950 },
           },
         },
         ScoreDetail: {
@@ -543,7 +543,7 @@ const options = {
             gameId: { type: 'integer' },
             game: { type: 'string' },
             genre: { type: 'string' },
-            score: { type: 'number' },
+            score: { type: 'integer' },
             createdAt: { type: 'string', format: 'date-time' },
           },
         },
@@ -561,7 +561,6 @@ const options = {
           type: 'object',
           properties: {
             data: { type: 'array', items: { $ref: '#/components/schemas/Player' } },
-            ROW_COUNT: { type: 'integer' },
             totalRecords: { type: 'integer' },
           },
         },
@@ -569,7 +568,6 @@ const options = {
           type: 'object',
           properties: {
             data: { type: 'array', items: { $ref: '#/components/schemas/Genre' } },
-            ROW_COUNT: { type: 'integer' },
             totalRecords: { type: 'integer' },
           },
         },
@@ -577,7 +575,6 @@ const options = {
           type: 'object',
           properties: {
             data: { type: 'array', items: { $ref: '#/components/schemas/Game' } },
-            ROW_COUNT: { type: 'integer' },
             totalRecords: { type: 'integer' },
           },
         },
@@ -585,7 +582,6 @@ const options = {
           type: 'object',
           properties: {
             data: { type: 'array', items: { $ref: '#/components/schemas/ScoreDetail' } },
-            ROW_COUNT: { type: 'integer' },
             totalRecords: { type: 'integer' },
           },
         },
@@ -593,7 +589,6 @@ const options = {
           type: 'object',
           properties: {
             data: { type: 'array', items: { $ref: '#/components/schemas/RankingEntry' } },
-            ROW_COUNT: { type: 'integer' },
             totalRecords: { type: 'integer' },
           },
         },

@@ -27,3 +27,12 @@ describe('RF02 - Register genres', () => {
     expect((await readJson(response)).error).toBe('Ya existe un registro con los datos proporcionados');
   });
 });
+
+test('returns a Spanish success message when deleting a genre', async () => {
+  database.genre.delete.mockResolvedValue({ id: 4 });
+
+  const response = await api.request('/api/v1/genres/4', 'DELETE');
+
+  expect(response.status).toBe(200);
+  expect(await readJson(response)).toEqual({ message: 'Género eliminado correctamente' });
+});

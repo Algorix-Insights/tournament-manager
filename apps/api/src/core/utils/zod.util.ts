@@ -15,10 +15,12 @@ export function positiveInteger(message: string) {
   );
 }
 
-export function nonNegativeNumber(invalidMessage: string, negativeMessage: string) {
+export function nonNegativeInteger(invalidMessage: string, negativeMessage: string) {
   return z.preprocess(
     (value) => (typeof value === 'string' && value.trim() ? Number(value) : value),
-    z.number({ error: invalidMessage }).nonnegative({ error: negativeMessage }),
+    z.number({ error: invalidMessage })
+      .int({ error: invalidMessage })
+      .nonnegative({ error: negativeMessage }),
   );
 }
 
