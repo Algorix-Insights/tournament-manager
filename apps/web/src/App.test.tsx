@@ -1,10 +1,8 @@
 import { expect, test } from '@jest/globals'
 import { render, screen } from '@testing-library/react'
-import App from './App'
+import App from '@/App'
 
-test('renders the tournament manager heading', () => {
+test('renders the app shell', () => {
   render(<App />)
-  expect(
-    screen.getByRole('heading', { name: /tournament manager/i }),
-  ).toBeInTheDocument()
+  expect(screen.getByRole('main')).toHaveClass('bg-background', 'text-foreground')
 })

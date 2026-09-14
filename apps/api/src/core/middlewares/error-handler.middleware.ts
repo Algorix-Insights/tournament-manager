@@ -8,7 +8,36 @@ function getErrorCode(error: unknown): string | undefined {
   return typeof error.code === 'string' ? error.code : undefined;
 }
 
-export const apiErrorHandler: ErrorRequestHandler = (error, _req, res, next): void => {
+function getErrorTargets(error: unknown): string[] {
+  if (typeof error !== 'object' || error === null || !('meta' in error)) {
+    return [];
+  }
+
+  const meta = error.meta;
+  if (typeof meta !== 'object' || meta === null || !('target' in meta)) {
+    return [];
+  }
+
+  return Array.isArray(meta.target)
+    ? meta.target.filter((target): target is string => typeof target === 'string')
+    : [];
+}
+
+function getDuplicateMessage(req: Parameters<ErrorRequestHandler>[1], error: unknown): string {
+  const targets = getErrorTargets(error);
+  const requestPath = req.originalUrl || req.baseUrl;
+
+  if (targets.includes('gamertag')) return 'El gamertag ya está registrado.';
+  if (targets.includes('email')) return 'El correo electrónico ya está registrado.';
+  if (targets.includes('name')) {
+    if (requestPath.includes('/games')) return 'El videojuego ya está registrado.';
+    if (requestPath.includes('/genres')) return 'El género ya está registrado.';
+  }
+
+  return 'Ya existe un registro con los datos proporcionados';
+}
+
+export const apiErrorHandler: ErrorRequestHandler = (error, req, res, next): void => {
   if (res.headersSent) {
     next(error);
     return;
@@ -24,7 +53,7 @@ export const apiErrorHandler: ErrorRequestHandler = (error, _req, res, next): vo
   switch (getErrorCode(error)) {
     case 'P2002':
       response.status = 400;
-      response.message = 'Ya existe un registro con los datos proporcionados';
+      response.message = getDuplicateMessage(req, error);
       break;
     case 'P2003':
       response.status = 400;

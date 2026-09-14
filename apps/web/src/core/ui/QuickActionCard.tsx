@@ -1,4 +1,4 @@
-import ArrowButton from "./ArrowButton";
+import ArrowButton from "@/core/ui/ArrowButton";
 
 interface QuickActionCardProps {
   title: string;
@@ -21,7 +21,7 @@ export default function QuickActionCard({
 }: QuickActionCardProps) {
   return (
     <article
-      className={`relative min-h-42.5 overflow-hidden rounded-[22px] p-6 sm:p-8 ${bgColor} ${textColor}`}
+      className={`relative min-h-42.5 rounded-[22px] p-6 sm:p-8 ${bgColor} ${textColor}`}
     >
       <div className="relative z-10 flex h-full max-w-46.25 flex-col justify-between gap-7">
         <h2 className="font-manrope-bold text-2xl leading-tight tracking-[-0.04em]">

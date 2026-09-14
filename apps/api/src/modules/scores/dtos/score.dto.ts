@@ -14,6 +14,7 @@ export interface CreateScoreDTO {
 }
 
 export interface RankingFilterDTO {
+  search?: string;
   playerId?: number;
   gameId?: number;
   genreId?: number;
@@ -44,6 +45,7 @@ export const createScoreSchema = z.object(
 );
 
 export const scoreFilterSchema = z.object({
+  search: optionalText('La búsqueda debe ser texto.'),
   playerId: playerId.optional(),
   gameId: gameId.optional(),
   genreId: genreId.optional(),

@@ -1,5 +1,5 @@
 import { expect, test, describe } from '@jest/globals';
-import { createQueryClient, queryClient } from '../queryClient';
+import { createQueryClient, queryClient } from '@/core/query/queryClient';
 
 describe('TanStack Query Client Configuration', () => {
   test('singleton queryClient is initialized with standard tournament defaults', () => {

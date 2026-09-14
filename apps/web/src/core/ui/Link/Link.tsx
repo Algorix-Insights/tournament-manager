@@ -1,7 +1,7 @@
 import { Link as HeroLink } from '@heroui/react'
 import type { ComponentProps } from 'react'
-import Root from './Root'
-import Icon from './Icon'
+import Root from '@/core/ui/Link/Root'
+import Icon from '@/core/ui/Link/Icon'
 
 function LocalLink(props: Readonly<ComponentProps<typeof HeroLink>>) {
   return <HeroLink {...props} />

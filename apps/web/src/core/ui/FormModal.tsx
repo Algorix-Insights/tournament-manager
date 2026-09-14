@@ -1,6 +1,9 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { createPortal } from "react-dom";
+import { useEffect, useState, type SyntheticEvent } from "react";
 import { X } from "lucide-react";
-import FormSelect from "./FormSelect";
+import FormSelect from "@/core/ui/FormSelect";
+
+const MODAL_ANIMATION_DURATION_MS = 220;
 
 export interface FormModalField {
   name: string;
@@ -20,6 +23,9 @@ interface FormModalProps {
   accentTitle: string;
   image: string;
   fields: FormModalField[];
+  initialValues?: Record<string, string>;
+  errorMessage?: string | null;
+  isSubmitting?: boolean;
   submitLabel?: string;
 }
 
@@ -31,25 +37,53 @@ export default function FormModal({
   accentTitle,
   image,
   fields,
+  initialValues,
+  errorMessage,
+  isSubmitting = false,
   submitLabel = "Registrar",
-}: FormModalProps) {
+}: Readonly<FormModalProps>) {
   const [values, setValues] = useState<Record<string, string>>({});
+  const [isMounted, setIsMounted] = useState(isOpen);
+  const isClosing = isMounted && !isOpen;
+
+  useEffect(() => {
+    if (isOpen) setIsMounted(true);
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isClosing) return;
+
+    const timeoutId = window.setTimeout(() => setIsMounted(false), MODAL_ANIMATION_DURATION_MS);
+    return () => window.clearTimeout(timeoutId);
+  }, [isClosing]);
+
+  useEffect(() => {
+    if (!isMounted) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isMounted]);
 
   useEffect(() => {
     if (!isOpen) return;
 
-    setValues(Object.fromEntries(fields.map((field) => [field.name, ""])));
+    setValues(Object.fromEntries(fields.map((field) => [field.name, initialValues?.[field.name] ?? ""])));
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
     };
 
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
-  }, [fields, isOpen, onClose]);
+  }, [fields, initialValues, isOpen, onClose]);
 
-  if (!isOpen) return null;
+  if (!isMounted) return null;
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const animationState = isClosing ? "exit" : "enter";
+
+  const handleSubmit = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const hasInvalidNumber = fields.some((field) => {
@@ -62,10 +96,15 @@ export default function FormModal({
     onSubmit?.(values);
   };
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-100 flex items-center justify-center bg-[#101827]/95 px-4 py-6"
-      role="presentation"
+      className={`fixed inset-0 z-100 flex items-center justify-center bg-[#101827]/95 px-4 py-6 modal-backdrop-${animationState}`}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="form-modal-title"
+      onAnimationEnd={(event) => {
+        if (event.target === event.currentTarget && isClosing) setIsMounted(false);
+      }}
       onMouseDown={(event) => event.target === event.currentTarget && onClose()}
     >
       <button
@@ -78,11 +117,11 @@ export default function FormModal({
       </button>
 
       <form
-        className="w-full max-w-120 rounded-4xl bg-[#f2f5fb] px-6 pb-7 pt-5 text-[#111827] shadow-2xl sm:px-8"
+        className={`max-h-[calc(100vh-3rem)] w-full max-w-120 overflow-y-auto overscroll-contain rounded-4xl bg-[#f2f5fb] px-6 pb-7 pt-5 text-[#111827] shadow-2xl sm:px-8 modal-panel-${animationState}`}
         onSubmit={handleSubmit}
       >
         <img className="mx-auto -mt-1 mb-2 h-36 w-56 object-contain sm:h-40" src={image} alt="" />
-        <h2 className="text-center font-manrope-bold text-2xl leading-tight tracking-[-0.04em] sm:text-3xl">
+        <h2 id="form-modal-title" className="text-center font-manrope-bold text-2xl leading-tight tracking-[-0.04em] sm:text-3xl">
           {title}
           <span className="block text-[#684bf3]">{accentTitle}</span>
         </h2>
@@ -98,6 +137,7 @@ export default function FormModal({
                     placeholder={field.placeholder}
                     options={field.options ?? []}
                     required={field.required ?? true}
+                    aria-label={field.label}
                     onChange={(value) => setValues((current) => ({ ...current, [field.name]: value }))}
                   />
               ) : (
@@ -120,14 +160,22 @@ export default function FormModal({
           ))}
         </div>
 
+        {errorMessage && (
+          <p role="alert" className="mt-4 rounded-2xl bg-red-100 px-4 py-3 text-xs text-red-700">
+            {errorMessage}
+          </p>
+        )}
+
         <button
-          className="mt-6 flex h-11 w-full cursor-pointer items-center justify-between rounded-full bg-[#101827] pl-4 pr-1 text-xs text-white transition-transform hover:scale-[1.01]"
+          className="mt-6 flex h-11 w-full cursor-pointer items-center justify-between rounded-full bg-[#101827] pl-4 pr-1 text-xs text-white transition-transform hover:scale-[1.01] disabled:cursor-wait disabled:opacity-60"
           type="submit"
+          disabled={isSubmitting}
         >
-          <span className="flex-1 text-center">{submitLabel}</span>
+          <span className="flex-1 text-center">{isSubmitting ? "Guardando..." : submitLabel}</span>
           <span className="flex size-9 items-center justify-center rounded-full bg-[#f4f1f8] text-base text-[#101827]" aria-hidden="true">↗</span>
         </button>
       </form>
-    </div>
+    </div>,
+    document.body,
   );
 }

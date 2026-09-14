@@ -13,6 +13,11 @@ export class GenreService implements IGenreService {
       where.name = { contains: name.trim() };
     }
 
+    const search = filters?.search?.trim();
+    if (search && !name) {
+      where.name = { contains: search };
+    }
+
     const order = filters?.order;
     const orderBy = parseOrderBy(
       order,

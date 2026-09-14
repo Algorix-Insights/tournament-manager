@@ -1,9 +1,9 @@
 import { ListBox as HeroListBox } from '@heroui/react'
 import type { ComponentProps } from 'react'
-import Root from './Root'
-import Item from './Item'
-import ItemIndicator from './ItemIndicator'
-import Section from './Section'
+import Root from '@/core/ui/ListBox/Root'
+import Item from '@/core/ui/ListBox/Item'
+import ItemIndicator from '@/core/ui/ListBox/ItemIndicator'
+import Section from '@/core/ui/ListBox/Section'
 
 function LocalListBox(props: Readonly<ComponentProps<typeof HeroListBox>>) {
   return <HeroListBox {...props} />

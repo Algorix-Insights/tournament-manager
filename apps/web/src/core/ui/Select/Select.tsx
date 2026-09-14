@@ -1,11 +1,11 @@
 import { Select as HeroSelect } from '@heroui/react'
 import type { ComponentProps } from 'react'
-import Root from './Root'
-import Trigger from './Trigger'
-import Value from './Value'
-import Indicator from './Indicator'
-import ClearButton from './ClearButton'
-import Popover from './Popover'
+import Root from '@/core/ui/Select/Root'
+import Trigger from '@/core/ui/Select/Trigger'
+import Value from '@/core/ui/Select/Value'
+import Indicator from '@/core/ui/Select/Indicator'
+import ClearButton from '@/core/ui/Select/ClearButton'
+import Popover from '@/core/ui/Select/Popover'
 
 function LocalSelect(props: Readonly<ComponentProps<typeof HeroSelect>>) {
   return <HeroSelect {...props} />

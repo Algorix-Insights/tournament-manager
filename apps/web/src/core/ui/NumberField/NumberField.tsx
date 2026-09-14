@@ -1,10 +1,10 @@
 import { NumberField as HeroNumberField } from '@heroui/react'
 import type { ComponentProps } from 'react'
-import Root from './Root'
-import Group from './Group'
-import Input from './Input'
-import IncrementButton from './IncrementButton'
-import DecrementButton from './DecrementButton'
+import Root from '@/core/ui/NumberField/Root'
+import Group from '@/core/ui/NumberField/Group'
+import Input from '@/core/ui/NumberField/Input'
+import IncrementButton from '@/core/ui/NumberField/IncrementButton'
+import DecrementButton from '@/core/ui/NumberField/DecrementButton'
 
 function LocalNumberField(props: Readonly<ComponentProps<typeof HeroNumberField>>) {
   return <HeroNumberField {...props} />

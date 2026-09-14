@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ChevronRight, ChevronUp } from "lucide-react";
-import GameCard from "./GameCard";
+import GameCard from "@/features/players/components/GameCard";
+import type { PlayerGame } from "@/features/players/players.types";
 
 interface GameDetail {
   name: string;
@@ -9,17 +10,17 @@ interface GameDetail {
   points: number;
 }
 
-interface PlayerRowProps {
+export interface PlayerRowData {
   position: number;
   name: string;
   handle: string;
   email: string;
   registeredAt: string;
-  mainGame: string;
-  extraGamesCount: number;
-  games: GameDetail[];
+  games: PlayerGame[];
   initiallyOpen?: boolean;
 }
+
+type PlayerRowProps = PlayerRowData;
 
 const CARD_COLORS = ["bg-[#FDF1FA]", "bg-[#E5DFF5]"];
 
@@ -29,12 +30,18 @@ export default function PlayerRow({
   handle,
   email,
   registeredAt,
-  mainGame,
-  extraGamesCount,
-  games,
+  games: playedGames,
   initiallyOpen = false,
 }: PlayerRowProps) {
   const [isOpen, setIsOpen] = useState(initiallyOpen);
+  const games: GameDetail[] = playedGames.map((game, index) => ({
+    name: game.game,
+    genre: game.genre,
+    rank: index + 1,
+    points: game.score,
+  }));
+  const mainGame = games[0]?.name ?? "Sin juegos";
+  const extraGamesCount = Math.max(games.length - 1, 0);
 
   return (
     <div
@@ -91,18 +98,22 @@ export default function PlayerRow({
             Ha participado en los siguientes juegos y ha obtenido puntos
           </p>
 
-          <div className="grid grid-cols-1 grid-rows-[auto_auto_auto] gap-1 sm:grid-cols-[repeat(3,180px)]">
-            {games.map((game, index) => (
-              <GameCard
-                key={game.name}
-                name={game.name}
-                genre={game.genre}
-                rank={game.rank}
-                points={game.points}
-                bgColor={CARD_COLORS[index % CARD_COLORS.length]}
-              />
-            ))}
-          </div>
+          {games.length > 0 ? (
+            <div className="grid grid-cols-1 grid-rows-[auto_auto_auto] gap-1 sm:grid-cols-[repeat(3,180px)]">
+              {games.map((game, index) => (
+                <GameCard
+                  key={game.name}
+                  name={game.name}
+                  genre={game.genre}
+                  rank={game.rank}
+                  points={game.points}
+                  bgColor={CARD_COLORS[index % CARD_COLORS.length]}
+                />
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-[#8f929b]">No hay juegos registrados.</p>
+          )}
         </div>
       )}
     </div>

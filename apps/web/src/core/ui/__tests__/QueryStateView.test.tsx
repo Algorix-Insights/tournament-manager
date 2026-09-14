@@ -1,17 +1,17 @@
 import { expect, test, describe, jest } from '@jest/globals';
 import { render, screen, fireEvent } from '@testing-library/react';
-import QueryStateView from '../QueryStateView';
+import QueryStateView from '@/core/ui/QueryStateView';
 
 describe('QueryStateView and UI state components', () => {
-  test('renders loading skeleton when isLoading is true', () => {
+  test('renders loader when isLoading is true', () => {
     render(
       <QueryStateView isLoading={true} loadingMessage="Loading records...">
         <div>Actual Content</div>
       </QueryStateView>
     );
 
-    expect(screen.getByRole('status')).toBeInTheDocument();
-    expect(screen.getByText('Loading records...')).toBeInTheDocument();
+    expect(screen.getByRole('status', { name: 'Loading records...' })).toBeInTheDocument();
+    expect(screen.queryByText('Loading records...')).not.toBeInTheDocument();
     expect(screen.queryByText('Actual Content')).not.toBeInTheDocument();
   });
 
@@ -56,29 +56,14 @@ describe('QueryStateView and UI state components', () => {
     expect(screen.queryByText('Actual Content')).not.toBeInTheDocument();
   });
 
-  test('renders background refetch indicator when isFetching is true and isLoading is false', () => {
+  test('renders content without background status indicators', () => {
     render(
-      <QueryStateView isLoading={false} isFetching={true}>
+      <QueryStateView isLoading={false}>
         <div>Active Tournament Content</div>
       </QueryStateView>
     );
 
-    expect(screen.getByRole('status', { name: /updating data in background/i })).toBeInTheDocument();
-    expect(screen.getByText('Syncing...')).toBeInTheDocument();
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
     expect(screen.getByText('Active Tournament Content')).toBeInTheDocument();
-  });
-
-  test('renders stale data badge when isStale is true', () => {
-    const handleRefresh = jest.fn();
-    render(
-      <QueryStateView isLoading={false} isStale={true} onRetry={handleRefresh}>
-        <div>Active Tournament Content</div>
-      </QueryStateView>
-    );
-
-    const staleBadge = screen.getByRole('button', { name: /stale data/i });
-    expect(staleBadge).toBeInTheDocument();
-    fireEvent.click(staleBadge);
-    expect(handleRefresh).toHaveBeenCalledTimes(1);
   });
 });

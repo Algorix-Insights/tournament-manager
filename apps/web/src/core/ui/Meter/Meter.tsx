@@ -1,9 +1,9 @@
 import { Meter as HeroMeter } from '@heroui/react'
 import type { ComponentProps } from 'react'
-import Root from './Root'
-import Output from './Output'
-import Track from './Track'
-import Fill from './Fill'
+import Root from '@/core/ui/Meter/Root'
+import Output from '@/core/ui/Meter/Output'
+import Track from '@/core/ui/Meter/Track'
+import Fill from '@/core/ui/Meter/Fill'
 
 function LocalMeter(props: Readonly<ComponentProps<typeof HeroMeter>>) {
   return <HeroMeter {...props} />

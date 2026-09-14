@@ -1,7 +1,7 @@
 import { expect, test, describe } from "@jest/globals";
 import { render, screen } from "@testing-library/react";
 import { useQuery } from "@tanstack/react-query";
-import QueryProvider from "../QueryProvider";
+import QueryProvider from "@/core/providers/QueryProvider";
 import { createTestQueryClient } from "@/tests/query-test-utils";
 
 function ConsumerComponent() {

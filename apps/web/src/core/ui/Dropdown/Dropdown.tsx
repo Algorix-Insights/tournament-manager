@@ -1,14 +1,14 @@
 import { Dropdown as HeroDropdown } from '@heroui/react'
 import type { ComponentProps } from 'react'
-import Root from './Root'
-import Trigger from './Trigger'
-import Popover from './Popover'
-import Menu from './Menu'
-import Section from './Section'
-import Item from './Item'
-import ItemIndicator from './ItemIndicator'
-import SubmenuIndicator from './SubmenuIndicator'
-import SubmenuTrigger from './SubmenuTrigger'
+import Root from '@/core/ui/Dropdown/Root'
+import Trigger from '@/core/ui/Dropdown/Trigger'
+import Popover from '@/core/ui/Dropdown/Popover'
+import Menu from '@/core/ui/Dropdown/Menu'
+import Section from '@/core/ui/Dropdown/Section'
+import Item from '@/core/ui/Dropdown/Item'
+import ItemIndicator from '@/core/ui/Dropdown/ItemIndicator'
+import SubmenuIndicator from '@/core/ui/Dropdown/SubmenuIndicator'
+import SubmenuTrigger from '@/core/ui/Dropdown/SubmenuTrigger'
 
 function LocalDropdown(props: Readonly<ComponentProps<typeof HeroDropdown>>) {
   return <HeroDropdown {...props} />
