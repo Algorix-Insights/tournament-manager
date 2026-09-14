@@ -165,6 +165,7 @@ const options = {
           summary: 'Listar géneros',
           parameters: [
             { name: 'name', in: 'query', schema: { type: 'string' } },
+            { name: 'search', in: 'query', schema: { type: 'string' } },
             { name: 'order', in: 'query', schema: { type: 'string', example: 'name:asc' } },
             pageParameter,
             limitParameter,
@@ -241,6 +242,7 @@ const options = {
           summary: 'Listar videojuegos',
           parameters: [
             { name: 'name', in: 'query', schema: { type: 'string' } },
+            { name: 'search', in: 'query', schema: { type: 'string' } },
             { name: 'genreId', in: 'query', schema: { type: 'integer', minimum: 1 } },
             { name: 'genreName', in: 'query', schema: { type: 'string' } },
             { name: 'order', in: 'query', schema: { type: 'string', example: 'name:asc' } },
@@ -318,6 +320,7 @@ const options = {
           tags: ['Scores'],
           summary: 'Listar puntuaciones',
           parameters: [
+            { name: 'search', in: 'query', schema: { type: 'string' } },
             { name: 'playerId', in: 'query', schema: { type: 'integer', minimum: 1 } },
             { name: 'gameId', in: 'query', schema: { type: 'integer', minimum: 1 } },
             { name: 'genreId', in: 'query', schema: { type: 'integer', minimum: 1 } },
@@ -361,6 +364,7 @@ const options = {
           tags: ['Scores'],
           summary: 'Consultar clasificación',
           parameters: [
+            { name: 'search', in: 'query', schema: { type: 'string' } },
             { name: 'playerId', in: 'query', schema: { type: 'integer', minimum: 1 } },
             { name: 'gameId', in: 'query', schema: { type: 'integer', minimum: 1 } },
             { name: 'genreId', in: 'query', schema: { type: 'integer', minimum: 1 } },

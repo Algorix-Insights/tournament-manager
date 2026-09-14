@@ -7,6 +7,25 @@ import { database, readJson, setupApiTest } from '@/test-utils/api-test-utils';
 
 const api = setupApiTest(app);
 
+test('searches games by name or genre', async () => {
+  database.game.findMany.mockResolvedValue([{ id: 6, name: 'Tekken 8' }]);
+  database.game.count.mockResolvedValue(1);
+
+  const response = await api.request('/api/v1/games?search=Fighting');
+
+  expect(response.status).toBe(200);
+  expect(database.game.findMany).toHaveBeenCalledWith(
+    expect.objectContaining({
+      where: {
+        OR: [
+          { name: { contains: 'Fighting' } },
+          { genre: { name: { contains: 'Fighting' } } },
+        ],
+      },
+    }),
+  );
+});
+
 describe('RF02 - Register games', () => {
   test('CP-RF02-03 registers a game with a valid genre', async () => {
     const game = { id: 6, name: 'Tekken 8', genreId: 4 };

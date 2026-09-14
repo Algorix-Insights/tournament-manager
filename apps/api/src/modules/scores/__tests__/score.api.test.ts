@@ -7,6 +7,27 @@ import { database, readJson, setupApiTest } from '@/test-utils/api-test-utils';
 
 const api = setupApiTest(app);
 
+test('searches scores by player or game text', async () => {
+  database.score.findMany.mockResolvedValue([]);
+  database.score.count.mockResolvedValue(0);
+
+  const response = await api.request('/api/v1/scores?search=Shadow');
+
+  expect(response.status).toBe(200);
+  expect(database.score.findMany).toHaveBeenCalledWith(
+    expect.objectContaining({
+      where: {
+        OR: [
+          { player: { name: { contains: 'Shadow' } } },
+          { player: { gamertag: { contains: 'Shadow' } } },
+          { game: { name: { contains: 'Shadow' } } },
+          { game: { genre: { name: { contains: 'Shadow' } } } },
+        ],
+      },
+    }),
+  );
+});
+
 describe('RF03 - Register scores', () => {
   test('CP-RF03-01 registers a valid score', async () => {
     const score = { id: 8, playerId: 8, gameId: 6, score: 950 };
