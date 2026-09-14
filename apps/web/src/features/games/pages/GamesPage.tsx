@@ -4,6 +4,8 @@ import floralGameIconController from "@/assets/floral-game-icon-controller.png"
 import QuickActionCard from "../../../core/ui/QuickActionCard";
 import SearchInput from "../../players/components/SearchInput";
 import GameTile from "@/features/games/components/GameTile";
+import RegisterGameModal, { type RegisterGameData } from "../components/RegisterGameModal";
+import { useState } from "react";
 
 const games = [
   { name: "Minecraft", genre: "Sandbox" },
@@ -17,6 +19,13 @@ const GAME_CARD_COLORS = ["bg-[#F6EAF3]", "bg-[#E4DEF5]"];
 
 
 export default function GamesPage() {
+  const [isRegisterGameOpen, setIsRegisterGameOpen] = useState(false);
+
+  const handleRegisterGame = (data: RegisterGameData) => {
+    console.log("Register game payload", data);
+    setIsRegisterGameOpen(false);
+  };
+
   return (
     <main className="min-h-screen overflow-hidden bg-[#f7f6f8] px-5 py-6 text-[#111827] sm:px-8 lg:px-12">
       <h2 className="sr-only">Videojuegos</h2>
@@ -46,6 +55,7 @@ export default function GamesPage() {
             textColor="text-white"
             image={floralGameIconController}
             imageClassName="absolute -right-10 top-1/2 h-80 w-80 -translate-y-1/2 object-contain sm:-right-8 sm:h-120 sm:w-120"
+            onClick={() => setIsRegisterGameOpen(true)}
           />
         </section>
 
@@ -62,6 +72,7 @@ export default function GamesPage() {
           ))}
         </section>
       </div>
+      <RegisterGameModal isOpen={isRegisterGameOpen} onClose={() => setIsRegisterGameOpen(false)} onSubmit={handleRegisterGame} />
     </main>
   );
 }

@@ -7,6 +7,7 @@ import ArrowButton from "../../../core/ui/ArrowButton";
 import PageHeader from "../../../core/ui/HeaderPages/PageHeader";
 import RegisterPlayerModal, { type RegisterPlayerData } from "../../players/components/RegisterPlayerModal";
 import { useState } from "react";
+import RegisterGameModal, { type RegisterGameData } from "../../games/components/RegisterGameModal";
 
 const players = [
   {
@@ -34,10 +35,16 @@ const players = [
 
 export default function DashboardPage() {
   const [isRegisterPlayerOpen, setIsRegisterPlayerOpen] = useState(false);
+  const [isRegisterGameOpen, setIsRegisterGameOpen] = useState(false);
 
   const handleRegisterPlayer = (data: RegisterPlayerData) => {
     console.log("Register player payload", data);
     setIsRegisterPlayerOpen(false);
+  };
+
+  const handleRegisterGame = (data: RegisterGameData) => {
+    console.log("Register game payload", data);
+    setIsRegisterGameOpen(false);
   };
 
   return (
@@ -83,7 +90,8 @@ export default function DashboardPage() {
             textColor="text-white"
             image={floralGameController}
             imageClassName="absolute -bottom-5 -right-4.5 h-46.25 w-46.25 object-contain sm:right-2"
-          ></QuickActionCard>
+            onClick={() => setIsRegisterGameOpen(true)}
+          />
 
           <article
             className="flex flex-col gap-3"
@@ -204,6 +212,7 @@ export default function DashboardPage() {
         </section>
       </div>
       <RegisterPlayerModal isOpen={isRegisterPlayerOpen} onClose={() => setIsRegisterPlayerOpen(false)} onSubmit={handleRegisterPlayer} />
+      <RegisterGameModal isOpen={isRegisterGameOpen} onClose={() => setIsRegisterGameOpen(false)} onSubmit={handleRegisterGame} />
     </main>
   );
 }
