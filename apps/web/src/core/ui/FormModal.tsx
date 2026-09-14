@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { X } from "lucide-react";
-import FormSelect from "./FormSelect";
+import FormSelect from "@/core/ui/FormSelect";
 
 export interface FormModalField {
   name: string;

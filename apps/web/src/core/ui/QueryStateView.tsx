@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react';
-import { BackgroundSyncBadge } from './BackgroundSyncBadge';
-import { StaleDataBadge } from './StaleDataBadge';
-import { LoadingSkeleton } from './LoadingSkeleton';
-import { ErrorAlert } from './ErrorAlert';
-import { EmptyState } from './EmptyState';
+import { BackgroundSyncBadge } from '@/core/ui/BackgroundSyncBadge';
+import { StaleDataBadge } from '@/core/ui/StaleDataBadge';
+import { LoadingSkeleton } from '@/core/ui/LoadingSkeleton';
+import { ErrorAlert } from '@/core/ui/ErrorAlert';
+import { EmptyState } from '@/core/ui/EmptyState';
 
 export interface QueryStateViewProps {
   isLoading: boolean;

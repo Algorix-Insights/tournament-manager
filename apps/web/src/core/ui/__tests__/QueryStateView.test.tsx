@@ -1,6 +1,6 @@
 import { expect, test, describe, jest } from '@jest/globals';
 import { render, screen, fireEvent } from '@testing-library/react';
-import QueryStateView from '../QueryStateView';
+import QueryStateView from '@/core/ui/QueryStateView';
 
 describe('QueryStateView and UI state components', () => {
   test('renders loading skeleton when isLoading is true', () => {

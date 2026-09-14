@@ -1,5 +1,5 @@
 
-import MetricItem from './MetricItem';
+import MetricItem from '@/core/ui/HeaderPages/MetricItem';
 
 interface PageHeaderProps {
   subtitle: string;
