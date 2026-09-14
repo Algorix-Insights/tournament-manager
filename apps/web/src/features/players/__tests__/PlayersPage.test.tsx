@@ -163,4 +163,16 @@ describe('PlayersPage', () => {
       expect(mockedPost).toHaveBeenCalledWith('/scores', { playerId: 8, gameId: 2, score: 950 });
     });
   });
+
+  test('shows the total number of games returned by the API', async () => {
+    mockedGet.mockImplementation((url) => Promise.resolve({
+      data: url === '/scores/stats'
+        ? { totalPlayers: 3, totalGames: 42, totalScores: 0, averageScore: 0 }
+        : { data: [], totalRecords: 3 },
+    }));
+
+    renderWithQuery(<PlayersPage />);
+
+    expect(await screen.findByText('42')).toBeInTheDocument();
+  });
 });

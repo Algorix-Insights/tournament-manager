@@ -5,7 +5,7 @@ interface PlayersTableProps {
   players: PlayerRowData[];
 }
 
-export default function PlayersTable({ players }: PlayersTableProps) {
+export default function PlayersTable({ players }: Readonly<PlayersTableProps>) {
   return (
     <div className="flex flex-col gap-3">
       <div className="hidden grid-cols-[88px_minmax(180px,1fr)_minmax(180px,1fr)_minmax(160px,1fr)_auto] gap-3 px-4 text-[12px] text-[#8f929b] sm:grid">
