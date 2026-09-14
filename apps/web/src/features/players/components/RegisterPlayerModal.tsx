@@ -17,9 +17,11 @@ interface RegisterPlayerModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit?: (data: RegisterPlayerData) => void;
+  errorMessage?: string | null;
+  isSubmitting?: boolean;
 }
 
-export default function RegisterPlayerModal({ isOpen, onClose, onSubmit }: RegisterPlayerModalProps) {
+export default function RegisterPlayerModal({ isOpen, onClose, onSubmit, errorMessage, isSubmitting = false }: RegisterPlayerModalProps) {
   return (
     <FormModal
       isOpen={isOpen}
@@ -33,6 +35,8 @@ export default function RegisterPlayerModal({ isOpen, onClose, onSubmit }: Regis
       accentTitle="Jugador"
       image={floralRockCharacter}
       fields={PLAYER_FIELDS}
+      errorMessage={errorMessage}
+      isSubmitting={isSubmitting}
     />
   );
 }

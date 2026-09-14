@@ -9,7 +9,7 @@ interface GameDetail {
   points: number;
 }
 
-interface PlayerRowProps {
+export interface PlayerRowData {
   position: number;
   name: string;
   handle: string;
@@ -20,6 +20,8 @@ interface PlayerRowProps {
   games: GameDetail[];
   initiallyOpen?: boolean;
 }
+
+type PlayerRowProps = PlayerRowData;
 
 const CARD_COLORS = ["bg-[#FDF1FA]", "bg-[#E5DFF5]"];
 

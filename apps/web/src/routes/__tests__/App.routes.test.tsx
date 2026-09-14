@@ -9,7 +9,7 @@ test.each([
   ['/dashboard', 'Dashboard'],
   ['/players', 'Jugadores'],
   ['/games', 'Videojuegos'],
-  ['/scores', 'Clasificacion'],
+  ['/scores', 'Clasificación'],
   ['/missing', 'Dashboard'],
 ])('renders %s as %s', (path, heading) => {
   renderWithQuery(
