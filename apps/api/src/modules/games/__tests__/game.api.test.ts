@@ -51,3 +51,12 @@ describe('RF02 - Register games', () => {
     expect((await readJson(response)).error).toBe('La referencia especificada no existe o no es válida');
   });
 });
+
+test('returns a Spanish success message when deleting a game', async () => {
+  database.game.delete.mockResolvedValue({ id: 6 });
+
+  const response = await api.request('/api/v1/games/6', 'DELETE');
+
+  expect(response.status).toBe(200);
+  expect(await readJson(response)).toEqual({ message: 'Videojuego eliminado correctamente' });
+});

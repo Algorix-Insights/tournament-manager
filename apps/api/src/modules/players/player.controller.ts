@@ -33,6 +33,6 @@ export class PlayerController implements IPlayerController {
   async delete(req: Request, res: Response): Promise<void> {
     const id = Number(req.params.id);
     await this.playerService.delete(id);
-    res.json({ message: 'Player deleted successfully' });
+    res.json({ message: 'Jugador eliminado correctamente' });
   }
 }
