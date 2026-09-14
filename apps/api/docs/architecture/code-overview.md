@@ -385,8 +385,11 @@ Variables principales:
 ```text
 DATABASE_URL
 NODE_ENV
+CORS_ORIGIN
 PORT
 ```
+
+`CORS_ORIGIN` define el origen permitido para clientes web y usa `http://localhost:5173` por defecto.
 
 Comandos habituales:
 

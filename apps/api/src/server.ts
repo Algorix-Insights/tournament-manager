@@ -1,5 +1,5 @@
 import express from 'express';
-// import cors from 'cors';
+import cors from 'cors';
 import { apiReference } from '@scalar/express-api-reference';
 import { apiErrorHandler } from '@/core/middlewares/error-handler.middleware';
 import { openApiDocument } from '@/core/openapi';
@@ -11,7 +11,11 @@ import { registerCoreMiddlewares } from '@/core/middlewares/register-core-middle
 
 const app = express();
 
-// app.use(cors());
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN ?? 'http://localhost:5173',
+  }),
+);
 registerCoreMiddlewares(app);
 app.disable('x-powered-by');
 
