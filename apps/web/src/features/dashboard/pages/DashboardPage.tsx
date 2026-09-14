@@ -42,8 +42,11 @@ export default function DashboardPage() {
   };
 
   const handleRegisterGame = (data: RegisterGameData) => {
-    console.log("Register game payload", data);
-    setActiveModal(null);
+    setActionError(null);
+    createGameMutation.mutate(data, {
+      onSuccess: closeModal,
+      onError: (error) => setActionError(getApiErrorMessage(error)),
+    });
   };
 
   const handleRegisterPoints = (data: RegisterPointsData) => {
@@ -90,6 +93,7 @@ export default function DashboardPage() {
         onClose={closeModal}
         onSubmit={handleRegisterGame}
         genres={genresQuery.data}
+        errorMessage={actionError}
         isSubmitting={createGameMutation.isPending}
       />
       <RegisterPointsModal
