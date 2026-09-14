@@ -131,33 +131,39 @@ export class ScoreService implements IScoreService {
     const orderBy = parseOrderBy(order, scoreFieldMapping, { score: 'desc' });
     const { skip, take } = pagination ?? DEFAULT_PAGINATION;
 
-    const [scores, totalRecords] = await Promise.all([
-      prisma.score.findMany({
-        where,
-        include: {
-          player: {
-            select: {
-              id: true,
-              gamertag: true,
-              name: true,
-            },
-          },
-          game: {
-            select: {
-              id: true,
-              name: true,
-              genre: true,
-            },
+    const scores = await prisma.score.findMany({
+      where,
+      include: {
+        player: {
+          select: {
+            id: true,
+            gamertag: true,
+            name: true,
           },
         },
-        orderBy,
-        skip,
-        take,
-      }),
-      prisma.score.count({ where }),
-    ]);
+        game: {
+          select: {
+            id: true,
+            name: true,
+            genre: true,
+          },
+        },
+      },
+      orderBy,
+    });
 
-    const formattedRanking = scores.map((item, index) => ({
+    const bestScoreByPlayer = new Map<number, (typeof scores)[number]>();
+    for (const item of scores) {
+      const current = bestScoreByPlayer.get(item.player.id);
+      if (!current || item.score > current.score) {
+        bestScoreByPlayer.set(item.player.id, item);
+      }
+    }
+
+    // ponytail: deduplicate in memory; use a SQL window query if score volume makes this expensive.
+    const ranking = [...bestScoreByPlayer.values()].sort((a, b) => b.score - a.score);
+    const paginatedRanking = ranking.slice(skip, skip + take);
+    const formattedRanking = paginatedRanking.map((item, index) => ({
       position: skip + index + 1,
       playerId: item.player.id,
       player: item.player.gamertag,
@@ -169,7 +175,7 @@ export class ScoreService implements IScoreService {
       createdAt: item.createdAt,
     }));
 
-    return formatPaginatedResponse(formattedRanking, totalRecords);
+    return formatPaginatedResponse(formattedRanking, ranking.length);
   }
 
   async getStats(): Promise<ScoreStats> {

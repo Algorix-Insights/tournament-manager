@@ -362,7 +362,7 @@ const options = {
       '/api/v1/scores/ranking': {
         get: {
           tags: ['Scores'],
-          summary: 'Consultar clasificación',
+          summary: 'Consultar clasificación por jugador',
           parameters: [
             { name: 'search', in: 'query', schema: { type: 'string' } },
             { name: 'playerId', in: 'query', schema: { type: 'integer', minimum: 1 } },
@@ -379,7 +379,7 @@ const options = {
           ],
           responses: {
             200: {
-              description: 'Clasificación ordenada por puntuación',
+              description: 'Una fila por jugador con su puntuación más alta y el videojuego correspondiente',
               content: { 'application/json': { schema: { $ref: '#/components/schemas/PaginatedRanking' } } },
             },
             400: validationError,
@@ -539,6 +539,7 @@ const options = {
         },
         RankingEntry: {
           type: 'object',
+          description: 'Jugador representado por su puntuación más alta y el videojuego correspondiente.',
           properties: {
             position: { type: 'integer' },
             playerId: { type: 'integer' },

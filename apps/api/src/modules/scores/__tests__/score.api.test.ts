@@ -111,6 +111,55 @@ describe('RF03 - Register scores', () => {
 });
 
 describe('RF06 - Score ranking', () => {
+  test('returns each player with their highest score and corresponding game', async () => {
+    database.score.findMany.mockResolvedValue([
+      {
+        id: 1,
+        player: { id: 8, name: 'Carlos Mendoza', gamertag: 'ShadowQA' },
+        game: { id: 6, name: 'Tekken 8', genre: { name: 'Fighting' } },
+        score: 450,
+        createdAt: new Date('2026-01-01'),
+      },
+      {
+        id: 2,
+        player: { id: 8, name: 'Carlos Mendoza', gamertag: 'ShadowQA' },
+        game: { id: 7, name: 'Street Fighter 6', genre: { name: 'Fighting' } },
+        score: 950,
+        createdAt: new Date('2026-01-02'),
+      },
+      {
+        id: 3,
+        player: { id: 9, name: 'Ana', gamertag: 'Apex' },
+        game: { id: 8, name: 'Minecraft', genre: { name: 'Sandbox' } },
+        score: 820,
+        createdAt: new Date('2026-01-03'),
+      },
+    ]);
+    database.score.count.mockResolvedValue(3);
+
+    const response = await api.request('/api/v1/scores/ranking');
+    const result = await readJson(response);
+
+    expect(response.status).toBe(200);
+    expect(result).toEqual({
+      data: [
+        expect.objectContaining({
+          position: 1,
+          playerId: 8,
+          gameId: 7,
+          score: 950,
+        }),
+        expect.objectContaining({
+          position: 2,
+          playerId: 9,
+          gameId: 8,
+          score: 820,
+        }),
+      ],
+      totalRecords: 2,
+    });
+  });
+
   test('CP-RF06-01 returns ranking ordered by score', async () => {
     database.score.findMany.mockResolvedValue([
       {
