@@ -13,6 +13,7 @@ export interface UpdateGameDTO {
 
 export interface GameFilterDTO {
   name?: string;
+  search?: string;
   genreId?: number;
   genreName?: string;
   order?: string;
@@ -42,6 +43,7 @@ export const updateGameSchema = z.object(
 
 export const gameFilterSchema = z.object({
   name: optionalText('El nombre debe ser texto.'),
+  search: optionalText('La búsqueda debe ser texto.'),
   genreId: genreId.optional(),
   genreName: optionalText('El nombre del género debe ser texto.'),
   order: optionalText('El orden debe ser texto.'),

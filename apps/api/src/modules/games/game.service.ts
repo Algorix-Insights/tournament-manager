@@ -13,6 +13,14 @@ export class GameService implements IGameService {
       where.name = { contains: name.trim() };
     }
 
+    const search = filters?.search?.trim();
+    if (search && !name && !filters?.genreName) {
+      where.OR = [
+        { name: { contains: search } },
+        { genre: { name: { contains: search } } },
+      ];
+    }
+
     const genreId = filters?.genreId;
     if (genreId !== undefined) {
       where.genreId = genreId;
