@@ -67,6 +67,23 @@ const scoreFieldMapping = {
   game: { game: 'name' },
 };
 
+const rankingScoreInclude = {
+  player: {
+    select: {
+      id: true,
+      gamertag: true,
+      name: true,
+    },
+  },
+  game: {
+    select: {
+      id: true,
+      name: true,
+      genre: true,
+    },
+  },
+} as const;
+
 export class ScoreService implements IScoreService {
   async getAll(filters?: ScoreFilterDTO, pagination?: PaginationParams) {
     const where = buildScoreWhere(filters);
@@ -133,24 +150,21 @@ export class ScoreService implements IScoreService {
 
     const scores = await prisma.score.findMany({
       where,
-      include: {
-        player: {
-          select: {
-            id: true,
-            gamertag: true,
-            name: true,
-          },
-        },
-        game: {
-          select: {
-            id: true,
-            name: true,
-            genre: true,
-          },
-        },
-      },
+      include: rankingScoreInclude,
       orderBy,
     });
+
+    const gamesWhere = { ...where };
+    delete gamesWhere.gameId;
+
+    const allPlayerScores =
+      filters?.gameId !== undefined && scores.length > 0
+        ? await prisma.score.findMany({
+            where: { ...gamesWhere, playerId: { in: [...new Set(scores.map((item) => item.player.id))] } },
+            include: rankingScoreInclude,
+            orderBy: { score: 'desc' },
+          })
+        : scores;
 
     const bestScoreByPlayer = new Map<number, (typeof scores)[number]>();
     for (const item of scores) {
@@ -158,6 +172,16 @@ export class ScoreService implements IScoreService {
       if (!current || item.score > current.score) {
         bestScoreByPlayer.set(item.player.id, item);
       }
+    }
+
+    const gamesByPlayer = new Map<number, Map<number, (typeof allPlayerScores)[number]>>();
+    for (const item of allPlayerScores) {
+      const playerGames = gamesByPlayer.get(item.player.id) ?? new Map();
+      const current = playerGames.get(item.game.id);
+      if (!current || item.score > current.score) {
+        playerGames.set(item.game.id, item);
+      }
+      gamesByPlayer.set(item.player.id, playerGames);
     }
 
     // ponytail: deduplicate in memory; use a SQL window query if score volume makes this expensive.
@@ -173,6 +197,14 @@ export class ScoreService implements IScoreService {
       genre: item.game.genre.name,
       score: item.score,
       createdAt: item.createdAt,
+      games: [...(gamesByPlayer.get(item.player.id)?.values() ?? [])]
+        .sort((a, b) => b.score - a.score)
+        .map((gameScore) => ({
+          gameId: gameScore.game.id,
+          game: gameScore.game.name,
+          genre: gameScore.game.genre.name,
+          score: gameScore.score,
+        })),
     }));
 
     return formatPaginatedResponse(formattedRanking, ranking.length);

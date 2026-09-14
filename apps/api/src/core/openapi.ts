@@ -379,7 +379,7 @@ const options = {
           ],
           responses: {
             200: {
-              description: 'Una fila por jugador con su puntuación más alta y el videojuego correspondiente',
+              description: 'Una fila por jugador con su puntuación más alta y sus juegos con puntuaciones',
               content: { 'application/json': { schema: { $ref: '#/components/schemas/PaginatedRanking' } } },
             },
             400: validationError,
@@ -539,7 +539,7 @@ const options = {
         },
         RankingEntry: {
           type: 'object',
-          description: 'Jugador representado por su puntuación más alta y el videojuego correspondiente.',
+          description: 'Jugador representado por su puntuación más alta y sus videojuegos con puntuaciones.',
           properties: {
             position: { type: 'integer' },
             playerId: { type: 'integer' },
@@ -550,6 +550,17 @@ const options = {
             genre: { type: 'string' },
             score: { type: 'integer' },
             createdAt: { type: 'string', format: 'date-time' },
+            games: { type: 'array', items: { $ref: '#/components/schemas/PlayedGameScore' } },
+          },
+        },
+        PlayedGameScore: {
+          type: 'object',
+          required: ['gameId', 'game', 'genre', 'score'],
+          properties: {
+            gameId: { type: 'integer' },
+            game: { type: 'string' },
+            genre: { type: 'string' },
+            score: { type: 'integer' },
           },
         },
         ScoreStats: {
