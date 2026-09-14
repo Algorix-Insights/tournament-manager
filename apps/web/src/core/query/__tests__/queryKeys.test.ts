@@ -1,5 +1,5 @@
 import { expect, test, describe } from '@jest/globals';
-import { createQueryKeys } from '../queryKeys';
+import { createQueryKeys } from '@/core/query/queryKeys';
 
 describe('createQueryKeys', () => {
   test('generates domain-shaped hierarchical query keys', () => {
