@@ -17,6 +17,7 @@ export default function QuickActionCard({
   textColor,
   image,
   imageClassName = "absolute -bottom-2 -right-3 h-42.5 w-42.5 object-contain sm:right-4",
+  onClick,
 }: QuickActionCardProps) {
   return (
     <article
@@ -26,7 +27,7 @@ export default function QuickActionCard({
         <h2 className="font-manrope-bold text-2xl leading-tight tracking-[-0.04em]">
           {title}
         </h2>
-        <ArrowButton>{buttonText}</ArrowButton>
+        <ArrowButton onClick={onClick}>{buttonText}</ArrowButton>
       </div>
       <img className={imageClassName} src={image} alt="" />
     </article>

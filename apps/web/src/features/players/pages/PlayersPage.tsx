@@ -5,6 +5,8 @@ import floralCoin from "@/assets/floral-coin.png";
 import QuickActionCard from "../../../core/ui/QuickActionCard";
 import SearchInput from "../components/SearchInput";
 import PlayersTable from "../components/PlayersTable";
+import RegisterPlayerModal, { type RegisterPlayerData } from "../components/RegisterPlayerModal";
+import { useState } from "react";
 
 const players = [
   {
@@ -45,6 +47,13 @@ const players = [
 ];
 
 export default function PlayersPage() {
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+
+  const handleRegisterPlayer = (data: RegisterPlayerData) => {
+    console.log("Register player payload", data);
+    setIsRegisterModalOpen(false);
+  };
+
   return (
     <main className="min-h-screen overflow-hidden bg-[#f7f6f8] px-5 py-6 text-[#111827] sm:px-8 lg:px-12">
       <h2 className="sr-only">Jugadores</h2>
@@ -77,7 +86,8 @@ export default function PlayersPage() {
             textColor="text-[#101827]"
             image={floralRockCharacter}
             imageClassName="absolute -bottom-5 -right-4.5 h-46.25 w-46.25 object-contain sm:right-2"
-          ></QuickActionCard>
+            onClick={() => setIsRegisterModalOpen(true)}
+          />
 
           <QuickActionCard
             title="Registrar Puntos a Jugadores"
@@ -91,6 +101,7 @@ export default function PlayersPage() {
   <SearchInput placeholder="Buscar participante" />
   <PlayersTable players={players} />
       </div>
+      <RegisterPlayerModal isOpen={isRegisterModalOpen} onClose={() => setIsRegisterModalOpen(false)} onSubmit={handleRegisterPlayer} />
     </main>
   );
 }

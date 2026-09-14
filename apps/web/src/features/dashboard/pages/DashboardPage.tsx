@@ -5,6 +5,8 @@ import { UsersRound, Gamepad2 } from "lucide-react";
 import QuickActionCard from "../../../core/ui/QuickActionCard";
 import ArrowButton from "../../../core/ui/ArrowButton";
 import PageHeader from "../../../core/ui/HeaderPages/PageHeader";
+import RegisterPlayerModal, { type RegisterPlayerData } from "../../players/components/RegisterPlayerModal";
+import { useState } from "react";
 
 const players = [
   {
@@ -31,6 +33,13 @@ const players = [
 ];
 
 export default function DashboardPage() {
+  const [isRegisterPlayerOpen, setIsRegisterPlayerOpen] = useState(false);
+
+  const handleRegisterPlayer = (data: RegisterPlayerData) => {
+    console.log("Register player payload", data);
+    setIsRegisterPlayerOpen(false);
+  };
+
   return (
     <main className="min-h-screen overflow-hidden bg-[#f7f6f8] px-5 py-6 text-[#111827] sm:px-8 lg:px-12">
       <h2 className="sr-only">Dashboard</h2>
@@ -65,7 +74,8 @@ export default function DashboardPage() {
             textColor="text-[#101827]"
             image={floralRockCharacter}
             imageClassName="absolute -bottom-5 -right-4.5 h-46.25 w-46.25 object-contain sm:right-2"
-          ></QuickActionCard>
+            onClick={() => setIsRegisterPlayerOpen(true)}
+          />
           {/*Registrar nuevos videojuegos*/}
           <QuickActionCard
             title="Registrar Nuevos Videojuegos"
@@ -193,6 +203,7 @@ export default function DashboardPage() {
           </div>
         </section>
       </div>
+      <RegisterPlayerModal isOpen={isRegisterPlayerOpen} onClose={() => setIsRegisterPlayerOpen(false)} onSubmit={handleRegisterPlayer} />
     </main>
   );
 }

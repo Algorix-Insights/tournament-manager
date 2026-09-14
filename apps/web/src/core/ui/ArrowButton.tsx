@@ -1,8 +1,14 @@
-export default function ArrowButton({ children }: { children: string }) {
+interface ArrowButtonProps {
+  children: string;
+  onClick?: () => void;
+}
+
+export default function ArrowButton({ children, onClick }: ArrowButtonProps) {
   return (
     <button
       className="flex h-9 items-center justify-between rounded-full bg-[#101827] py-1 pl-5 pr-1 text-[14px] text-white transition-transform hover:scale-[1.02] cursor-pointer"
       type="button"
+      onClick={onClick}
     >
       
      <span className="flex-1 text-center font-medium">
