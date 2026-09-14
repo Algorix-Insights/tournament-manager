@@ -1,10 +1,11 @@
 import { expect, test } from "@jest/globals";
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import DashboardRoutes from "@/routes/dashboard.routes";
+import { renderWithQuery } from "@/tests/query-test-utils";
 
 test("renders DashboardPage at root of dashboard module", () => {
-  render(
+  renderWithQuery(
     <MemoryRouter initialEntries={["/"]}>
       <DashboardRoutes />
     </MemoryRouter>,

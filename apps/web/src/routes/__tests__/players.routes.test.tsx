@@ -10,5 +10,5 @@ test("renders PlayersPage at root of players module", () => {
     </MemoryRouter>,
   );
 
-  expect(screen.getByRole("heading", { name: "Players" })).toBeInTheDocument();
+  expect(screen.getByRole("heading", { name: "Jugadores" })).toBeInTheDocument();
 });

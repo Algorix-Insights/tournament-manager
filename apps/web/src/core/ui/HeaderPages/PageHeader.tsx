@@ -2,6 +2,7 @@ import MetricItem from './MetricItem';
 
 interface PageHeaderProps {
   subtitle: string;
+  title?: string;
   metrics?: {
     icon: React.ReactNode;
     value: string | number;
@@ -17,7 +18,7 @@ const getGreeting = () => {
   return 'Buenas noches, Admin';
 };
 
-export default function PageHeader({ subtitle, metrics = [] }: PageHeaderProps) {
+export default function PageHeader({ subtitle, metrics = [] }: Readonly<PageHeaderProps>) {
   return (
     <header className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
       <div>
