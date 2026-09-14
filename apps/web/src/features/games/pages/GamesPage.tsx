@@ -1,10 +1,10 @@
-import PageHeader from "../../../core/ui/HeaderPages/PageHeader";
+import PageHeader from "@/core/ui/HeaderPages/PageHeader";
 import { UsersRound, Gamepad2 } from "lucide-react";
 import floralGameIconController from "@/assets/floral-game-icon-controller.png"
-import QuickActionCard from "../../../core/ui/QuickActionCard";
-import SearchInput from "../../players/components/SearchInput";
+import QuickActionCard from "@/core/ui/QuickActionCard";
+import SearchInput from "@/features/players/components/SearchInput";
 import GameTile from "@/features/games/components/GameTile";
-import RegisterGameModal, { type RegisterGameData } from "../components/RegisterGameModal";
+import RegisterGameModal, { type RegisterGameData } from "@/features/games/components/RegisterGameModal";
 import { useState } from "react";
 
 const games = [
