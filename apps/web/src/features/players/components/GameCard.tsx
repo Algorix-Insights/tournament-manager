@@ -17,13 +17,15 @@ export default function GameCard({
     <div
       className={`grid w-40 min-h-31 row-span-3 grid-rows-subgrid gap-y-3 rounded-[18px] p-4 ${bgColor}`}
     >
-      <h4 className="font-manrope-bold text-sm leading-tight tracking-[-0.02em]">
+      <div className="mb-3 flex flex-col gap-2">
+        <h4 className="font-manrope-bold text-lg leading-tight tracking-[-0.02em]">
         {name}
       </h4>
 
-      <span className="w-fit self-start rounded-full bg-white/75 px-3 py-1 text-[10px] leading-none text-[#5f6470]">
+      <span className="w-fit self-start rounded-full bg-white/80 px-3 py-1 text-[12px] leading-none text-[#202124]">
         {genre}
       </span>
+      </div>
 
       <div className="grid grid-cols-[auto_1fr] items-end gap-3">
         <span className="flex items-center gap-3 text-xs text-[#8f929b]">

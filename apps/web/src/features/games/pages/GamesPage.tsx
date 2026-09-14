@@ -19,7 +19,7 @@ const GAME_CARD_COLORS = ["bg-[#F6EAF3]", "bg-[#E4DEF5]"];
 export default function GamesPage() {
   return (
     <main className="min-h-screen overflow-hidden bg-[#f7f6f8] px-5 py-6 text-[#111827] sm:px-8 lg:px-12">
-      <h2 className="sr-only">Games</h2>
+      <h2 className="sr-only">Videojuegos</h2>
 
       <div className="mx-auto flex max-w-290 flex-col gap-6 ">
         <PageHeader
