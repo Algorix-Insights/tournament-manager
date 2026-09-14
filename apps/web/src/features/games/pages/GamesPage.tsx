@@ -5,21 +5,17 @@ import QuickActionCard from "@/core/ui/QuickActionCard";
 import SearchInput from "@/features/players/components/SearchInput";
 import GameTile from "@/features/games/components/GameTile";
 import RegisterGameModal, { type RegisterGameData } from "@/features/games/components/RegisterGameModal";
+import QueryStateView from "@/core/ui/QueryStateView";
+import { useGames } from "@/features/games/hooks/useGames";
 import { useState } from "react";
-
-const games = [
-  { name: "Minecraft", genre: "Sandbox" },
-  { name: "LOL", genre: "Sandbox" },
-  { name: "Brawl Stars", genre: "Sandbox" },
-  { name: "LOL", genre: "Sandbox" },
-  { name: "Brawl Stars", genre: "Sandbox" },
-];
 
 const GAME_CARD_COLORS = ["bg-[#F6EAF3]", "bg-[#E4DEF5]"];
 
 
 export default function GamesPage() {
   const [isRegisterGameOpen, setIsRegisterGameOpen] = useState(false);
+  const { data, error, isError, isFetching, isLoading, isStale, refetch } = useGames();
+  const games = data?.data ?? [];
 
   const handleRegisterGame = (data: RegisterGameData) => {
     console.log("Register game payload", data);
@@ -42,8 +38,9 @@ export default function GamesPage() {
             },
             {
               icon: <Gamepad2 className="size-5" />,
-              value: 36,
+              value: data?.totalRecords ?? "",
               label: "Videojuegos Registrados",
+              isLoading,
             },
           ]}
         />
@@ -61,16 +58,29 @@ export default function GamesPage() {
 
         <SearchInput placeholder="Buscar juego" />
 
-        <section className="grid grid-cols-[200px] gap-2 sm:grid-cols-[repeat(2,200px)] md:grid-cols-[repeat(3,200px)] lg:grid-cols-[repeat(5,200px)]" aria-label="Videojuegos registrados">
-          {games.map((game, index) => (
-            <GameTile
-              key={`${game.name}-${index}`}
-              name={game.name}
-              genre={game.genre}
-              bgColor={GAME_CARD_COLORS[index % GAME_CARD_COLORS.length]}
-            />
-          ))}
-        </section>
+        <QueryStateView
+          isLoading={isLoading}
+          isError={isError}
+          error={error}
+          isEmpty={games.length === 0}
+          isFetching={isFetching}
+          isStale={isStale}
+          onRetry={refetch}
+          loadingMessage="Cargando videojuegos..."
+          emptyTitle="No hay videojuegos registrados"
+          emptyMessage="Registra un videojuego para verlo aquí."
+        >
+          <section className="grid grid-cols-[200px] gap-2 sm:grid-cols-[repeat(2,200px)] md:grid-cols-[repeat(3,200px)] lg:grid-cols-[repeat(5,200px)]" aria-label="Videojuegos registrados">
+            {games.map((game, index) => (
+              <GameTile
+                key={game.id}
+                name={game.name}
+                genre={game.genre.name}
+                bgColor={GAME_CARD_COLORS[index % GAME_CARD_COLORS.length]}
+              />
+            ))}
+          </section>
+        </QueryStateView>
       </div>
       <RegisterGameModal isOpen={isRegisterGameOpen} onClose={() => setIsRegisterGameOpen(false)} onSubmit={handleRegisterGame} />
     </main>
