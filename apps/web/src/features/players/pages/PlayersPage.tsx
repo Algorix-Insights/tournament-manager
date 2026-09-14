@@ -91,8 +91,9 @@ export default function PlayersPage() {
             },
             {
               icon: <Gamepad2 className="size-5" />,
-              value: 36,
+              value: gamesQuery.data?.totalRecords ?? "",
               label: "Videojuegos Registrados",
+              isLoading: gamesQuery.isLoading,
             },
           ]}
         />

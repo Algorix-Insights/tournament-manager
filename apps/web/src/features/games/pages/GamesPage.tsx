@@ -11,6 +11,7 @@ import Pagination from "@/core/ui/Pagination/Pagination";
 import { getApiErrorMessage } from "@/features/games/api/games";
 import { useCreateGame, useDeleteGame, useGames, useUpdateGame } from "@/features/games/hooks/useGames";
 import { useGenres } from "@/features/games/hooks/useGenres";
+import { usePlayers } from "@/features/players/hooks/usePlayers";
 import type { Game } from "@/features/games/games.types";
 import { useCallback, useState } from "react";
 
@@ -27,6 +28,7 @@ export default function GamesPage() {
   const [actionError, setActionError] = useState<string | null>(null);
   const { data, error, isError, isLoading, refetch } = useGames(search, page, GAMES_PER_PAGE);
   const genresQuery = useGenres();
+  const playersQuery = usePlayers();
   const createGameMutation = useCreateGame();
   const updateGameMutation = useUpdateGame();
   const deleteGameMutation = useDeleteGame();
@@ -91,8 +93,9 @@ export default function GamesPage() {
           metrics={[
             {
               icon: <UsersRound className="size-5" />,
-              value: 128,
+              value: playersQuery.data?.totalRecords ?? "",
               label: "Jugadores Registrados",
+              isLoading: playersQuery.isLoading,
             },
             {
               icon: <Gamepad2 className="size-5" />,

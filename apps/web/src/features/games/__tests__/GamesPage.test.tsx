@@ -185,4 +185,17 @@ describe('GamesPage', () => {
       expect(mockedDelete).toHaveBeenCalledWith('/games/6');
     });
   });
+
+  test('shows the total number of players returned by the API', async () => {
+    mockedGet.mockImplementation((url) => Promise.resolve({
+      data: url === '/players'
+        ? { data: [], totalRecords: 42 }
+        : { data: [], totalRecords: 3 },
+    }));
+
+    renderWithQuery(<GamesPage />);
+
+    expect(await screen.findByText('42')).toBeInTheDocument();
+    expect(mockedGet).toHaveBeenCalledWith('/players');
+  });
 });
