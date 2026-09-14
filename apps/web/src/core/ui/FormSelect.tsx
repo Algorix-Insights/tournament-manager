@@ -100,7 +100,7 @@ export default function FormSelect({
             if (!isOpen) updateMenuPosition();
             setIsOpen((current) => !current);
           }}
-        className={`flex h-11 w-full cursor-pointer items-center justify-between rounded-full border px-4 text-left text-xs font-manrope-regular transition-colors focus:outline-none focus:ring-2 focus:ring-[#d9cffb] ${isOpen ? "border-[#c9b7ff] bg-white" : "border-transparent bg-[#e9edf5]"}`}
+        className={`flex h-11 w-full cursor-pointer items-center justify-between rounded-full border px-4 text-left text-xs font-manrope-regular transition-colors focus:outline-none focus:ring-2 focus:ring-[#d9cffb] ${isOpen ? "border-[#c9b7ff] bg-white" : "border-transparent bg-[#FFF]"}`}
       >
         <span className={selectedOption ? "text-[#5f6470]" : "text-[#9ca1aa]"}>
           {selectedOption?.label ?? placeholder}

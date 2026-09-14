@@ -23,8 +23,8 @@ export default function ScoreRow({ player }: ScoreRowProps) {
 
   return (
     <div className="grid grid-cols-[44px_1fr_auto] items-center gap-3 rounded-full bg-white px-3 py-2.5 sm:grid-cols-[70px_1fr_140px_70px] sm:px-4">
-      <span className={`flex size-7 items-center justify-center rounded-full text-xs ${positionStyle}`}>
-        {player.position === 1 ? <Medal className="size-4" aria-label="Primer lugar" /> : player.position}
+      <span className={`flex size-12 items-center justify-center rounded-full text-xs ${positionStyle}`}>
+        {player.position === 1 ? <Medal className="size-6" aria-label="Primer lugar" /> : player.position}
       </span>
       <div className="flex min-w-0 items-center gap-3 sm:col-start-2">
         <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#d9cffb] text-xs">{player.name.charAt(0)}</span>

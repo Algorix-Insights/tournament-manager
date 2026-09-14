@@ -33,7 +33,7 @@ export default function PlayersPage() {
   const [page, setPage] = useState(1);
   const [actionError, setActionError] = useState<string | null>(null);
   const { data, error, isError, isLoading, refetch } = usePlayers(search, page, PLAYERS_PER_PAGE);
-  const gamesQuery = useGames();
+  const gamesQuery = useGames("", 1, 1000);
   const createPlayerMutation = useCreatePlayer();
   const createScoreMutation = useCreateScore();
   const players = data?.data.map((player, index) => ({
