@@ -6,50 +6,31 @@ import QuickActionCard from "@/core/ui/QuickActionCard";
 import SearchInput from "@/features/players/components/SearchInput";
 import PlayersTable from "@/features/players/components/PlayersTable";
 import RegisterPlayerModal, { type RegisterPlayerData } from "@/features/players/components/RegisterPlayerModal";
+import { useGetPlayers } from "@/core/hook/usePlayer";
 import { useState } from "react";
 import RegisterPointsModal, { type RegisterPointsData } from "@/features/scores/components/RegisterPointsModal";
-
-const players = [
-  {
-    position: 1,
-    name: "Boki Rodriguez",
-    handle: "Boki-02",
-    email: "Boki@gmail.com",
-    registeredAt: "Marzo 12, 2026",
-    mainGame: "Minecraft",
-    extraGamesCount: 2,
-    initiallyOpen: true,
-    games: [
-      { name: "Minecraft", genre: "Sandbox", rank: 2, points: 450 },
-      { name: "Valorant", genre: "Sandbox", rank: 2, points: 350 },
-      { name: "Bodrio Stars", genre: "Sandbox", rank: 2, points: 550 },
-    ],
-  },
-  {
-    position: 2,
-    name: "Boki Rodriguez",
-    handle: "Boki-02",
-    email: "Boki@gmail.com",
-    registeredAt: "Marzo 12, 2026",
-    mainGame: "Minecraft",
-    extraGamesCount: 2,
-    games: [],
-  },
-  {
-    position: 3,
-    name: "Boki Rodriguez",
-    handle: "Boki-02",
-    email: "Boki@gmail.com",
-    registeredAt: "Marzo 12, 2026",
-    mainGame: "Minecraft",
-    extraGamesCount: 2,
-    games: [],
-  },
-];
+import { useStats } from "@/features/dashboard/hooks/useStats";
 
 export default function PlayersPage() {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [isPointsModalOpen, setIsPointsModalOpen] = useState(false);
+  const { data: playersResponse } = useGetPlayers();
+  const players = (playersResponse?.data ?? []).map((player, index) => ({
+    position: index + 1,
+    name: player.name,
+    handle: player.gamertag,
+    email: player.email,
+    registeredAt: new Date(player.createdAt).toLocaleDateString("es-ES", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }),
+    mainGame: "Sin juegos",
+    extraGamesCount: 0,
+    games: [],
+  }));
+
+  const { data: stats, isLoading: isStatsLoading } = useStats();
 
   const handleRegisterPlayer = (data: RegisterPlayerData) => {
     console.log("Register player payload", data);
@@ -68,18 +49,9 @@ export default function PlayersPage() {
       <div className="mx-auto flex max-w-290 flex-col gap-6 ">
         <PageHeader
           subtitle="Listo para la aventura"
-          title="Buenas tardes, Admin"
           metrics={[
-            {
-              icon: <UsersRound className="size-5" />,
-              value: 128,
-              label: "Jugadores Registrados",
-            },
-            {
-              icon: <Gamepad2 className="size-5" />,
-              value: 36,
-              label: "Videojuegos Registrados",
-            },
+            { icon: <UsersRound className="size-6" />, value: stats?.totalPlayers ?? "", label: "Jugadores Registrados", isLoading: isStatsLoading },
+            { icon: <Gamepad2 className="size-7" />, value: stats?.totalGames ?? "", label: "Videojuegos Registrados", isLoading: isStatsLoading },
           ]}
         />
 
@@ -106,8 +78,8 @@ export default function PlayersPage() {
           />
         </section>
 
-  <SearchInput placeholder="Buscar participante" />
-  <PlayersTable players={players} />
+        <SearchInput placeholder="Buscar participante" />
+        <PlayersTable players={players} />
       </div>
       <RegisterPlayerModal isOpen={isRegisterModalOpen} onClose={() => setIsRegisterModalOpen(false)} onSubmit={handleRegisterPlayer} />
       <RegisterPointsModal isOpen={isPointsModalOpen} onClose={() => setIsPointsModalOpen(false)} onSubmit={handleRegisterPoints} />

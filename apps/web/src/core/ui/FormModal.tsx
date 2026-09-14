@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import FormSelect from "@/core/ui/FormSelect";
 
@@ -12,10 +13,15 @@ export interface FormModalField {
   required?: boolean;
 }
 
+export type FormModalErrors = Record<string, string>;
+
 interface FormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit?: (values: Record<string, string>) => void;
+  onSubmit?: (values: Record<string, string>) => void | Promise<void>;
+  errors?: FormModalErrors;
+  formError?: string;
+  isSubmitting?: boolean;
   title: string;
   accentTitle: string;
   image: string;
@@ -32,39 +38,56 @@ export default function FormModal({
   image,
   fields,
   submitLabel = "Registrar",
+  errors = {},
+  formError,
+  isSubmitting = false,
 }: FormModalProps) {
   const [values, setValues] = useState<Record<string, string>>({});
+  const [validationErrors, setValidationErrors] = useState<FormModalErrors>({});
 
   useEffect(() => {
     if (!isOpen) return;
 
     setValues(Object.fromEntries(fields.map((field) => [field.name, ""])));
+    setValidationErrors({});
+    const previousBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
     };
 
     document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = previousBodyOverflow;
+    };
   }, [fields, isOpen, onClose]);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const hasInvalidNumber = fields.some((field) => {
-      if (field.type !== "number") return false;
-      const value = values[field.name] ?? "";
-      return !/^[1-9]\d*$/.test(value);
+    const nextValidationErrors: FormModalErrors = {};
+    fields.forEach((field) => {
+      const value = values[field.name]?.trim() ?? "";
+      if ((field.required ?? true) && !value) {
+        nextValidationErrors[field.name] = `${field.label} es obligatorio.`;
+      } else if (field.type === "email" && value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+        nextValidationErrors[field.name] = "Ingresa un correo electrónico válido.";
+      } else if (field.type === "number" && value && !/^[1-9]\d*$/.test(value)) {
+        nextValidationErrors[field.name] = `${field.label} debe ser mayor que cero.`;
+      }
     });
 
-    if (hasInvalidNumber) return;
-    onSubmit?.(values);
+    setValidationErrors(nextValidationErrors);
+    if (Object.keys(nextValidationErrors).length > 0) return;
+    await onSubmit?.(values);
   };
 
-  return (
+  return createPortal((
     <div
-      className="fixed inset-0 z-100 flex items-center justify-center bg-[#101827]/95 px-4 py-6"
+      className="fixed inset-0 z-9999 flex items-center justify-center overflow-hidden bg-[#101827]/95 px-4 py-6"
       role="presentation"
       onMouseDown={(event) => event.target === event.currentTarget && onClose()}
     >
@@ -78,7 +101,7 @@ export default function FormModal({
       </button>
 
       <form
-        className="w-full max-w-120 rounded-4xl bg-[#f2f5fb] px-6 pb-7 pt-5 text-[#111827] shadow-2xl sm:px-8"
+        className="max-h-[calc(100vh-3rem)] w-full max-w-120 overflow-y-auto rounded-4xl bg-[#f2f5fb] px-6 pb-7 pt-5 text-[#111827] shadow-2xl sm:px-8"
         onSubmit={handleSubmit}
       >
         <img className="mx-auto -mt-1 mb-2 h-36 w-56 object-contain sm:h-40" src={image} alt="" />
@@ -86,6 +109,8 @@ export default function FormModal({
           {title}
           <span className="block text-[#684bf3]">{accentTitle}</span>
         </h2>
+
+        {formError && <div className="mt-3 text-center text-xs font-manrope-regular text-[#dc2626]" role="alert">{formError}</div>}
 
         <div className="mt-5 flex flex-col gap-4">
           {fields.map((field) => (
@@ -98,24 +123,31 @@ export default function FormModal({
                     placeholder={field.placeholder}
                     options={field.options ?? []}
                     required={field.required ?? true}
-                    onChange={(value) => setValues((current) => ({ ...current, [field.name]: value }))}
+                    onChange={(value) => {
+                      setValues((current) => ({ ...current, [field.name]: value }));
+                      setValidationErrors((current) => ({ ...current, [field.name]: "" }));
+                    }}
                   />
               ) : (
                 <input
-                  required={field.required ?? true}
                   type={field.type ?? "text"}
                   min={field.type === "number" ? "1" : undefined}
                   step={field.type === "number" ? "1" : undefined}
                   value={values[field.name] ?? ""}
-                  onChange={(event) => setValues((current) => ({
-                    ...current,
-                    [field.name]: field.type === "number" ? event.target.value.replace(/\D/g, "") : event.target.value,
-                  }))}
+                  onChange={(event) => {
+                    setValues((current) => ({
+                      ...current,
+                      [field.name]: field.type === "number" ? event.target.value.replace(/\D/g, "") : event.target.value,
+                    }));
+                    setValidationErrors((current) => ({ ...current, [field.name]: "" }));
+                  }}
                   placeholder={field.placeholder}
                   inputMode={field.type === "number" ? "numeric" : undefined}
+                  aria-invalid={Boolean(errors[field.name] || validationErrors[field.name])}
                   className="h-11 rounded-full bg-white px-4 text-xs font-manrope-regular outline-none ring-[#684bf3] placeholder:text-[#9ca1aa] focus:ring-2"
                 />
               )}
+              {(errors[field.name] || validationErrors[field.name]) && <span className="text-xs font-manrope-regular text-[#dc2626]" role="alert">{errors[field.name] || validationErrors[field.name]}</span>}
             </label>
           ))}
         </div>
@@ -123,11 +155,12 @@ export default function FormModal({
         <button
           className="mt-6 flex h-11 w-full cursor-pointer items-center justify-between rounded-full bg-[#101827] pl-4 pr-1 text-xs text-white transition-transform hover:scale-[1.01]"
           type="submit"
+          disabled={isSubmitting}
         >
-          <span className="flex-1 text-center">{submitLabel}</span>
+          <span className="flex-1 text-center">{isSubmitting ? "Registrando..." : submitLabel}</span>
           <span className="flex size-9 items-center justify-center rounded-full bg-[#f4f1f8] text-base text-[#101827]" aria-hidden="true">↗</span>
         </button>
       </form>
     </div>
-  );
+  ), document.body);
 }
