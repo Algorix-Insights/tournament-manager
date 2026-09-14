@@ -43,6 +43,7 @@ model Score {
   id        Int      @id @default(autoincrement())
   playerId  Int      @map("player_id")
   gameId    Int      @map("game_id")
+  // The database constraint is maintained by the score validation migration.
   score     Int
   createdAt DateTime @default(now()) @map("created_at")
 
