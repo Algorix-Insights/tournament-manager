@@ -8,7 +8,6 @@ const mockedGet = jest.spyOn(api, 'get');
 const mockedPost = jest.spyOn(api, 'post');
 const mockedPut = jest.spyOn(api, 'put');
 const mockedDelete = jest.spyOn(api, 'delete');
-const mockedConfirm = jest.spyOn(window, 'confirm');
 
 describe('GamesPage', () => {
   beforeEach(() => {
@@ -16,7 +15,6 @@ describe('GamesPage', () => {
     mockedPost.mockReset();
     mockedPut.mockReset();
     mockedDelete.mockReset();
-    mockedConfirm.mockReset();
   });
 
   test('renders games returned by the games API', async () => {
@@ -140,18 +138,19 @@ describe('GamesPage', () => {
     });
   });
 
-  test('deletes a game after confirmation', async () => {
+  test('deletes a game after confirming in the modal', async () => {
     mockedGet.mockResolvedValue({
       data: {
         data: [{ id: 6, name: 'Tekken 8', genreId: 4, genre: { id: 4, name: 'Fighting' } }],
         totalRecords: 1,
       },
     });
-    mockedConfirm.mockReturnValue(true);
     mockedDelete.mockResolvedValue({ data: { message: 'Videojuego eliminado correctamente' } });
 
     renderWithQuery(<GamesPage />);
     fireEvent.click(await screen.findByRole('button', { name: 'Eliminar Tekken 8' }));
+    expect(await screen.findByRole('alertdialog')).toHaveTextContent('¿Eliminar Tekken 8?');
+    fireEvent.click(screen.getByRole('button', { name: 'Eliminar' }));
 
     await waitFor(() => {
       expect(mockedDelete).toHaveBeenCalledWith('/games/6');

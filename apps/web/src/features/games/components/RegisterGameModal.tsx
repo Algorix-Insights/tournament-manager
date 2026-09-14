@@ -26,7 +26,7 @@ export default function RegisterGameModal({
   initialGame,
   errorMessage,
   isSubmitting = false,
-}: RegisterGameModalProps) {
+}: Readonly<RegisterGameModalProps>) {
   const fields = useMemo<FormModalField[]>(() => [
     { name: "name", label: "Nombre del videojuego", placeholder: "Nombre" },
     {

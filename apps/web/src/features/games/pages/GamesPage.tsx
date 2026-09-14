@@ -5,6 +5,7 @@ import QuickActionCard from "@/core/ui/QuickActionCard";
 import SearchInput from "@/features/players/components/SearchInput";
 import GameTile from "@/features/games/components/GameTile";
 import RegisterGameModal, { type RegisterGameData } from "@/features/games/components/RegisterGameModal";
+import DeleteGameModal from "@/features/games/components/DeleteGameModal";
 import QueryStateView from "@/core/ui/QueryStateView";
 import { getApiErrorMessage } from "@/features/games/api/games";
 import { useCreateGame, useDeleteGame, useGames, useUpdateGame } from "@/features/games/hooks/useGames";
@@ -18,6 +19,7 @@ const GAME_CARD_COLORS = ["bg-[#F6EAF3]", "bg-[#E4DEF5]"];
 export default function GamesPage() {
   const [isRegisterGameOpen, setIsRegisterGameOpen] = useState(false);
   const [editingGame, setEditingGame] = useState<Game | null>(null);
+  const [gameToDelete, setGameToDelete] = useState<Game | null>(null);
   const [search, setSearch] = useState("");
   const [actionError, setActionError] = useState<string | null>(null);
   const { data, error, isError, isLoading, refetch } = useGames(search);
@@ -60,10 +62,16 @@ export default function GamesPage() {
   };
 
   const handleDeleteGame = (game: Game) => {
-    if (!window.confirm(`¿Eliminar ${game.name}?`)) return;
+    setGameToDelete(game);
+  };
 
+  const confirmDeleteGame = () => {
+    if (!gameToDelete) return;
+
+    const gameId = gameToDelete.id;
+    setGameToDelete(null);
     setActionError(null);
-    deleteGameMutation.mutate(game.id, {
+    deleteGameMutation.mutate(gameId, {
       onError: (error) => setActionError(getApiErrorMessage(error)),
     });
   };
@@ -144,6 +152,7 @@ export default function GamesPage() {
         errorMessage={actionError ?? (genresQuery.isError ? getApiErrorMessage(genresQuery.error) : null)}
         isSubmitting={isSubmitting}
       />
+      <DeleteGameModal game={gameToDelete} onClose={() => setGameToDelete(null)} onConfirm={confirmDeleteGame} />
     </main>
   );
 }
