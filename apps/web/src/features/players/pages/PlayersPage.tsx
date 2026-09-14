@@ -7,6 +7,7 @@ import SearchInput from "../components/SearchInput";
 import PlayersTable from "../components/PlayersTable";
 import RegisterPlayerModal, { type RegisterPlayerData } from "../components/RegisterPlayerModal";
 import { useState } from "react";
+import RegisterPointsModal, { type RegisterPointsData } from "../../scores/components/RegisterPointsModal";
 
 const players = [
   {
@@ -48,10 +49,16 @@ const players = [
 
 export default function PlayersPage() {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+  const [isPointsModalOpen, setIsPointsModalOpen] = useState(false);
 
   const handleRegisterPlayer = (data: RegisterPlayerData) => {
     console.log("Register player payload", data);
     setIsRegisterModalOpen(false);
+  };
+
+  const handleRegisterPoints = (data: RegisterPointsData) => {
+    console.log("Register points payload", data);
+    setIsPointsModalOpen(false);
   };
 
   return (
@@ -95,13 +102,15 @@ export default function PlayersPage() {
             textColor="text-[#101827]"
             image={floralCoin}
             imageClassName="absolute -bottom-5 -right-4.5 h-46.25 w-46.25 object-contain sm:right-2"
-          ></QuickActionCard>
+            onClick={() => setIsPointsModalOpen(true)}
+          />
         </section>
 
   <SearchInput placeholder="Buscar participante" />
   <PlayersTable players={players} />
       </div>
       <RegisterPlayerModal isOpen={isRegisterModalOpen} onClose={() => setIsRegisterModalOpen(false)} onSubmit={handleRegisterPlayer} />
+      <RegisterPointsModal isOpen={isPointsModalOpen} onClose={() => setIsPointsModalOpen(false)} onSubmit={handleRegisterPoints} />
     </main>
   );
 }

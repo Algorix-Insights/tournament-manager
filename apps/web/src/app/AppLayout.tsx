@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from "react-router";
+import { NavLink, Outlet, useLocation } from "react-router";
 import { Gamepad2, LayoutDashboard, Search, Trophy, UsersRound } from "lucide-react";
 import logoGameSpace from "@/assets/logo-game-space.png";
 
@@ -10,6 +10,8 @@ const navigation = [
 ];
 
 export default function AppLayout() {
+  const location = useLocation();
+
   return (
     <div className="min-h-screen bg-[#f7f6f8] font-manrope-regular text-[#111827]">
       <header className="sticky top-0 z-50 w-full bg-[#f7f6f8] px-3 py-4 sm:px-6 sm:py-5 lg:px-8">
@@ -35,7 +37,9 @@ export default function AppLayout() {
       </header>
 
       <main>
-        <Outlet />
+        <div key={location.pathname} className="route-enter">
+          <Outlet />
+        </div>
       </main>
     </div>
   );

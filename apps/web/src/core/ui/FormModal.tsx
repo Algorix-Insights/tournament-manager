@@ -1,11 +1,14 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { X } from "lucide-react";
+import FormSelect from "./FormSelect";
 
 export interface FormModalField {
   name: string;
   label: string;
   placeholder: string;
   type?: "text" | "email" | "number";
+  control?: "input" | "select";
+  options?: { label: string; value: string }[];
   required?: boolean;
 }
 
@@ -48,6 +51,14 @@ export default function FormModal({
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    const hasInvalidNumber = fields.some((field) => {
+      if (field.type !== "number") return false;
+      const value = values[field.name] ?? "";
+      return !/^[1-9]\d*$/.test(value);
+    });
+
+    if (hasInvalidNumber) return;
     onSubmit?.(values);
   };
 
@@ -80,14 +91,31 @@ export default function FormModal({
           {fields.map((field) => (
             <label key={field.name} className="flex flex-col gap-1.5 text-xs font-manrope-bold">
               {field.label}
-              <input
-                required={field.required ?? true}
-                type={field.type ?? "text"}
-                value={values[field.name] ?? ""}
-                onChange={(event) => setValues((current) => ({ ...current, [field.name]: event.target.value }))}
-                placeholder={field.placeholder}
-                className="h-11 rounded-full bg-white px-4 text-xs font-manrope-regular outline-none ring-[#684bf3] placeholder:text-[#9ca1aa] focus:ring-2"
-              />
+              {field.control === "select" ? (
+                  <FormSelect
+                    name={field.name}
+                    value={values[field.name] ?? ""}
+                    placeholder={field.placeholder}
+                    options={field.options ?? []}
+                    required={field.required ?? true}
+                    onChange={(value) => setValues((current) => ({ ...current, [field.name]: value }))}
+                  />
+              ) : (
+                <input
+                  required={field.required ?? true}
+                  type={field.type ?? "text"}
+                  min={field.type === "number" ? "1" : undefined}
+                  step={field.type === "number" ? "1" : undefined}
+                  value={values[field.name] ?? ""}
+                  onChange={(event) => setValues((current) => ({
+                    ...current,
+                    [field.name]: field.type === "number" ? event.target.value.replace(/\D/g, "") : event.target.value,
+                  }))}
+                  placeholder={field.placeholder}
+                  inputMode={field.type === "number" ? "numeric" : undefined}
+                  className="h-11 rounded-full bg-white px-4 text-xs font-manrope-regular outline-none ring-[#684bf3] placeholder:text-[#9ca1aa] focus:ring-2"
+                />
+              )}
             </label>
           ))}
         </div>

@@ -8,6 +8,8 @@ import PageHeader from "../../../core/ui/HeaderPages/PageHeader";
 import RegisterPlayerModal, { type RegisterPlayerData } from "../../players/components/RegisterPlayerModal";
 import { useState } from "react";
 import RegisterGameModal, { type RegisterGameData } from "../../games/components/RegisterGameModal";
+import RegisterPointsModal, { type RegisterPointsData } from "../../scores/components/RegisterPointsModal";
+import { useNavigate } from "react-router";
 
 const players = [
   {
@@ -34,8 +36,10 @@ const players = [
 ];
 
 export default function DashboardPage() {
+  const navigate = useNavigate();
   const [isRegisterPlayerOpen, setIsRegisterPlayerOpen] = useState(false);
   const [isRegisterGameOpen, setIsRegisterGameOpen] = useState(false);
+  const [isPointsModalOpen, setIsPointsModalOpen] = useState(false);
 
   const handleRegisterPlayer = (data: RegisterPlayerData) => {
     console.log("Register player payload", data);
@@ -45,6 +49,11 @@ export default function DashboardPage() {
   const handleRegisterGame = (data: RegisterGameData) => {
     console.log("Register game payload", data);
     setIsRegisterGameOpen(false);
+  };
+
+  const handleRegisterPoints = (data: RegisterPointsData) => {
+    console.log("Register points payload", data);
+    setIsPointsModalOpen(false);
   };
 
   return (
@@ -136,7 +145,8 @@ export default function DashboardPage() {
             textColor="text-[#101827]"
             image={floralCoin}
             imageClassName="absolute -bottom-5 -right-4.5 h-46.25 w-46.25 object-contain sm:right-2"
-          ></QuickActionCard>
+            onClick={() => setIsPointsModalOpen(true)}
+          />
         </section>
 
         <section className="overflow-hidden " aria-labelledby="score-summary">
@@ -165,7 +175,7 @@ export default function DashboardPage() {
                 <br />
                 de puntos
               </h3>
-              <ArrowButton>¡Vamos!</ArrowButton>
+              <ArrowButton onClick={() => navigate("/scores")}>¡Vamos!</ArrowButton>
             </aside>
             <div className="min-w-0">
               <div className="mb-2 hidden grid-cols-[60px_1fr_140px_80px] items-center px-4 text-[12px] text-[#000000] sm:grid">
@@ -213,6 +223,7 @@ export default function DashboardPage() {
       </div>
       <RegisterPlayerModal isOpen={isRegisterPlayerOpen} onClose={() => setIsRegisterPlayerOpen(false)} onSubmit={handleRegisterPlayer} />
       <RegisterGameModal isOpen={isRegisterGameOpen} onClose={() => setIsRegisterGameOpen(false)} onSubmit={handleRegisterGame} />
+      <RegisterPointsModal isOpen={isPointsModalOpen} onClose={() => setIsPointsModalOpen(false)} onSubmit={handleRegisterPoints} />
     </main>
   );
 }
