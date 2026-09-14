@@ -11,6 +11,7 @@ export interface UpdateGenreDTO {
 
 export interface GenreFilterDTO {
   name?: string;
+  search?: string;
   order?: string;
   page?: number;
   limit?: number;
@@ -30,6 +31,7 @@ export const updateGenreSchema = z.object(
 
 export const genreFilterSchema = z.object({
   name: optionalText('El nombre debe ser texto.'),
+  search: optionalText('La búsqueda debe ser texto.'),
   order: optionalText('El orden debe ser texto.'),
   page: positiveInteger('La página debe ser un número entero positivo.').optional(),
   limit: positiveInteger('El límite debe ser un número entero positivo.').optional(),
