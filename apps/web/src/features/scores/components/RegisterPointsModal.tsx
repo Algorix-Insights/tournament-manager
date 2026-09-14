@@ -1,5 +1,7 @@
 import floralCoin from "@/assets/floral-coin.png";
 import FormModal, { type FormModalField } from "@/core/ui/FormModal";
+import type { Game } from "@/features/games/games.types";
+import type { Player } from "@/features/players/players.types";
 
 export interface RegisterPointsData {
   playerId: string;
@@ -11,35 +13,39 @@ interface RegisterPointsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit?: (data: RegisterPointsData) => void;
+  players?: Player[];
+  games?: Game[];
+  errorMessage?: string | null;
+  isSubmitting?: boolean;
 }
 
-const POINTS_FIELDS: FormModalField[] = [
-  {
-    name: "playerId",
-    label: "Nombre del jugador",
-    placeholder: "Nombre",
-    control: "select",
-    options: [
-      { label: "Boki Rodriguez", value: "1" },
-      { label: "Sebastián VP", value: "2" },
-      { label: "Churi Delez", value: "3" },
-    ],
-  },
-  {
-    name: "gameId",
-    label: "Videojuego",
-    placeholder: "Mario bro",
-    control: "select",
-    options: [
-      { label: "Mario bro", value: "1" },
-      { label: "Minecraft", value: "2" },
-      { label: "Brawl Stars", value: "3" },
-    ],
-  },
-  { name: "score", label: "Puntuación", placeholder: "189", type: "number" },
-];
+export default function RegisterPointsModal({
+  isOpen,
+  onClose,
+  onSubmit,
+  players = [],
+  games = [],
+  errorMessage,
+  isSubmitting = false,
+}: RegisterPointsModalProps) {
+  const fields: FormModalField[] = [
+    {
+      name: "playerId",
+      label: "Nombre del jugador",
+      placeholder: "Nombre",
+      control: "select",
+      options: players.map((player) => ({ label: player.name, value: String(player.id) })),
+    },
+    {
+      name: "gameId",
+      label: "Videojuego",
+      placeholder: "Selecciona un videojuego",
+      control: "select",
+      options: games.map((game) => ({ label: game.name, value: String(game.id) })),
+    },
+    { name: "score", label: "Puntuación", placeholder: "189", type: "number" },
+  ];
 
-export default function RegisterPointsModal({ isOpen, onClose, onSubmit }: RegisterPointsModalProps) {
   return (
     <FormModal
       isOpen={isOpen}
@@ -48,8 +54,10 @@ export default function RegisterPointsModal({ isOpen, onClose, onSubmit }: Regis
       title="Asignar puntos a"
       accentTitle="un Jugador"
       image={floralCoin}
-      fields={POINTS_FIELDS}
+      fields={fields}
       submitLabel="Asignar"
+      errorMessage={errorMessage}
+      isSubmitting={isSubmitting}
     />
   );
 }

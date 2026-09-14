@@ -1,8 +1,8 @@
 
-import PlayerRow from "@/features/players/components/PlayerRow";
+import PlayerRow, { type PlayerRowData } from "@/features/players/components/PlayerRow";
 
 interface PlayersTableProps {
-  players: Array<React.ComponentProps<typeof PlayerRow>>;
+  players: PlayerRowData[];
 }
 
 export default function PlayersTable({ players }: PlayersTableProps) {
