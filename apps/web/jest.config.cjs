@@ -2,7 +2,7 @@ module.exports = {
   extensionsToTreatAsEsm: ['.ts', '.tsx'],
   testEnvironment: 'jsdom',
   moduleNameMapper: {
-    '\\.(png)$': '<rootDir>/src/tests/fileMock.cjs',
+    '\\.(png)$': '<rootDir>/src/tests/__mock__/fileMock.cjs',
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   setupFilesAfterEnv: ['<rootDir>/src/tests/setup.ts'],
