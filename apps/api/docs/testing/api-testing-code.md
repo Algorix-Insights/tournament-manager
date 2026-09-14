@@ -353,7 +353,7 @@ La última ejecución completa registrada fue:
 
 ```text
 Test Suites: 13 passed, 13 total
-Tests:       59 passed, 59 total
+Tests:       60 passed, 60 total
 ```
 
 ## 12. Alcance
