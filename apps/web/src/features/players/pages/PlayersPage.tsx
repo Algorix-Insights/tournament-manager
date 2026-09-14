@@ -1,13 +1,13 @@
-import PageHeader from "../../../core/ui/HeaderPages/PageHeader";
+import PageHeader from "@/core/ui/HeaderPages/PageHeader";
 import { UsersRound, Gamepad2 } from "lucide-react";
 import floralRockCharacter from "@/assets/floral-rock-character.png";
 import floralCoin from "@/assets/floral-coin.png";
-import QuickActionCard from "../../../core/ui/QuickActionCard";
-import SearchInput from "../components/SearchInput";
-import PlayersTable from "../components/PlayersTable";
-import RegisterPlayerModal, { type RegisterPlayerData } from "../components/RegisterPlayerModal";
+import QuickActionCard from "@/core/ui/QuickActionCard";
+import SearchInput from "@/features/players/components/SearchInput";
+import PlayersTable from "@/features/players/components/PlayersTable";
+import RegisterPlayerModal, { type RegisterPlayerData } from "@/features/players/components/RegisterPlayerModal";
 import { useState } from "react";
-import RegisterPointsModal, { type RegisterPointsData } from "../../scores/components/RegisterPointsModal";
+import RegisterPointsModal, { type RegisterPointsData } from "@/features/scores/components/RegisterPointsModal";
 
 const players = [
   {

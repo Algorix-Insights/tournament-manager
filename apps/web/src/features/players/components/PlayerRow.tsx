@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ChevronRight, ChevronUp } from "lucide-react";
-import GameCard from "./GameCard";
+import GameCard from "@/features/players/components/GameCard";
 
 interface GameDetail {
   name: string;

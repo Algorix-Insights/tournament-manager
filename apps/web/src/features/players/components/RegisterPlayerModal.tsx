@@ -1,5 +1,5 @@
 import floralRockCharacter from "@/assets/floral-rock-character.png";
-import FormModal, { type FormModalField } from "../../../core/ui/FormModal";
+import FormModal, { type FormModalField } from "@/core/ui/FormModal";
 
 export interface RegisterPlayerData {
   name: string;

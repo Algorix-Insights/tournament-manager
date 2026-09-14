@@ -1,5 +1,5 @@
 
-import PlayerRow from "./PlayerRow";
+import PlayerRow from "@/features/players/components/PlayerRow";
 
 interface PlayersTableProps {
   players: Array<React.ComponentProps<typeof PlayerRow>>;
