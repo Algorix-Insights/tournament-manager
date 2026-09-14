@@ -1,5 +1,5 @@
 import floralCoin from "@/assets/floral-coin.png";
-import FormModal, { type FormModalField } from "../../../core/ui/FormModal";
+import FormModal, { type FormModalField } from "@/core/ui/FormModal";
 
 export interface RegisterPointsData {
   playerId: string;

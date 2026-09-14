@@ -1,4 +1,4 @@
-import ScoreRow, { type ScoreRowData } from "./ScoreRow";
+import ScoreRow, { type ScoreRowData } from "@/features/scores/components/ScoreRow";
 
 interface ScoresTableProps {
   players: ScoreRowData[];

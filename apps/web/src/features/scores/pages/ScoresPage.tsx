@@ -1,8 +1,8 @@
 import { UsersRound, Gamepad2 } from "lucide-react";
-import PageHeader from "../../../core/ui/HeaderPages/PageHeader";
-import ScoresHeader from "../components/ScoresHeader";
-import ScoresTable from "../components/ScoresTable";
-import type { ScoreRowData } from "../components/ScoreRow";
+import PageHeader from "@/core/ui/HeaderPages/PageHeader";
+import ScoresHeader from "@/features/scores/components/ScoresHeader";
+import ScoresTable from "@/features/scores/components/ScoresTable";
+import type { ScoreRowData } from "@/features/scores/components/ScoreRow";
 
 const scores: ScoreRowData[] = [
   { position: 1, name: "Boki Rodríguez", handle: "Boki-02", game: "Minecraft", score: 450 },
