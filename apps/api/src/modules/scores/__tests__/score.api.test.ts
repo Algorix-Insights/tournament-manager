@@ -111,6 +111,59 @@ describe('RF03 - Register scores', () => {
 });
 
 describe('RF06 - Score ranking', () => {
+  test('returns each player with their highest score and corresponding game', async () => {
+    database.score.findMany.mockResolvedValue([
+      {
+        id: 1,
+        player: { id: 8, name: 'Carlos Mendoza', gamertag: 'ShadowQA' },
+        game: { id: 6, name: 'Tekken 8', genre: { name: 'Fighting' } },
+        score: 450,
+        createdAt: new Date('2026-01-01'),
+      },
+      {
+        id: 2,
+        player: { id: 8, name: 'Carlos Mendoza', gamertag: 'ShadowQA' },
+        game: { id: 7, name: 'Street Fighter 6', genre: { name: 'Fighting' } },
+        score: 950,
+        createdAt: new Date('2026-01-02'),
+      },
+      {
+        id: 3,
+        player: { id: 9, name: 'Ana', gamertag: 'Apex' },
+        game: { id: 8, name: 'Minecraft', genre: { name: 'Sandbox' } },
+        score: 820,
+        createdAt: new Date('2026-01-03'),
+      },
+    ]);
+    database.score.count.mockResolvedValue(3);
+
+    const response = await api.request('/api/v1/scores/ranking');
+    const result = await readJson(response);
+
+    expect(response.status).toBe(200);
+    expect(result).toEqual({
+      data: [
+        expect.objectContaining({
+          position: 1,
+          playerId: 8,
+          gameId: 7,
+          score: 950,
+          games: [
+            { gameId: 7, game: 'Street Fighter 6', genre: 'Fighting', score: 950 },
+            { gameId: 6, game: 'Tekken 8', genre: 'Fighting', score: 450 },
+          ],
+        }),
+        expect.objectContaining({
+          position: 2,
+          playerId: 9,
+          gameId: 8,
+          score: 820,
+        }),
+      ],
+      totalRecords: 2,
+    });
+  });
+
   test('CP-RF06-01 returns ranking ordered by score', async () => {
     database.score.findMany.mockResolvedValue([
       {
@@ -142,11 +195,41 @@ describe('RF06 - Score ranking', () => {
   });
 
   test('CP-RF06-02 filters ranking by gameId', async () => {
-    database.score.count.mockResolvedValue(1);
+    const selectedGameScore = {
+      id: 1,
+      player: { id: 8, name: 'Carlos Mendoza', gamertag: 'ShadowQA' },
+      game: { id: 6, name: 'Tekken 8', genre: { name: 'Fighting' } },
+      score: 950,
+      createdAt: new Date('2026-01-01'),
+    };
+    database.score.findMany
+      .mockResolvedValueOnce([selectedGameScore])
+      .mockResolvedValueOnce([
+        selectedGameScore,
+        {
+          id: 2,
+          player: { id: 8, name: 'Carlos Mendoza', gamertag: 'ShadowQA' },
+          game: { id: 7, name: 'Minecraft', genre: { name: 'Sandbox' } },
+          score: 820,
+          createdAt: new Date('2026-01-02'),
+        },
+      ]);
 
     const response = await api.request('/api/v1/scores/ranking?gameId=6');
+    const result = await readJson(response);
 
     expect(response.status).toBe(200);
+    expect(result.data).toEqual([
+      expect.objectContaining({
+        playerId: 8,
+        gameId: 6,
+        score: 950,
+        games: [
+          { gameId: 6, game: 'Tekken 8', genre: 'Fighting', score: 950 },
+          { gameId: 7, game: 'Minecraft', genre: 'Sandbox', score: 820 },
+        ],
+      }),
+    ]);
     expect(database.score.findMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: { gameId: 6 } }),
     );
