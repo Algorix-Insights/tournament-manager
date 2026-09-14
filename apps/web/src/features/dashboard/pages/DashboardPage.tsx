@@ -10,7 +10,8 @@ import QuickActions from "../components/QuickActions";
 
 import { useStats } from "../hooks/useStats";
 import { getApiErrorMessage } from "@/features/games/api/games";
-import { useGames } from "@/features/games/hooks/useGames";
+import { useCreateGame, useGames } from "@/features/games/hooks/useGames";
+import { useGenres } from "@/features/games/hooks/useGenres";
 import { useCreatePlayer, usePlayers } from "@/features/players/hooks/usePlayers";
 import { useCreateScore } from "@/features/scores/hooks/useScores";
 
@@ -20,9 +21,11 @@ export default function DashboardPage() {
   const navigate = useNavigate();
   const [activeModal, setActiveModal] = useState<ModalType>(null);
   const [actionError, setActionError] = useState<string | null>(null);
-  const { data: players } = usePlayers();
-  const { data: games } = useGames();
+  const { data: players } = usePlayers("", 1, 1000);
+  const { data: games } = useGames("", 1, 1000);
+  const genresQuery = useGenres();
   const createPlayerMutation = useCreatePlayer();
+  const createGameMutation = useCreateGame();
   const createScoreMutation = useCreateScore();
 
   const closeModal = useCallback(() => {
@@ -82,7 +85,13 @@ export default function DashboardPage() {
         errorMessage={actionError}
         isSubmitting={createPlayerMutation.isPending}
       />
-      <RegisterGameModal isOpen={activeModal === "game"} onClose={() => setActiveModal(null)} onSubmit={handleRegisterGame} />
+      <RegisterGameModal
+        isOpen={activeModal === "game"}
+        onClose={closeModal}
+        onSubmit={handleRegisterGame}
+        genres={genresQuery.data}
+        isSubmitting={createGameMutation.isPending}
+      />
       <RegisterPointsModal
         isOpen={activeModal === "points"}
         onClose={closeModal}

@@ -68,7 +68,7 @@ export default function ScoresPage() {
                   placeholder="Todos los videojuegos"
                   options={[
                     { label: "Todos los videojuegos", value: "" },
-                    ...(gamesQuery.data?.data.map((game) => ({ label: game.name, value: String(game.id) })) ?? []),
+                    ...(gamesQuery.data?.data?.map((game) => ({ label: game.name, value: String(game.id) })) ?? []),
                   ]}
                   required={false}
                   aria-label="Filtrar por videojuego"

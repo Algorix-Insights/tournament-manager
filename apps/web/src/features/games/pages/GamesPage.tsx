@@ -204,7 +204,7 @@ export default function GamesPage() {
         isOpen={isRegisterGameOpen}
         onClose={closeGameModal}
         onSubmit={handleRegisterGame}
-        genres={genresQuery.data?.data}
+        genres={genresQuery.data}
         initialGame={editingGame}
         errorMessage={actionError ?? (genresQuery.isError ? getApiErrorMessage(genresQuery.error) : null)}
         isSubmitting={isSubmitting}
