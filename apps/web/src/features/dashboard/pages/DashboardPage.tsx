@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Gamepad2, UsersRound } from "lucide-react";
 import { useNavigate } from "react-router";
 import PageHeader from "../../../core/ui/HeaderPages/PageHeader";
@@ -9,16 +9,33 @@ import GameSpaceClassification from "../components/GameSpaceClassification";
 import QuickActions from "../components/QuickActions";
 
 import { useStats } from "../hooks/useStats";
+import { getApiErrorMessage } from "@/features/games/api/games";
+import { useGames } from "@/features/games/hooks/useGames";
+import { useCreatePlayer, usePlayers } from "@/features/players/hooks/usePlayers";
+import { useCreateScore } from "@/features/scores/hooks/useScores";
 
 type ModalType = "player" | "game" | "points" | null;
 
 export default function DashboardPage() {
   const navigate = useNavigate();
   const [activeModal, setActiveModal] = useState<ModalType>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const { data: players } = usePlayers();
+  const { data: games } = useGames();
+  const createPlayerMutation = useCreatePlayer();
+  const createScoreMutation = useCreateScore();
+
+  const closeModal = useCallback(() => {
+    setActiveModal(null);
+    setActionError(null);
+  }, []);
 
   const handleRegisterPlayer = (data: RegisterPlayerData) => {
-    console.log("Register player payload", data);
-    setActiveModal(null);
+    setActionError(null);
+    createPlayerMutation.mutate(data, {
+      onSuccess: closeModal,
+      onError: (error) => setActionError(getApiErrorMessage(error)),
+    });
   };
 
   const handleRegisterGame = (data: RegisterGameData) => {
@@ -27,8 +44,15 @@ export default function DashboardPage() {
   };
 
   const handleRegisterPoints = (data: RegisterPointsData) => {
-    console.log("Register points payload", data);
-    setActiveModal(null);
+    setActionError(null);
+    createScoreMutation.mutate({
+      playerId: Number(data.playerId),
+      gameId: Number(data.gameId),
+      score: data.score,
+    }, {
+      onSuccess: closeModal,
+      onError: (error) => setActionError(getApiErrorMessage(error)),
+    });
   };
 
   const { data: stats, isLoading: isStatsLoading } = useStats();
@@ -45,15 +69,29 @@ export default function DashboardPage() {
           ]}
         />
         <QuickActions
-          onRegisterPlayer={() => setActiveModal("player")}
-          onRegisterGame={() => setActiveModal("game")}
-          onRegisterPoints={() => setActiveModal("points")}
+          onRegisterPlayer={() => { setActionError(null); setActiveModal("player"); }}
+          onRegisterGame={() => { setActionError(null); setActiveModal("game"); }}
+          onRegisterPoints={() => { setActionError(null); setActiveModal("points"); }}
         />
         <GameSpaceClassification onViewScores={() => navigate("/scores")} />
       </div>
-      <RegisterPlayerModal isOpen={activeModal === "player"} onClose={() => setActiveModal(null)} onSubmit={handleRegisterPlayer} />
+      <RegisterPlayerModal
+        isOpen={activeModal === "player"}
+        onClose={closeModal}
+        onSubmit={handleRegisterPlayer}
+        errorMessage={actionError}
+        isSubmitting={createPlayerMutation.isPending}
+      />
       <RegisterGameModal isOpen={activeModal === "game"} onClose={() => setActiveModal(null)} onSubmit={handleRegisterGame} />
-      <RegisterPointsModal isOpen={activeModal === "points"} onClose={() => setActiveModal(null)} onSubmit={handleRegisterPoints} />
+      <RegisterPointsModal
+        isOpen={activeModal === "points"}
+        onClose={closeModal}
+        onSubmit={handleRegisterPoints}
+        players={players?.data}
+        games={games?.data}
+        errorMessage={actionError}
+        isSubmitting={createScoreMutation.isPending}
+      />
     </main>
   );
 }

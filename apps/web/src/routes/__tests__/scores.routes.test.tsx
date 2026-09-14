@@ -1,14 +1,15 @@
 import { expect, test } from "@jest/globals";
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import ScoresRoutes from "@/routes/scores.routes";
+import { renderWithQuery } from "@/tests/query-test-utils";
 
 test("renders ScoresPage at root of scores module", () => {
-  render(
+  renderWithQuery(
     <MemoryRouter initialEntries={["/"]}>
       <ScoresRoutes />
     </MemoryRouter>,
   );
 
-  expect(screen.getByRole("heading", { name: "Clasificacion" })).toBeInTheDocument();
+  expect(screen.getByRole("heading", { name: "Clasificación" })).toBeInTheDocument();
 });

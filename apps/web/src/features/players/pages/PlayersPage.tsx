@@ -6,59 +6,72 @@ import QuickActionCard from "@/core/ui/QuickActionCard";
 import SearchInput from "@/features/players/components/SearchInput";
 import PlayersTable from "@/features/players/components/PlayersTable";
 import RegisterPlayerModal, { type RegisterPlayerData } from "@/features/players/components/RegisterPlayerModal";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import RegisterPointsModal, { type RegisterPointsData } from "@/features/scores/components/RegisterPointsModal";
+import QueryStateView from "@/core/ui/QueryStateView";
+import Pagination from "@/core/ui/Pagination/Pagination";
+import { getApiErrorMessage } from "@/features/games/api/games";
+import { useGames } from "@/features/games/hooks/useGames";
+import { useCreatePlayer, usePlayers } from "@/features/players/hooks/usePlayers";
+import { useCreateScore } from "@/features/scores/hooks/useScores";
 
-const players = [
-  {
-    position: 1,
-    name: "Boki Rodriguez",
-    handle: "Boki-02",
-    email: "Boki@gmail.com",
-    registeredAt: "Marzo 12, 2026",
-    mainGame: "Minecraft",
-    extraGamesCount: 2,
-    initiallyOpen: true,
-    games: [
-      { name: "Minecraft", genre: "Sandbox", rank: 2, points: 450 },
-      { name: "Valorant", genre: "Sandbox", rank: 2, points: 350 },
-      { name: "Bodrio Stars", genre: "Sandbox", rank: 2, points: 550 },
-    ],
-  },
-  {
-    position: 2,
-    name: "Boki Rodriguez",
-    handle: "Boki-02",
-    email: "Boki@gmail.com",
-    registeredAt: "Marzo 12, 2026",
-    mainGame: "Minecraft",
-    extraGamesCount: 2,
-    games: [],
-  },
-  {
-    position: 3,
-    name: "Boki Rodriguez",
-    handle: "Boki-02",
-    email: "Boki@gmail.com",
-    registeredAt: "Marzo 12, 2026",
-    mainGame: "Minecraft",
-    extraGamesCount: 2,
-    games: [],
-  },
-];
+const PLAYERS_PER_PAGE = 20;
+
+const formatDate = (date: string) => new Intl.DateTimeFormat("es-MX", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
+}).format(new Date(date));
 
 export default function PlayersPage() {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [isPointsModalOpen, setIsPointsModalOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const { data, error, isError, isLoading, refetch } = usePlayers(search, page, PLAYERS_PER_PAGE);
+  const gamesQuery = useGames();
+  const createPlayerMutation = useCreatePlayer();
+  const createScoreMutation = useCreateScore();
+  const players = data?.data.map((player, index) => ({
+    id: player.id,
+    position: (page - 1) * PLAYERS_PER_PAGE + index + 1,
+    name: player.name,
+    handle: player.gamertag,
+    email: player.email,
+    registeredAt: formatDate(player.createdAt),
+  })) ?? [];
+  const totalPages = Math.ceil((data?.totalRecords ?? 0) / PLAYERS_PER_PAGE);
+
+  const closeRegisterModal = useCallback(() => {
+    setIsRegisterModalOpen(false);
+    setActionError(null);
+  }, []);
+
+  const closePointsModal = useCallback(() => {
+    setIsPointsModalOpen(false);
+    setActionError(null);
+  }, []);
 
   const handleRegisterPlayer = (data: RegisterPlayerData) => {
-    console.log("Register player payload", data);
-    setIsRegisterModalOpen(false);
+    setActionError(null);
+    createPlayerMutation.mutate(data, {
+      onSuccess: closeRegisterModal,
+      onError: (error) => setActionError(getApiErrorMessage(error)),
+    });
   };
 
   const handleRegisterPoints = (data: RegisterPointsData) => {
-    console.log("Register points payload", data);
-    setIsPointsModalOpen(false);
+    setActionError(null);
+    createScoreMutation.mutate({
+      playerId: Number(data.playerId),
+      gameId: Number(data.gameId),
+      score: data.score,
+    }, {
+      onSuccess: closePointsModal,
+      onError: (error) => setActionError(getApiErrorMessage(error)),
+    });
   };
 
   return (
@@ -72,8 +85,9 @@ export default function PlayersPage() {
           metrics={[
             {
               icon: <UsersRound className="size-5" />,
-              value: 128,
+              value: data?.totalRecords ?? "",
               label: "Jugadores Registrados",
+              isLoading,
             },
             {
               icon: <Gamepad2 className="size-5" />,
@@ -106,11 +120,91 @@ export default function PlayersPage() {
           />
         </section>
 
-  <SearchInput placeholder="Buscar participante" />
-  <PlayersTable players={players} />
+        <SearchInput
+          placeholder="Buscar participante"
+          value={search}
+          onChange={(value) => {
+            setSearch(value);
+            setPage(1);
+          }}
+        />
+
+        {actionError && !isRegisterModalOpen && !isPointsModalOpen && (
+          <p role="alert" className="rounded-2xl bg-red-100 px-4 py-3 text-sm text-red-700">
+            {actionError}
+          </p>
+        )}
+
+        <QueryStateView
+          isLoading={isLoading}
+          isError={isError}
+          error={error}
+          isEmpty={players.length === 0}
+          onRetry={refetch}
+          loadingMessage="Cargando jugadores..."
+          emptyTitle="No hay jugadores registrados"
+          emptyMessage="Registra un jugador para verlo aquí."
+        >
+          <PlayersTable players={players} />
+        </QueryStateView>
+
+        {totalPages > 1 && (
+          <Pagination className="justify-center" aria-label="Paginación de jugadores">
+            <Pagination.Content className="justify-center">
+              <Pagination.Item>
+                <Pagination.Previous
+                  type="button"
+                  isDisabled={page === 1}
+                  aria-label="Página anterior"
+                  onPress={() => setPage((currentPage) => Math.max(1, currentPage - 1))}
+                >
+                  <Pagination.PreviousIcon />
+                  <span className="sr-only">Página anterior</span>
+                </Pagination.Previous>
+              </Pagination.Item>
+              {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) => (
+                <Pagination.Item key={pageNumber}>
+                  <Pagination.Link
+                    type="button"
+                    isActive={pageNumber === page}
+                    aria-label={`Página ${pageNumber}`}
+                    onPress={() => setPage(pageNumber)}
+                  >
+                    {pageNumber}
+                  </Pagination.Link>
+                </Pagination.Item>
+              ))}
+              <Pagination.Item>
+                <Pagination.Next
+                  type="button"
+                  isDisabled={page === totalPages}
+                  aria-label="Página siguiente"
+                  onPress={() => setPage((currentPage) => Math.min(totalPages, currentPage + 1))}
+                >
+                  <span className="sr-only">Página siguiente</span>
+                  <Pagination.NextIcon />
+                </Pagination.Next>
+              </Pagination.Item>
+            </Pagination.Content>
+          </Pagination>
+        )}
       </div>
-      <RegisterPlayerModal isOpen={isRegisterModalOpen} onClose={() => setIsRegisterModalOpen(false)} onSubmit={handleRegisterPlayer} />
-      <RegisterPointsModal isOpen={isPointsModalOpen} onClose={() => setIsPointsModalOpen(false)} onSubmit={handleRegisterPoints} />
+      <RegisterPlayerModal
+        isOpen={isRegisterModalOpen}
+        onClose={closeRegisterModal}
+        onSubmit={handleRegisterPlayer}
+        errorMessage={actionError}
+        isSubmitting={createPlayerMutation.isPending}
+      />
+      <RegisterPointsModal
+        isOpen={isPointsModalOpen}
+        onClose={closePointsModal}
+        onSubmit={handleRegisterPoints}
+        players={data?.data}
+        games={gamesQuery.data?.data}
+        errorMessage={actionError}
+        isSubmitting={createScoreMutation.isPending}
+      />
     </main>
   );
 }
