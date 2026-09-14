@@ -25,7 +25,7 @@ function getErrorTargets(error: unknown): string[] {
 
 function getDuplicateMessage(req: Parameters<ErrorRequestHandler>[1], error: unknown): string {
   const targets = getErrorTargets(error);
-  const requestPath = req.baseUrl || req.originalUrl;
+  const requestPath = req.originalUrl || req.baseUrl;
 
   if (targets.includes('gamertag')) return 'El gamertag ya está registrado.';
   if (targets.includes('email')) return 'El correo electrónico ya está registrado.';
