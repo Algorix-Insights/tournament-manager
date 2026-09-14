@@ -95,7 +95,7 @@ export class ScoreService implements IScoreService {
 
   async create(data: CreateScoreDTO) {
     if (data.score < 0) {
-      throw new Error('Score cannot be negative');
+      throw new Error('El puntaje no puede ser negativo.');
     }
 
     return prisma.score.create({
