@@ -1,11 +1,11 @@
 import { Popover as HeroPopover } from '@heroui/react'
 import type { ComponentProps } from 'react'
-import Root from './Root'
-import Trigger from './Trigger'
-import Arrow from './Arrow'
-import Content from './Content'
-import Dialog from './Dialog'
-import Heading from './Heading'
+import Root from '@/core/ui/Popover/Root'
+import Trigger from '@/core/ui/Popover/Trigger'
+import Arrow from '@/core/ui/Popover/Arrow'
+import Content from '@/core/ui/Popover/Content'
+import Dialog from '@/core/ui/Popover/Dialog'
+import Heading from '@/core/ui/Popover/Heading'
 
 function LocalPopover(props: Readonly<ComponentProps<typeof HeroPopover>>) {
   return <HeroPopover {...props} />

@@ -1,5 +1,5 @@
-import { StatCard } from "./StatCard";
-import { SectionTitle } from "./StatSectionTitle";
+import { StatCard } from "@/features/dashboard/components/StatCard";
+import { SectionTitle } from "@/features/dashboard/components/StatSectionTitle";
 
 interface StatsSummaryProps {
   title: string;

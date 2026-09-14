@@ -1,10 +1,10 @@
 import { Switch as HeroSwitch } from '@heroui/react'
 import type { ComponentProps } from 'react'
-import Root from './Root'
-import Content from './Content'
-import Control from './Control'
-import Thumb from './Thumb'
-import Icon from './Icon'
+import Root from '@/core/ui/Switch/Root'
+import Content from '@/core/ui/Switch/Content'
+import Control from '@/core/ui/Switch/Control'
+import Thumb from '@/core/ui/Switch/Thumb'
+import Icon from '@/core/ui/Switch/Icon'
 
 function LocalSwitch(props: Readonly<ComponentProps<typeof HeroSwitch>>) {
   return <HeroSwitch {...props} />

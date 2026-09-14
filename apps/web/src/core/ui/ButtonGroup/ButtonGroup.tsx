@@ -1,7 +1,7 @@
 import { ButtonGroup as HeroButtonGroup } from '@heroui/react'
 import type { ComponentProps } from 'react'
-import Root from './Root'
-import Separator from './Separator'
+import Root from '@/core/ui/ButtonGroup/Root'
+import Separator from '@/core/ui/ButtonGroup/Separator'
 
 function LocalButtonGroup(props: Readonly<ComponentProps<typeof HeroButtonGroup>>) {
   return <HeroButtonGroup {...props} />

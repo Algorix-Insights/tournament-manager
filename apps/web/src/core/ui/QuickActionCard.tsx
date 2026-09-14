@@ -1,4 +1,4 @@
-import ArrowButton from "./ArrowButton";
+import ArrowButton from "@/core/ui/ArrowButton";
 
 interface QuickActionCardProps {
   title: string;

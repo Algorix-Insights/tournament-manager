@@ -1,10 +1,10 @@
 import { InputGroup as HeroInputGroup } from '@heroui/react'
 import type { ComponentProps } from 'react'
-import Root from './Root'
-import Input from './Input'
-import TextArea from './TextArea'
-import Prefix from './Prefix'
-import Suffix from './Suffix'
+import Root from '@/core/ui/InputGroup/Root'
+import Input from '@/core/ui/InputGroup/Input'
+import TextArea from '@/core/ui/InputGroup/TextArea'
+import Prefix from '@/core/ui/InputGroup/Prefix'
+import Suffix from '@/core/ui/InputGroup/Suffix'
 
 function LocalInputGroup(props: Readonly<ComponentProps<typeof HeroInputGroup>>) {
   return <HeroInputGroup {...props} />

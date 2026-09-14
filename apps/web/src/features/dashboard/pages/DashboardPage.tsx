@@ -2,13 +2,13 @@ import floralRockCharacter from "@/assets/floral-rock-character.png";
 import floralGameController from "@/assets/floral-game-cotroller.png";
 import floralCoin from "@/assets/floral-coin.png";
 import { UsersRound, Gamepad2 } from "lucide-react";
-import QuickActionCard from "../../../core/ui/QuickActionCard";
-import ArrowButton from "../../../core/ui/ArrowButton";
-import PageHeader from "../../../core/ui/HeaderPages/PageHeader";
-import RegisterPlayerModal, { type RegisterPlayerData } from "../../players/components/RegisterPlayerModal";
+import QuickActionCard from "@/core/ui/QuickActionCard";
+import ArrowButton from "@/core/ui/ArrowButton";
+import PageHeader from "@/core/ui/HeaderPages/PageHeader";
+import RegisterPlayerModal, { type RegisterPlayerData } from "@/features/players/components/RegisterPlayerModal";
 import { useState } from "react";
-import RegisterGameModal, { type RegisterGameData } from "../../games/components/RegisterGameModal";
-import RegisterPointsModal, { type RegisterPointsData } from "../../scores/components/RegisterPointsModal";
+import RegisterGameModal, { type RegisterGameData } from "@/features/games/components/RegisterGameModal";
+import RegisterPointsModal, { type RegisterPointsData } from "@/features/scores/components/RegisterPointsModal";
 import { useNavigate } from "react-router";
 
 const players = [

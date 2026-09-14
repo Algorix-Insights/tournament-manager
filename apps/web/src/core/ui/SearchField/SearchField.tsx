@@ -1,10 +1,10 @@
 import { SearchField as HeroSearchField } from '@heroui/react'
 import type { ComponentProps } from 'react'
-import Root from './Root'
-import Group from './Group'
-import Input from './Input'
-import SearchIcon from './SearchIcon'
-import ClearButton from './ClearButton'
+import Root from '@/core/ui/SearchField/Root'
+import Group from '@/core/ui/SearchField/Group'
+import Input from '@/core/ui/SearchField/Input'
+import SearchIcon from '@/core/ui/SearchField/SearchIcon'
+import ClearButton from '@/core/ui/SearchField/ClearButton'
 
 function LocalSearchField(props: Readonly<ComponentProps<typeof HeroSearchField>>) {
   return <HeroSearchField {...props} />

@@ -1,9 +1,9 @@
 import { DatePicker as HeroDatePicker } from '@heroui/react'
 import type { ComponentProps } from 'react'
-import Root from './Root'
-import Trigger from './Trigger'
-import TriggerIndicator from './TriggerIndicator'
-import Popover from './Popover'
+import Root from '@/core/ui/DatePicker/Root'
+import Trigger from '@/core/ui/DatePicker/Trigger'
+import TriggerIndicator from '@/core/ui/DatePicker/TriggerIndicator'
+import Popover from '@/core/ui/DatePicker/Popover'
 
 function LocalDatePicker(props: Readonly<ComponentProps<typeof HeroDatePicker>>) {
   return <HeroDatePicker {...props} />

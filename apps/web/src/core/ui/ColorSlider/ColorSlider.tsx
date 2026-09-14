@@ -1,9 +1,9 @@
 import { ColorSlider as HeroColorSlider } from '@heroui/react'
 import type { ComponentProps } from 'react'
-import Root from './Root'
-import Output from './Output'
-import Track from './Track'
-import Thumb from './Thumb'
+import Root from '@/core/ui/ColorSlider/Root'
+import Output from '@/core/ui/ColorSlider/Output'
+import Track from '@/core/ui/ColorSlider/Track'
+import Thumb from '@/core/ui/ColorSlider/Thumb'
 
 function LocalColorSlider(props: Readonly<ComponentProps<typeof HeroColorSlider>>) {
   return <HeroColorSlider {...props} />

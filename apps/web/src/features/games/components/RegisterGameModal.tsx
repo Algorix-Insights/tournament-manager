@@ -1,5 +1,5 @@
 import floralGameController from "@/assets/floral-game-icon-controller-form.png";
-import FormModal, { type FormModalField } from "../../../core/ui/FormModal";
+import FormModal, { type FormModalField } from "@/core/ui/FormModal";
 
 export interface RegisterGameData {
   name: string;

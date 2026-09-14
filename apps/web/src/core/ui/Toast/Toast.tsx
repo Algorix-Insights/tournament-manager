@@ -1,12 +1,12 @@
 import { Toast as HeroToast } from '@heroui/react'
 import type { ComponentProps } from 'react'
-import Provider from './Provider'
-import Content from './Content'
-import Indicator from './Indicator'
-import Title from './Title'
-import Description from './Description'
-import ActionButton from './ActionButton'
-import CloseButton from './CloseButton'
+import Provider from '@/core/ui/Toast/Provider'
+import Content from '@/core/ui/Toast/Content'
+import Indicator from '@/core/ui/Toast/Indicator'
+import Title from '@/core/ui/Toast/Title'
+import Description from '@/core/ui/Toast/Description'
+import ActionButton from '@/core/ui/Toast/ActionButton'
+import CloseButton from '@/core/ui/Toast/CloseButton'
 
 function LocalToast(props: Readonly<ComponentProps<typeof HeroToast>>) {
   return <HeroToast {...props} />
