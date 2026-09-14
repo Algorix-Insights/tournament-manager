@@ -129,4 +129,38 @@ describe('PlayersPage', () => {
     expect(await screen.findByRole('heading', { name: 'Minecraft' })).toBeInTheDocument();
     expect(mockedGet).toHaveBeenCalledWith('/players/8');
   });
+
+  test('registers points with the selected player and game', async () => {
+    mockedGet.mockImplementation((url) => Promise.resolve({
+      data: url === '/games'
+        ? {
+          data: [{ id: 2, name: 'Minecraft', genre: { id: 1, name: 'Sandbox' } }],
+          totalRecords: 1,
+        }
+        : {
+          data: [{
+            id: 8,
+            name: 'Carlos Mendoza',
+            gamertag: 'ShadowQA',
+            email: 'carlos@test.com',
+            createdAt: '2026-03-12T12:00:00.000Z',
+          }],
+          totalRecords: 1,
+        },
+    }));
+    mockedPost.mockResolvedValue({ data: { id: 4, playerId: 8, gameId: 2, score: 950 } });
+
+    renderWithQuery(<PlayersPage />);
+    fireEvent.click((await screen.findAllByRole('button', { name: '¡Vamos!' }))[1]);
+    fireEvent.click(screen.getByRole('button', { name: 'Nombre del jugador' }));
+    fireEvent.click(await screen.findByRole('option', { name: 'Carlos Mendoza' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Videojuego' }));
+    fireEvent.click(await screen.findByRole('option', { name: 'Minecraft' }));
+    fireEvent.change(screen.getByLabelText('Puntuación'), { target: { value: '950' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Asignar' }));
+
+    await waitFor(() => {
+      expect(mockedPost).toHaveBeenCalledWith('/scores', { playerId: 8, gameId: 2, score: 950 });
+    });
+  });
 });

@@ -11,7 +11,9 @@ import RegisterPointsModal, { type RegisterPointsData } from "@/features/scores/
 import QueryStateView from "@/core/ui/QueryStateView";
 import Pagination from "@/core/ui/Pagination/Pagination";
 import { getApiErrorMessage } from "@/features/games/api/games";
+import { useGames } from "@/features/games/hooks/useGames";
 import { useCreatePlayer, usePlayers } from "@/features/players/hooks/usePlayers";
+import { useCreateScore } from "@/features/scores/hooks/useScores";
 
 const PLAYERS_PER_PAGE = 20;
 
@@ -29,7 +31,9 @@ export default function PlayersPage() {
   const [page, setPage] = useState(1);
   const [actionError, setActionError] = useState<string | null>(null);
   const { data, error, isError, isLoading, refetch } = usePlayers(search, page, PLAYERS_PER_PAGE);
+  const gamesQuery = useGames();
   const createPlayerMutation = useCreatePlayer();
+  const createScoreMutation = useCreateScore();
   const players = data?.data.map((player, index) => ({
     id: player.id,
     position: (page - 1) * PLAYERS_PER_PAGE + index + 1,
@@ -45,6 +49,11 @@ export default function PlayersPage() {
     setActionError(null);
   }, []);
 
+  const closePointsModal = useCallback(() => {
+    setIsPointsModalOpen(false);
+    setActionError(null);
+  }, []);
+
   const handleRegisterPlayer = (data: RegisterPlayerData) => {
     setActionError(null);
     createPlayerMutation.mutate(data, {
@@ -54,8 +63,15 @@ export default function PlayersPage() {
   };
 
   const handleRegisterPoints = (data: RegisterPointsData) => {
-    console.log("Register points payload", data);
-    setIsPointsModalOpen(false);
+    setActionError(null);
+    createScoreMutation.mutate({
+      playerId: Number(data.playerId),
+      gameId: Number(data.gameId),
+      score: data.score,
+    }, {
+      onSuccess: closePointsModal,
+      onError: (error) => setActionError(getApiErrorMessage(error)),
+    });
   };
 
   return (
@@ -113,7 +129,7 @@ export default function PlayersPage() {
           }}
         />
 
-        {actionError && !isRegisterModalOpen && (
+        {actionError && !isRegisterModalOpen && !isPointsModalOpen && (
           <p role="alert" className="rounded-2xl bg-red-100 px-4 py-3 text-sm text-red-700">
             {actionError}
           </p>
@@ -180,7 +196,15 @@ export default function PlayersPage() {
         errorMessage={actionError}
         isSubmitting={createPlayerMutation.isPending}
       />
-      <RegisterPointsModal isOpen={isPointsModalOpen} onClose={() => setIsPointsModalOpen(false)} onSubmit={handleRegisterPoints} />
+      <RegisterPointsModal
+        isOpen={isPointsModalOpen}
+        onClose={closePointsModal}
+        onSubmit={handleRegisterPoints}
+        players={data?.data}
+        games={gamesQuery.data?.data}
+        errorMessage={actionError}
+        isSubmitting={createScoreMutation.isPending}
+      />
     </main>
   );
 }

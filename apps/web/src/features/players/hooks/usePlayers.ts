@@ -16,7 +16,10 @@ export function useCreatePlayer() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: PlayerInput) => createPlayer(data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: playersKeys.all }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: playersKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['stats'] });
+    },
   });
 }
 
