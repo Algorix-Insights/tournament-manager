@@ -94,40 +94,30 @@ describe('PlayersPage', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('El correo electrónico ya está registrado.');
   });
 
-  test('loads a player game history when the row is expanded', async () => {
+  test('uses the played games included in the players response', async () => {
     mockedGet.mockImplementation((url) => Promise.resolve({
-      data: url === '/players/8'
-        ? {
-          id: 8,
-          name: 'Carlos Mendoza',
-          gamertag: 'ShadowQA',
-          email: 'carlos@test.com',
-          createdAt: '2026-03-12T12:00:00.000Z',
-          scores: [{
-            id: 4,
-            gameId: 2,
-            score: 450,
-            createdAt: '2026-03-13T12:00:00.000Z',
-            game: { id: 2, name: 'Minecraft', genre: { id: 1, name: 'Sandbox' } },
-          }],
-        }
-        : {
-          data: [{
-            id: 8,
-            name: 'Carlos Mendoza',
-            gamertag: 'ShadowQA',
-            email: 'carlos@test.com',
-            createdAt: '2026-03-12T12:00:00.000Z',
-          }],
-          totalRecords: 1,
-        },
+      data: url === '/scores/stats'
+        ? { totalPlayers: 1, totalGames: 1, totalScores: 1, averageScore: 450 }
+        : url === '/games'
+          ? { data: [], totalRecords: 0 }
+          : {
+            data: [{
+              id: 8,
+              name: 'Carlos Mendoza',
+              gamertag: 'ShadowQA',
+              email: 'carlos@test.com',
+              createdAt: '2026-03-12T12:00:00.000Z',
+              games: [{ gameId: 2, game: 'Minecraft', genre: 'Sandbox', score: 450 }],
+            }],
+            totalRecords: 1,
+          },
     }));
 
     renderWithQuery(<PlayersPage />);
     fireEvent.click(await screen.findByRole('button', { name: /Carlos Mendoza ShadowQA/ }));
 
     expect(await screen.findByRole('heading', { name: 'Minecraft' })).toBeInTheDocument();
-    expect(mockedGet).toHaveBeenCalledWith('/players/8');
+    expect(mockedGet).not.toHaveBeenCalledWith('/players/8');
   });
 
   test('registers points with the selected player and game', async () => {

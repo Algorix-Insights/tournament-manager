@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ChevronRight, ChevronUp } from "lucide-react";
 import GameCard from "@/features/players/components/GameCard";
-import { usePlayer } from "@/features/players/hooks/usePlayers";
+import type { PlayerGame } from "@/features/players/players.types";
 
 interface GameDetail {
   name: string;
@@ -11,12 +11,12 @@ interface GameDetail {
 }
 
 export interface PlayerRowData {
-  id: number;
   position: number;
   name: string;
   handle: string;
   email: string;
   registeredAt: string;
+  games: PlayerGame[];
   initiallyOpen?: boolean;
 }
 
@@ -25,23 +25,22 @@ type PlayerRowProps = PlayerRowData;
 const CARD_COLORS = ["bg-[#FDF1FA]", "bg-[#E5DFF5]"];
 
 export default function PlayerRow({
-  id,
   position,
   name,
   handle,
   email,
   registeredAt,
+  games: playedGames,
   initiallyOpen = false,
 }: PlayerRowProps) {
   const [isOpen, setIsOpen] = useState(initiallyOpen);
-  const { data, isError, isLoading } = usePlayer(id, isOpen);
-  const games: GameDetail[] = data?.scores.map((score, index) => ({
-    name: score.game.name,
-    genre: score.game.genre.name,
+  const games: GameDetail[] = playedGames.map((game, index) => ({
+    name: game.game,
+    genre: game.genre,
     rank: index + 1,
-    points: score.score,
-  })) ?? [];
-  const mainGame = isLoading ? "Cargando..." : games[0]?.name ?? "Sin juegos";
+    points: game.score,
+  }));
+  const mainGame = games[0]?.name ?? "Sin juegos";
   const extraGamesCount = Math.max(games.length - 1, 0);
 
   return (
@@ -99,9 +98,7 @@ export default function PlayerRow({
             Ha participado en los siguientes juegos y ha obtenido puntos
           </p>
 
-          {isError ? (
-            <p role="alert" className="text-xs text-red-600">No se pudo cargar el historial del jugador.</p>
-          ) : games.length > 0 ? (
+          {games.length > 0 ? (
             <div className="grid grid-cols-1 grid-rows-[auto_auto_auto] gap-1 sm:grid-cols-[repeat(3,180px)]">
               {games.map((game, index) => (
                 <GameCard
@@ -114,9 +111,9 @@ export default function PlayerRow({
                 />
               ))}
             </div>
-          ) : !isLoading ? (
+          ) : (
             <p className="text-xs text-[#8f929b]">No hay juegos registrados.</p>
-          ) : null}
+          )}
         </div>
       )}
     </div>

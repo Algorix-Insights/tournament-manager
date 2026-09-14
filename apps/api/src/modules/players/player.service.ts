@@ -5,6 +5,25 @@ import { parseOrderBy } from '@/core/utils/order-by.util';
 import { DEFAULT_PAGINATION, formatPaginatedResponse, PaginationParams } from '@/core/utils/pagination.util';
 import { IPlayerService } from '@/modules/players/interfaces/player.service.interface';
 
+function formatPlayedGames(
+  scores: { score: number; game: { id: number; name: string; genre: { name: string } } }[],
+) {
+  const games = new Map<number, (typeof scores)[number]>();
+  for (const item of scores) {
+    const current = games.get(item.game.id);
+    if (!current || item.score > current.score) games.set(item.game.id, item);
+  }
+
+  return [...games.values()]
+    .sort((a, b) => b.score - a.score)
+    .map((item) => ({
+      gameId: item.game.id,
+      game: item.game.name,
+      genre: item.game.genre.name,
+      score: item.score,
+    }));
+}
+
 export class PlayerService implements IPlayerService {
   async getAll(filters?: PlayerFilterDTO, pagination?: PaginationParams) {
     const where: any = {};
@@ -60,12 +79,15 @@ export class PlayerService implements IPlayerService {
     const [data, totalRecords] = await Promise.all([
       prisma.player.findMany({
         where,
-        select: {
-          id: true,
-          name: true,
-          gamertag: true,
-          email: true,
-          createdAt: true,
+        include: {
+          scores: {
+            orderBy: { score: 'desc' },
+            include: {
+              game: {
+                include: { genre: true },
+              },
+            },
+          },
         },
         orderBy,
         skip,
@@ -74,7 +96,13 @@ export class PlayerService implements IPlayerService {
       prisma.player.count({ where }),
     ]);
 
-    return formatPaginatedResponse(data, totalRecords);
+    return formatPaginatedResponse(
+      data.map(({ scores = [], ...player }) => ({
+        ...player,
+        games: formatPlayedGames(scores),
+      })),
+      totalRecords,
+    );
   }
 
   async getById(id: number) {

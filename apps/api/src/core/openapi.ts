@@ -463,6 +463,12 @@ const options = {
             { type: 'object', properties: { scores: { type: 'array', items: { $ref: '#/components/schemas/ScoreDetail' } } } },
           ],
         },
+        PlayerWithGames: {
+          allOf: [
+            { $ref: '#/components/schemas/Player' },
+            { type: 'object', properties: { games: { type: 'array', items: { $ref: '#/components/schemas/PlayedGameScore' } } } },
+          ],
+        },
         GenreInput: {
           type: 'object',
           required: ['name'],
@@ -576,7 +582,7 @@ const options = {
         PaginatedPlayers: {
           type: 'object',
           properties: {
-            data: { type: 'array', items: { $ref: '#/components/schemas/Player' } },
+            data: { type: 'array', items: { $ref: '#/components/schemas/PlayerWithGames' } },
             totalRecords: { type: 'integer' },
           },
         },

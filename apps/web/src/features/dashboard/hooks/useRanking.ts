@@ -11,6 +11,14 @@ export interface RankingEntry {
     genre: string;
     score: number;
     createdAt: string;
+    games: PlayedGame[];
+}
+
+export interface PlayedGame {
+    gameId: number;
+    game: string;
+    genre: string;
+    score: number;
 }
 
 export interface RankingResponse {

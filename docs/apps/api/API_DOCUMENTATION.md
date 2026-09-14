@@ -35,6 +35,8 @@ All endpoints returning paginated lists on `GET` requests adhere to the standard
 #### `GET /api/players`
 Retrieves a paginated list of players with filtering and ordering.
 
+Each player includes a `games` array with the games played, the best score recorded for each game, and the games ordered from highest to lowest score.
+
 - **Filter Parameters (Query Params):**
   - `name` *(String, optional, max 100 chars)*: Partial case-insensitive search by name.
   - `gamertag` *(String, optional, max 50 chars)*: Partial case-insensitive search by gamertag.
@@ -222,6 +224,7 @@ Deletes a score record by its ID.
 #### `GET /api/scores/ranking`
 Retrieves the paginated leaderboard ranking.
 - Default ordering: Highest score to lowest (`-score`).
+- Each player is returned once and includes their played games ordered from highest to lowest score.
 - Each item in `data` includes:
   ```json
   {

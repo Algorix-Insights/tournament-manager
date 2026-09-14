@@ -4,6 +4,14 @@ export interface Player {
   gamertag: string;
   email: string;
   createdAt: string;
+  games?: PlayerGame[];
+}
+
+export interface PlayerGame {
+  gameId: number;
+  game: string;
+  genre: string;
+  score: number;
 }
 
 export interface PlayerScore {
