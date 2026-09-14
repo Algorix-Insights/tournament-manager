@@ -37,12 +37,12 @@ export default function PlayersPage() {
   const createPlayerMutation = useCreatePlayer();
   const createScoreMutation = useCreateScore();
   const players = data?.data.map((player, index) => ({
-    id: player.id,
     position: (page - 1) * PLAYERS_PER_PAGE + index + 1,
     name: player.name,
     handle: player.gamertag,
     email: player.email,
     registeredAt: formatDate(player.createdAt),
+    games: player.games ?? [],
   })) ?? [];
   const totalPages = Math.ceil((data?.totalRecords ?? 0) / PLAYERS_PER_PAGE);
 

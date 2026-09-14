@@ -72,7 +72,50 @@ describe('RF04 - Query players', () => {
 
     expect(response.status).toBe(200);
     expect(result.totalRecords).toBe(6);
-    expect(result.data).toEqual(players);
+    expect(result.data).toEqual([{ ...players[0], games: [] }]);
+  });
+
+  test('returns each player with their played games ordered by score', async () => {
+    database.player.findMany.mockResolvedValue([
+      {
+        id: 8,
+        name: 'Carlos Mendoza',
+        gamertag: 'ShadowQA',
+        email: 'carlos@test.com',
+        createdAt: new Date('2026-01-01'),
+        scores: [
+          {
+            score: 450,
+            game: { id: 6, name: 'Tekken 8', genre: { name: 'Fighting' } },
+          },
+          {
+            score: 950,
+            game: { id: 7, name: 'Street Fighter 6', genre: { name: 'Fighting' } },
+          },
+          {
+            score: 300,
+            game: { id: 7, name: 'Street Fighter 6', genre: { name: 'Fighting' } },
+          },
+        ],
+      },
+    ]);
+    database.player.count.mockResolvedValue(1);
+
+    const response = await api.request('/api/v1/players');
+    const result = await readJson(response);
+
+    expect(response.status).toBe(200);
+    expect(result.data[0].games).toEqual([
+      { gameId: 7, game: 'Street Fighter 6', genre: 'Fighting', score: 950 },
+      { gameId: 6, game: 'Tekken 8', genre: 'Fighting', score: 450 },
+    ]);
+    expect(database.player.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        include: expect.objectContaining({
+          scores: expect.objectContaining({ orderBy: { score: 'desc' } }),
+        }),
+      }),
+    );
   });
 
   test('CP-RF04-02 returns an existing player by id', async () => {

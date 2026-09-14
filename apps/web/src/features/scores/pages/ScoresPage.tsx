@@ -17,6 +17,7 @@ export default function ScoresPage() {
       handle: entry.player,
       game: entry.game,
       score: entry.score,
+      games: entry.games,
     })) ?? [];
 
   return (
@@ -50,4 +51,3 @@ export default function ScoresPage() {
     </main>
   );
 }
-
