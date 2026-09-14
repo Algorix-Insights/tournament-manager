@@ -1,5 +1,5 @@
 import api from '@/core/api/axios';
-import type { Player, PlayerInput, PlayersResponse } from '@/features/players/players.types';
+import type { Player, PlayerDetail, PlayerInput, PlayersResponse } from '@/features/players/players.types';
 
 export async function fetchPlayers(search = '', page = 1, limit = 20): Promise<PlayersResponse> {
   const params = {
@@ -14,5 +14,10 @@ export async function fetchPlayers(search = '', page = 1, limit = 20): Promise<P
 
 export async function createPlayer(data: PlayerInput): Promise<Player> {
   const response = await api.post<Player>('/players', data);
+  return response.data;
+}
+
+export async function fetchPlayer(id: number): Promise<PlayerDetail> {
+  const response = await api.get<PlayerDetail>(`/players/${id}`);
   return response.data;
 }

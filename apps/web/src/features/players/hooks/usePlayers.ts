@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createQueryKeys } from '@/core/query/queryKeys';
-import { createPlayer, fetchPlayers } from '@/features/players/api/players';
+import { createPlayer, fetchPlayer, fetchPlayers } from '@/features/players/api/players';
 import type { PlayerInput } from '@/features/players/players.types';
 
 export const playersKeys = createQueryKeys('players');
@@ -17,5 +17,13 @@ export function useCreatePlayer() {
   return useMutation({
     mutationFn: (data: PlayerInput) => createPlayer(data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: playersKeys.all }),
+  });
+}
+
+export function usePlayer(id: number, enabled: boolean) {
+  return useQuery({
+    queryKey: playersKeys.detail(id),
+    queryFn: () => fetchPlayer(id),
+    enabled,
   });
 }

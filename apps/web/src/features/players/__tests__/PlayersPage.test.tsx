@@ -75,4 +75,58 @@ describe('PlayersPage', () => {
       expect(mockedGet).toHaveBeenCalledWith('/players', { params: { search: 'Carlos' } });
     });
   });
+
+  test('shows the API message when a player email is already registered', async () => {
+    mockedGet.mockResolvedValue({ data: { data: [], totalRecords: 0 } });
+    mockedPost.mockRejectedValue({
+      isAxiosError: true,
+      message: 'Request failed',
+      response: { data: { error: 'El correo electrónico ya está registrado.' } },
+    });
+
+    renderWithQuery(<PlayersPage />);
+    fireEvent.click((await screen.findAllByRole('button', { name: '¡Vamos!' }))[0]);
+    fireEvent.change(screen.getByLabelText('Nombre'), { target: { value: 'Carlos Mendoza' } });
+    fireEvent.change(screen.getByLabelText('Gamertag'), { target: { value: 'ShadowQA' } });
+    fireEvent.change(screen.getByLabelText('Correo Electronico'), { target: { value: 'carlos@test.com' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Registrar' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('El correo electrónico ya está registrado.');
+  });
+
+  test('loads a player game history when the row is expanded', async () => {
+    mockedGet.mockImplementation((url) => Promise.resolve({
+      data: url === '/players/8'
+        ? {
+          id: 8,
+          name: 'Carlos Mendoza',
+          gamertag: 'ShadowQA',
+          email: 'carlos@test.com',
+          createdAt: '2026-03-12T12:00:00.000Z',
+          scores: [{
+            id: 4,
+            gameId: 2,
+            score: 450,
+            createdAt: '2026-03-13T12:00:00.000Z',
+            game: { id: 2, name: 'Minecraft', genre: { id: 1, name: 'Sandbox' } },
+          }],
+        }
+        : {
+          data: [{
+            id: 8,
+            name: 'Carlos Mendoza',
+            gamertag: 'ShadowQA',
+            email: 'carlos@test.com',
+            createdAt: '2026-03-12T12:00:00.000Z',
+          }],
+          totalRecords: 1,
+        },
+    }));
+
+    renderWithQuery(<PlayersPage />);
+    fireEvent.click(await screen.findByRole('button', { name: /Carlos Mendoza ShadowQA/ }));
+
+    expect(await screen.findByRole('heading', { name: 'Minecraft' })).toBeInTheDocument();
+    expect(mockedGet).toHaveBeenCalledWith('/players/8');
+  });
 });

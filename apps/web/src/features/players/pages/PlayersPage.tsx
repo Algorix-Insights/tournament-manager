@@ -6,7 +6,7 @@ import QuickActionCard from "@/core/ui/QuickActionCard";
 import SearchInput from "@/features/players/components/SearchInput";
 import PlayersTable from "@/features/players/components/PlayersTable";
 import RegisterPlayerModal, { type RegisterPlayerData } from "@/features/players/components/RegisterPlayerModal";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import RegisterPointsModal, { type RegisterPointsData } from "@/features/scores/components/RegisterPointsModal";
 import QueryStateView from "@/core/ui/QueryStateView";
 import Pagination from "@/core/ui/Pagination/Pagination";
@@ -30,16 +30,14 @@ export default function PlayersPage() {
   const [actionError, setActionError] = useState<string | null>(null);
   const { data, error, isError, isLoading, refetch } = usePlayers(search, page, PLAYERS_PER_PAGE);
   const createPlayerMutation = useCreatePlayer();
-  const players = useMemo(() => data?.data.map((player, index) => ({
+  const players = data?.data.map((player, index) => ({
+    id: player.id,
     position: (page - 1) * PLAYERS_PER_PAGE + index + 1,
     name: player.name,
     handle: player.gamertag,
     email: player.email,
     registeredAt: formatDate(player.createdAt),
-    mainGame: "Sin juegos",
-    extraGamesCount: 0,
-    games: [],
-  })) ?? [], [data?.data, page]);
+  })) ?? [];
   const totalPages = Math.ceil((data?.totalRecords ?? 0) / PLAYERS_PER_PAGE);
 
   const closeRegisterModal = useCallback(() => {
