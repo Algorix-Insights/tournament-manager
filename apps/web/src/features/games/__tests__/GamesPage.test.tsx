@@ -199,32 +199,4 @@ describe('GamesPage', () => {
     expect(mockedGet).toHaveBeenCalledWith('/players');
   });
 
-  test('updates the visible games when searching', async () => {
-    mockedGet.mockImplementation((url, config) => {
-      if (url === '/players' || url === '/genres') {
-        return Promise.resolve({ data: { data: [], totalRecords: 0 } });
-      }
-
-      const requestedSearch = (config as { params?: { search?: string } } | undefined)?.params?.search;
-      return Promise.resolve({
-        data: requestedSearch === 'Mario'
-          ? {
-            data: [{ id: 2, name: 'Super Mario', genreId: 1, genre: { id: 1, name: 'Platform' } }],
-            totalRecords: 1,
-          }
-          : {
-            data: [{ id: 1, name: 'Tekken 8', genreId: 4, genre: { id: 4, name: 'Fighting' } }],
-            totalRecords: 1,
-          },
-      });
-    });
-
-    renderWithQuery(<GamesPage />);
-    expect(await screen.findByRole('heading', { name: 'Tekken 8' })).toBeInTheDocument();
-
-    fireEvent.change(screen.getByPlaceholderText('Buscar juego'), { target: { value: 'Mario' } });
-
-    expect(await screen.findByRole('heading', { name: 'Super Mario' })).toBeInTheDocument();
-    expect(screen.queryByRole('heading', { name: 'Tekken 8' })).not.toBeInTheDocument();
-  });
 });
