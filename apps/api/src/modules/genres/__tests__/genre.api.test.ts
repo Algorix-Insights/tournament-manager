@@ -30,13 +30,13 @@ describe('RF02 - Register genres', () => {
     expect(await readJson(response)).toEqual(genre);
   });
 
-  test('CP-RF02-02 rejects a duplicated genre', async () => {
-    database.genre.create.mockRejectedValue({ code: 'P2002' });
+  test('CP-RF02-02 rejects a duplicated genre with a specific message', async () => {
+    database.genre.create.mockRejectedValue({ code: 'P2002', meta: { target: ['name'] } });
 
     const response = await api.request('/api/v1/genres', 'POST', { name: 'Fighting' });
 
     expect(response.status).toBe(400);
-    expect((await readJson(response)).error).toBe('Ya existe un registro con los datos proporcionados');
+    expect((await readJson(response)).error).toBe('El género ya está registrado.');
   });
 });
 

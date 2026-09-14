@@ -34,8 +34,8 @@ describe('RF01 - Register players', () => {
     expect(database.player.create).not.toHaveBeenCalled();
   });
 
-  test('CP-RF01-05 rejects a duplicated gamertag', async () => {
-    database.player.create.mockRejectedValue({ code: 'P2002' });
+  test('CP-RF01-05 rejects a duplicated gamertag with a specific message', async () => {
+    database.player.create.mockRejectedValue({ code: 'P2002', meta: { target: ['gamertag'] } });
 
     const response = await api.request('/api/v1/players', 'POST', {
       name: 'Dhayan',
@@ -44,7 +44,20 @@ describe('RF01 - Register players', () => {
     });
 
     expect(response.status).toBe(400);
-    expect((await readJson(response)).error).toBe('Ya existe un registro con los datos proporcionados');
+    expect((await readJson(response)).error).toBe('El gamertag ya está registrado.');
+  });
+
+  test('rejects a duplicated email with a specific message', async () => {
+    database.player.create.mockRejectedValue({ code: 'P2002', meta: { target: ['email'] } });
+
+    const response = await api.request('/api/v1/players', 'POST', {
+      name: 'Dhayan',
+      gamertag: 'AnotherTag',
+      email: 'carlos@test.com',
+    });
+
+    expect(response.status).toBe(400);
+    expect((await readJson(response)).error).toBe('El correo electrónico ya está registrado.');
   });
 });
 
