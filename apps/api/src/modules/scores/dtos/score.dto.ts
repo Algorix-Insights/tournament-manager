@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import {
   integerInRange,
-  nonNegativeNumber,
+  nonNegativeInteger,
   optionalText,
   positiveInteger,
   validDate,
@@ -32,7 +32,7 @@ export interface ScoreFilterDTO extends RankingFilterDTO {}
 const playerId = positiveInteger('El jugador debe ser un número entero positivo.');
 const gameId = positiveInteger('El juego debe ser un número entero positivo.');
 const genreId = positiveInteger('El género debe ser un número entero positivo.');
-const score = nonNegativeNumber(
+const score = nonNegativeInteger(
   'El puntaje debe ser un número válido.',
   'El puntaje no puede ser negativo.',
 );

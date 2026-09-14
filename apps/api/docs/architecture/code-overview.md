@@ -343,7 +343,7 @@ Genre  1 ──── N Game
 
 Las relaciones de `Score` con `Player` y `Game` usan eliminación en cascada. La relación de `Game` con `Genre` restringe la eliminación de géneros que todavía tienen videojuegos.
 
-La puntuación se valida en dos niveles: Zod devuelve un error HTTP claro desde el API y MySQL aplica `CHECK (score >= 0)` mediante la migración `20260913110000_add_non_negative_score_constraint`.
+La puntuación se valida como entero no negativo en Zod. MySQL refuerza el límite inferior mediante `CHECK (score >= 0)` en la migración `20260913110000_add_non_negative_score_constraint`.
 
 Las migraciones mantienen la evolución del esquema y contemplan la migración de datos desde las tablas legacy en español antes de eliminarlas.
 
