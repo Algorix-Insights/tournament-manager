@@ -5,9 +5,22 @@ import ScoresTable from "@/features/scores/components/ScoresTable";
 import type { ScoreRowData } from "@/features/scores/components/ScoreRow";
 import { useRanking } from "@/features/dashboard/hooks/useRanking";
 import { useStats } from "@/features/dashboard/hooks/useStats";
+import { useGames } from "@/features/games/hooks/useGames";
+import FormSelect from "@/core/ui/FormSelect";
+import Pagination from "@/core/ui/Pagination/Pagination";
+import { useState } from "react";
+
+const SCORES_PER_PAGE = 20;
 
 export default function ScoresPage() {
-  const { data: ranking, isLoading, isError } = useRanking();
+  const [gameId, setGameId] = useState("");
+  const [page, setPage] = useState(1);
+  const { data: ranking, isLoading, isError } = useRanking(
+    gameId ? Number(gameId) : undefined,
+    page,
+    SCORES_PER_PAGE,
+  );
+  const gamesQuery = useGames("", 1, 1000);
   const { data: stats, isLoading: isStatsLoading } = useStats();
 
   const scores: ScoreRowData[] =
@@ -44,8 +57,70 @@ export default function ScoresPage() {
         />
 
         <section className="flex flex-col gap-3" aria-labelledby="scores-title">
-          <ScoresHeader title="Clasificación de GameSpace" filterLabel="Clasificación General" />
+          <ScoresHeader
+            title="Clasificación de GameSpace"
+            filterLabel="Clasificación General"
+            filter={(
+              <div className="w-48 sm:w-64">
+                <FormSelect
+                  name="ranking-game"
+                  value={gameId}
+                  placeholder="Todos los videojuegos"
+                  options={[
+                    { label: "Todos los videojuegos", value: "" },
+                    ...(gamesQuery.data?.data.map((game) => ({ label: game.name, value: String(game.id) })) ?? []),
+                  ]}
+                  required={false}
+                  aria-label="Filtrar por videojuego"
+                  onChange={(value) => {
+                    setGameId(value);
+                    setPage(1);
+                  }}
+                />
+              </div>
+            )}
+          />
           <ScoresTable players={scores} isLoading={isLoading} isError={isError} />
+          {ranking && ranking.totalRecords > SCORES_PER_PAGE && (
+            <Pagination className="justify-center" aria-label="Paginación de clasificación">
+              <Pagination.Content className="justify-center">
+                <Pagination.Item>
+                  <Pagination.Previous
+                    type="button"
+                    isDisabled={page === 1}
+                    aria-label="Página anterior"
+                    onPress={() => setPage((currentPage) => Math.max(1, currentPage - 1))}
+                  >
+                    <Pagination.PreviousIcon />
+                    <span className="sr-only">Página anterior</span>
+                  </Pagination.Previous>
+                </Pagination.Item>
+                {Array.from({ length: Math.ceil(ranking.totalRecords / SCORES_PER_PAGE) }, (_, index) => index + 1).map((pageNumber) => (
+                  <Pagination.Item key={pageNumber}>
+                    <Pagination.Link
+                      type="button"
+                      isActive={pageNumber === page}
+                      aria-label={`Página ${pageNumber}`}
+                      onPress={() => setPage(pageNumber)}
+                    >
+                      {pageNumber}
+                    </Pagination.Link>
+                  </Pagination.Item>
+                ))}
+                <Pagination.Item>
+                  <Pagination.Next
+                    type="button"
+                    isDisabled={page === Math.ceil(ranking.totalRecords / SCORES_PER_PAGE)}
+                    aria-label="Página siguiente"
+                    onPress={() => setPage((currentPage) => Math.min(Math.ceil(ranking.totalRecords / SCORES_PER_PAGE), currentPage + 1))}
+                  >
+                    <span className="sr-only">Página siguiente</span>
+                    <Pagination.NextIcon />
+                  </Pagination.Next>
+                </Pagination.Item>
+              </Pagination.Content>
+            </Pagination>
+          )}
         </section>
       </div>
     </main>

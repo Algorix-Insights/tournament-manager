@@ -142,7 +142,10 @@ export default function GamesPage() {
           emptyTitle="No hay videojuegos registrados"
           emptyMessage="Registra un videojuego para verlo aquí."
         >
-          <section className="grid grid-cols-[200px] justify-center gap-2 sm:grid-cols-[repeat(2,200px)] md:grid-cols-[repeat(3,200px)] lg:grid-cols-[repeat(5,200px)]" aria-label="Videojuegos registrados">
+          <section
+            className="grid grid-cols-[200px] justify-center gap-2 sm:grid-cols-[repeat(2,200px)] md:grid-cols-[repeat(3,200px)] lg:grid-cols-[repeat(5,200px)]"
+            aria-label="Videojuegos registrados"
+          >
             {games.map((game, index) => (
               <GameTile
                 key={game.id}
