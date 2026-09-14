@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import { useEffect, useState, type SyntheticEvent } from "react";
 import { X } from "lucide-react";
 import FormSelect from "@/core/ui/FormSelect";
@@ -95,7 +96,7 @@ export default function FormModal({
     onSubmit?.(values);
   };
 
-  return (
+  return createPortal(
     <div
       className={`fixed inset-0 z-100 flex items-center justify-center bg-[#101827]/95 px-4 py-6 modal-backdrop-${animationState}`}
       role="dialog"
@@ -174,6 +175,7 @@ export default function FormModal({
           <span className="flex size-9 items-center justify-center rounded-full bg-[#f4f1f8] text-base text-[#101827]" aria-hidden="true">↗</span>
         </button>
       </form>
-    </div>
+    </div>,
+    document.body,
   );
 }
