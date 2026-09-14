@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
-import { LoadingSkeleton } from '@/core/ui/LoadingSkeleton';
 import { ErrorAlert } from '@/core/ui/ErrorAlert';
 import { EmptyState } from '@/core/ui/EmptyState';
+import Spinner from '@/core/ui/Spinner';
 
 export interface QueryStateViewProps {
   isLoading: boolean;
@@ -29,7 +29,11 @@ export function QueryStateView({
   children,
 }: Readonly<QueryStateViewProps>) {
   if (isLoading) {
-    return <LoadingSkeleton message={loadingMessage} />;
+    return (
+      <div className="flex justify-center py-12" aria-busy="true">
+        <Spinner size="lg" aria-label={loadingMessage ?? 'Cargando...'} className="text-[#684bf3]" />
+      </div>
+    );
   }
 
   if (isError) {

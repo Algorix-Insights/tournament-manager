@@ -109,6 +109,35 @@ describe('GamesPage', () => {
     });
   });
 
+  test('loads the next page of games from the API', async () => {
+    mockedGet.mockImplementation((url, config) => {
+      if (url === '/genres') {
+        return Promise.resolve({ data: { data: [], totalRecords: 0 } });
+      }
+
+      const requestedPage = (config as { params?: { page?: number } } | undefined)?.params?.page;
+      return Promise.resolve({
+        data: requestedPage === 2
+          ? {
+            data: [{ id: 21, name: 'Street Fighter 6', genreId: 4, genre: { id: 4, name: 'Fighting' } }],
+            totalRecords: 21,
+          }
+          : {
+            data: [{ id: 1, name: 'Tekken 8', genreId: 4, genre: { id: 4, name: 'Fighting' } }],
+            totalRecords: 21,
+          },
+      });
+    });
+
+    renderWithQuery(<GamesPage />);
+    expect(await screen.findByRole('heading', { name: 'Tekken 8' })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Página 2' }));
+
+    expect(await screen.findByRole('heading', { name: 'Street Fighter 6' })).toBeInTheDocument();
+    expect(mockedGet).toHaveBeenCalledWith('/games', { params: { page: 2, limit: 20 } });
+  });
+
   test('updates a game from its tile', async () => {
     mockedGet.mockImplementation((url) => {
       if (url === '/genres') {

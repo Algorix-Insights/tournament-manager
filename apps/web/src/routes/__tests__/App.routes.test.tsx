@@ -1,17 +1,18 @@
 import { expect, test } from '@jest/globals'
-import { render, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 import AppRoutes from '@/routes/App.routes'
+import { renderWithQuery } from '@/tests/query-test-utils'
 
 test.each([
-  ['/', 'Tournament Manager'],
+  ['/', 'Dashboard'],
   ['/dashboard', 'Dashboard'],
-  ['/players', 'Players'],
-  ['/games', 'Games'],
-  ['/scores', 'Scores'],
-  ['/missing', 'Tournament Manager'],
+  ['/players', 'Jugadores'],
+  ['/games', 'Videojuegos'],
+  ['/scores', 'Clasificacion'],
+  ['/missing', 'Dashboard'],
 ])('renders %s as %s', (path, heading) => {
-  render(
+  renderWithQuery(
     <MemoryRouter initialEntries={[path]}>
       <AppRoutes />
     </MemoryRouter>,

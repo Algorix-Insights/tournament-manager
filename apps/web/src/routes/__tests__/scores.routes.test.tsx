@@ -10,5 +10,5 @@ test("renders ScoresPage at root of scores module", () => {
     </MemoryRouter>,
   );
 
-  expect(screen.getByRole("heading", { name: "Scores" })).toBeInTheDocument();
+  expect(screen.getByRole("heading", { name: "Clasificacion" })).toBeInTheDocument();
 });

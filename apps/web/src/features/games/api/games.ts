@@ -2,9 +2,13 @@ import axios from 'axios';
 import api from '@/core/api/axios';
 import type { Game, GameInput, GenresResponse, GamesResponse } from '@/features/games/games.types';
 
-export async function fetchGames(search?: string): Promise<GamesResponse> {
-  const response = search
-    ? await api.get<GamesResponse>('/games', { params: { search } })
+export async function fetchGames(search = '', page = 1, limit = 20): Promise<GamesResponse> {
+  const params = {
+    ...(search ? { search } : {}),
+    ...(page !== 1 || limit !== 20 ? { page, limit } : {}),
+  };
+  const response = Object.keys(params).length > 0
+    ? await api.get<GamesResponse>('/games', { params })
     : await api.get<GamesResponse>('/games');
   return response.data;
 }

@@ -7,6 +7,7 @@ import GameTile from "@/features/games/components/GameTile";
 import RegisterGameModal, { type RegisterGameData } from "@/features/games/components/RegisterGameModal";
 import DeleteGameModal from "@/features/games/components/DeleteGameModal";
 import QueryStateView from "@/core/ui/QueryStateView";
+import Pagination from "@/core/ui/Pagination/Pagination";
 import { getApiErrorMessage } from "@/features/games/api/games";
 import { useCreateGame, useDeleteGame, useGames, useUpdateGame } from "@/features/games/hooks/useGames";
 import { useGenres } from "@/features/games/hooks/useGenres";
@@ -14,6 +15,7 @@ import type { Game } from "@/features/games/games.types";
 import { useCallback, useState } from "react";
 
 const GAME_CARD_COLORS = ["bg-[#F6EAF3]", "bg-[#E4DEF5]"];
+const GAMES_PER_PAGE = 20;
 
 
 export default function GamesPage() {
@@ -21,13 +23,15 @@ export default function GamesPage() {
   const [editingGame, setEditingGame] = useState<Game | null>(null);
   const [gameToDelete, setGameToDelete] = useState<Game | null>(null);
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
   const [actionError, setActionError] = useState<string | null>(null);
-  const { data, error, isError, isLoading, refetch } = useGames(search);
+  const { data, error, isError, isLoading, refetch } = useGames(search, page, GAMES_PER_PAGE);
   const genresQuery = useGenres();
   const createGameMutation = useCreateGame();
   const updateGameMutation = useUpdateGame();
   const deleteGameMutation = useDeleteGame();
   const games = data?.data ?? [];
+  const totalPages = Math.ceil((data?.totalRecords ?? 0) / GAMES_PER_PAGE);
   const isSubmitting = createGameMutation.isPending || updateGameMutation.isPending;
 
   const closeGameModal = useCallback(() => {
@@ -110,7 +114,14 @@ export default function GamesPage() {
           />
         </section>
 
-        <SearchInput placeholder="Buscar juego" value={search} onChange={setSearch} />
+        <SearchInput
+          placeholder="Buscar juego"
+          value={search}
+          onChange={(value) => {
+            setSearch(value);
+            setPage(1);
+          }}
+        />
 
         {actionError && !isRegisterGameOpen && (
           <p role="alert" className="rounded-2xl bg-red-100 px-4 py-3 text-sm text-red-700">
@@ -128,7 +139,7 @@ export default function GamesPage() {
           emptyTitle="No hay videojuegos registrados"
           emptyMessage="Registra un videojuego para verlo aquí."
         >
-          <section className="grid grid-cols-[200px] gap-2 sm:grid-cols-[repeat(2,200px)] md:grid-cols-[repeat(3,200px)] lg:grid-cols-[repeat(5,200px)]" aria-label="Videojuegos registrados">
+          <section className="grid grid-cols-[200px] justify-center gap-2 sm:grid-cols-[repeat(2,200px)] md:grid-cols-[repeat(3,200px)] lg:grid-cols-[repeat(5,200px)]" aria-label="Videojuegos registrados">
             {games.map((game, index) => (
               <GameTile
                 key={game.id}
@@ -142,6 +153,46 @@ export default function GamesPage() {
             ))}
           </section>
         </QueryStateView>
+        {totalPages > 1 && (
+          <Pagination className="justify-center" aria-label="Paginación de videojuegos">
+            <Pagination.Content className="justify-center">
+              <Pagination.Item>
+                <Pagination.Previous
+                  type="button"
+                  isDisabled={page === 1}
+                  aria-label="Página anterior"
+                  onPress={() => setPage((currentPage) => Math.max(1, currentPage - 1))}
+                >
+                  <Pagination.PreviousIcon />
+                  <span className="sr-only">Página anterior</span>
+                </Pagination.Previous>
+              </Pagination.Item>
+              {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) => (
+                <Pagination.Item key={pageNumber}>
+                  <Pagination.Link
+                    type="button"
+                    isActive={pageNumber === page}
+                    aria-label={`Página ${pageNumber}`}
+                    onPress={() => setPage(pageNumber)}
+                  >
+                    {pageNumber}
+                  </Pagination.Link>
+                </Pagination.Item>
+              ))}
+              <Pagination.Item>
+                <Pagination.Next
+                  type="button"
+                  isDisabled={page === totalPages}
+                  aria-label="Página siguiente"
+                  onPress={() => setPage((currentPage) => Math.min(totalPages, currentPage + 1))}
+                >
+                  <span className="sr-only">Página siguiente</span>
+                  <Pagination.NextIcon />
+                </Pagination.Next>
+              </Pagination.Item>
+            </Pagination.Content>
+          </Pagination>
+        )}
       </div>
       <RegisterGameModal
         isOpen={isRegisterGameOpen}

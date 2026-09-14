@@ -5,10 +5,10 @@ import type { GameInput } from '@/features/games/games.types';
 
 export const gamesKeys = createQueryKeys('games');
 
-export function useGames(search = '') {
+export function useGames(search = '', page = 1, limit = 20) {
   return useQuery({
-    queryKey: gamesKeys.list({ search }),
-    queryFn: () => fetchGames(search),
+    queryKey: gamesKeys.list({ search, page, limit }),
+    queryFn: () => fetchGames(search, page, limit),
   });
 }
 

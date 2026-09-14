@@ -3,15 +3,15 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import QueryStateView from '@/core/ui/QueryStateView';
 
 describe('QueryStateView and UI state components', () => {
-  test('renders loading skeleton when isLoading is true', () => {
+  test('renders loader when isLoading is true', () => {
     render(
       <QueryStateView isLoading={true} loadingMessage="Loading records...">
         <div>Actual Content</div>
       </QueryStateView>
     );
 
-    expect(screen.getByRole('status')).toBeInTheDocument();
-    expect(screen.getByText('Loading records...')).toBeInTheDocument();
+    expect(screen.getByRole('status', { name: 'Loading records...' })).toBeInTheDocument();
+    expect(screen.queryByText('Loading records...')).not.toBeInTheDocument();
     expect(screen.queryByText('Actual Content')).not.toBeInTheDocument();
   });
 
