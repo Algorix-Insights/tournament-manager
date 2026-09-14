@@ -27,7 +27,7 @@ export default function GameSpaceClassification({ onViewScores }: GameSpaceClass
                         placeholder="Todos los videojuegos"
                         options={[
                             { label: "Todos los videojuegos", value: "" },
-                            ...(gamesQuery.data?.data.map((game) => ({ label: game.name, value: String(game.id) })) ?? []),
+                            ...(gamesQuery.data?.data?.map((game) => ({ label: game.name, value: String(game.id) })) ?? []),
                         ]}
                         required={false}
                         aria-label="Filtrar clasificación por videojuego"
