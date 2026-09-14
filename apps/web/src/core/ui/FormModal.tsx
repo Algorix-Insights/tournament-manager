@@ -20,6 +20,9 @@ interface FormModalProps {
   accentTitle: string;
   image: string;
   fields: FormModalField[];
+  initialValues?: Record<string, string>;
+  errorMessage?: string | null;
+  isSubmitting?: boolean;
   submitLabel?: string;
 }
 
@@ -31,6 +34,9 @@ export default function FormModal({
   accentTitle,
   image,
   fields,
+  initialValues,
+  errorMessage,
+  isSubmitting = false,
   submitLabel = "Registrar",
 }: FormModalProps) {
   const [values, setValues] = useState<Record<string, string>>({});
@@ -38,14 +44,14 @@ export default function FormModal({
   useEffect(() => {
     if (!isOpen) return;
 
-    setValues(Object.fromEntries(fields.map((field) => [field.name, ""])));
+    setValues(Object.fromEntries(fields.map((field) => [field.name, initialValues?.[field.name] ?? ""])));
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
     };
 
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
-  }, [fields, isOpen, onClose]);
+  }, [fields, initialValues, isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -98,6 +104,7 @@ export default function FormModal({
                     placeholder={field.placeholder}
                     options={field.options ?? []}
                     required={field.required ?? true}
+                    aria-label={field.label}
                     onChange={(value) => setValues((current) => ({ ...current, [field.name]: value }))}
                   />
               ) : (
@@ -120,11 +127,18 @@ export default function FormModal({
           ))}
         </div>
 
+        {errorMessage && (
+          <p role="alert" className="mt-4 rounded-2xl bg-red-100 px-4 py-3 text-xs text-red-700">
+            {errorMessage}
+          </p>
+        )}
+
         <button
-          className="mt-6 flex h-11 w-full cursor-pointer items-center justify-between rounded-full bg-[#101827] pl-4 pr-1 text-xs text-white transition-transform hover:scale-[1.01]"
+          className="mt-6 flex h-11 w-full cursor-pointer items-center justify-between rounded-full bg-[#101827] pl-4 pr-1 text-xs text-white transition-transform hover:scale-[1.01] disabled:cursor-wait disabled:opacity-60"
           type="submit"
+          disabled={isSubmitting}
         >
-          <span className="flex-1 text-center">{submitLabel}</span>
+          <span className="flex-1 text-center">{isSubmitting ? "Guardando..." : submitLabel}</span>
           <span className="flex size-9 items-center justify-center rounded-full bg-[#f4f1f8] text-base text-[#101827]" aria-hidden="true">↗</span>
         </button>
       </form>

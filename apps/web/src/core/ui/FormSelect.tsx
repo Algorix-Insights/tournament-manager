@@ -12,6 +12,7 @@ interface FormSelectProps {
   placeholder: string;
   options: FormSelectOption[];
   required?: boolean;
+  'aria-label'?: string;
   onChange: (value: string) => void;
 }
 
@@ -21,6 +22,7 @@ export default function FormSelect({
   placeholder,
   options,
   required = true,
+  'aria-label': ariaLabel,
   onChange,
 }: FormSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -46,6 +48,7 @@ export default function FormSelect({
       <input type="hidden" name={name} value={value} required={required} />
       <button
         type="button"
+        aria-label={ariaLabel}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         onClick={() => setIsOpen((current) => !current)}

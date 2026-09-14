@@ -6,20 +6,66 @@ import SearchInput from "@/features/players/components/SearchInput";
 import GameTile from "@/features/games/components/GameTile";
 import RegisterGameModal, { type RegisterGameData } from "@/features/games/components/RegisterGameModal";
 import QueryStateView from "@/core/ui/QueryStateView";
-import { useGames } from "@/features/games/hooks/useGames";
-import { useState } from "react";
+import { getApiErrorMessage } from "@/features/games/api/games";
+import { useCreateGame, useDeleteGame, useGames, useUpdateGame } from "@/features/games/hooks/useGames";
+import { useGenres } from "@/features/games/hooks/useGenres";
+import type { Game } from "@/features/games/games.types";
+import { useCallback, useState } from "react";
 
 const GAME_CARD_COLORS = ["bg-[#F6EAF3]", "bg-[#E4DEF5]"];
 
 
 export default function GamesPage() {
   const [isRegisterGameOpen, setIsRegisterGameOpen] = useState(false);
-  const { data, error, isError, isFetching, isLoading, isStale, refetch } = useGames();
+  const [editingGame, setEditingGame] = useState<Game | null>(null);
+  const [search, setSearch] = useState("");
+  const [actionError, setActionError] = useState<string | null>(null);
+  const { data, error, isError, isFetching, isLoading, isStale, refetch } = useGames(search);
+  const genresQuery = useGenres();
+  const createGameMutation = useCreateGame();
+  const updateGameMutation = useUpdateGame();
+  const deleteGameMutation = useDeleteGame();
   const games = data?.data ?? [];
+  const isSubmitting = createGameMutation.isPending || updateGameMutation.isPending;
+
+  const closeGameModal = useCallback(() => {
+    setIsRegisterGameOpen(false);
+    setEditingGame(null);
+    setActionError(null);
+  }, []);
+
+  const openCreateGameModal = useCallback(() => {
+    setEditingGame(null);
+    setActionError(null);
+    setIsRegisterGameOpen(true);
+  }, []);
+
+  const openEditGameModal = useCallback((game: Game) => {
+    setEditingGame(game);
+    setActionError(null);
+    setIsRegisterGameOpen(true);
+  }, []);
 
   const handleRegisterGame = (data: RegisterGameData) => {
-    console.log("Register game payload", data);
-    setIsRegisterGameOpen(false);
+    setActionError(null);
+    const onSuccess = () => closeGameModal();
+    const onError = (error: unknown) => setActionError(getApiErrorMessage(error));
+
+    if (editingGame) {
+      updateGameMutation.mutate({ id: editingGame.id, data }, { onSuccess, onError });
+      return;
+    }
+
+    createGameMutation.mutate(data, { onSuccess, onError });
+  };
+
+  const handleDeleteGame = (game: Game) => {
+    if (!window.confirm(`¿Eliminar ${game.name}?`)) return;
+
+    setActionError(null);
+    deleteGameMutation.mutate(game.id, {
+      onError: (error) => setActionError(getApiErrorMessage(error)),
+    });
   };
 
   return (
@@ -52,11 +98,17 @@ export default function GamesPage() {
             textColor="text-white"
             image={floralGameIconController}
             imageClassName="absolute -right-10 top-1/2 h-80 w-80 -translate-y-1/2 object-contain sm:-right-8 sm:h-120 sm:w-120"
-            onClick={() => setIsRegisterGameOpen(true)}
+            onClick={openCreateGameModal}
           />
         </section>
 
-        <SearchInput placeholder="Buscar juego" />
+        <SearchInput placeholder="Buscar juego" value={search} onChange={setSearch} />
+
+        {actionError && !isRegisterGameOpen && (
+          <p role="alert" className="rounded-2xl bg-red-100 px-4 py-3 text-sm text-red-700">
+            {actionError}
+          </p>
+        )}
 
         <QueryStateView
           isLoading={isLoading}
@@ -77,12 +129,23 @@ export default function GamesPage() {
                 name={game.name}
                 genre={game.genre.name}
                 bgColor={GAME_CARD_COLORS[index % GAME_CARD_COLORS.length]}
+                onEdit={() => openEditGameModal(game)}
+                onDelete={() => handleDeleteGame(game)}
+                isDeleting={deleteGameMutation.isPending && deleteGameMutation.variables === game.id}
               />
             ))}
           </section>
         </QueryStateView>
       </div>
-      <RegisterGameModal isOpen={isRegisterGameOpen} onClose={() => setIsRegisterGameOpen(false)} onSubmit={handleRegisterGame} />
+      <RegisterGameModal
+        isOpen={isRegisterGameOpen}
+        onClose={closeGameModal}
+        onSubmit={handleRegisterGame}
+        genres={genresQuery.data?.data}
+        initialGame={editingGame}
+        errorMessage={actionError ?? (genresQuery.isError ? getApiErrorMessage(genresQuery.error) : null)}
+        isSubmitting={isSubmitting}
+      />
     </main>
   );
 }
