@@ -8,6 +8,7 @@ import PlayersTable from "@/features/players/components/PlayersTable";
 import RegisterPlayerModal, { type RegisterPlayerData } from "@/features/players/components/RegisterPlayerModal";
 import { useState } from "react";
 import RegisterPointsModal, { type RegisterPointsData } from "@/features/scores/components/RegisterPointsModal";
+import { useStats } from "@/features/dashboard/hooks/useStats";
 
 const players = [
   {
@@ -50,6 +51,7 @@ const players = [
 export default function PlayersPage() {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [isPointsModalOpen, setIsPointsModalOpen] = useState(false);
+  const { data: stats, isLoading: isStatsLoading } = useStats();
 
   const handleRegisterPlayer = (data: RegisterPlayerData) => {
     console.log("Register player payload", data);
@@ -72,13 +74,15 @@ export default function PlayersPage() {
           metrics={[
             {
               icon: <UsersRound className="size-5" />,
-              value: 128,
+              value: stats?.totalPlayers ?? "",
               label: "Jugadores Registrados",
+              isLoading: isStatsLoading,
             },
             {
               icon: <Gamepad2 className="size-5" />,
-              value: 36,
+              value: stats?.totalGames ?? "",
               label: "Videojuegos Registrados",
+              isLoading: isStatsLoading,
             },
           ]}
         />
