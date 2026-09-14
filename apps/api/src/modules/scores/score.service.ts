@@ -8,6 +8,16 @@ import { IScoreService, ScoreStats } from '@/modules/scores/interfaces/score.ser
 function buildScoreWhere(filters?: ScoreFilterDTO) {
   const where: any = {};
 
+  const search = filters?.search?.trim();
+  if (search) {
+    where.OR = [
+      { player: { name: { contains: search } } },
+      { player: { gamertag: { contains: search } } },
+      { game: { name: { contains: search } } },
+      { game: { genre: { name: { contains: search } } } },
+    ];
+  }
+
   const playerId = filters?.playerId;
   if (playerId !== undefined) {
     where.playerId = playerId;
